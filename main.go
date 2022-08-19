@@ -1,36 +1,36 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
+	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/go-microservice"
-	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/manga-reader/reader"
+	"github.com/unluckythoughts/manga-reader/reader/service"
+	"go.uber.org/zap"
 )
 
-func exampleMiddleware(r web.MiddlewareRequest) error {
-	r.GetContext().Logger().Info("test log from middleware")
-	_ = r.SetContextValue("example-key", "example-value")
-	return nil
-}
-
-func exampleHandler(r web.Request) (interface{}, error) {
-	val := r.GetContext().Value("example-key").(string)
-	r.GetContext().Logger().Infof("test log from handler with value: %s", val)
-	r.GetContext().Logger().Errorf("test log from handler with value: %s", val)
-
-	return "example-result", nil
+func proxyTransport(l *zap.Logger) http.RoundTripper {
+	return cloudflarebp.AddCloudFlareByPass(http.DefaultTransport)
 }
 
 func main() {
 	_ = os.Setenv("DB_FILE_PATH", "db.sqlite")
+	_ = os.Setenv("WEB_PORT", "5678")
+	_ = os.Setenv("WEB_CORS", "true")
+	_ = os.Setenv("WEB_PROXY", "true")
+	_ = os.Setenv("DB_DEBUG", "true")
 
 	opts := microservice.Options{
-		Name:     "example",
-		EnableDB: true,
-		DBType:   microservice.DBTypeSqlite,
+		Name:           "manga-reader",
+		EnableDB:       true,
+		DBType:         microservice.DBTypeSqlite,
+		ProxyTransport: proxyTransport,
 	}
 	s := microservice.New(opts)
 
-	s.HttpRouter().GET("/example", exampleMiddleware, exampleHandler)
+	readerService := service.New(s.GetDB())
+	reader.RegisterRoutes(s.HttpRouter(), readerService)
 	s.Start()
 }

@@ -1,28 +1,30 @@
 package scrapper
 
 import (
-	"errors"
+	"net/http"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/pkg/errors"
+	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func (s *Scrapper) populateMangas(resp *mangaListResponse) func(h *colly.HTMLElement) {
+func populateMangas(ctx web.Context, sels models.MangaListSelectors, resp *mangaListResponse) func(h *colly.HTMLElement) {
 	return func(h *colly.HTMLElement) {
 		var titles []string
-		titles, resp.Error = getTextListForSelector(h, s.src.MangaList.MangaTitleSelector)
+		titles, resp.Error = getTextListForSelector(h, sels.MangaTitleSelector)
 		if resp.Error != nil {
 			return
 		}
 
 		var urls []string
-		urls, resp.Error = getTextListForSelector(h, s.src.MangaList.MangaURLSelector)
+		urls, resp.Error = getTextListForSelector(h, sels.MangaURLSelector)
 		if resp.Error != nil {
 			return
 		}
 
 		var imageUrls []string
-		imageUrls, resp.Error = getTextListForSelector(h, s.src.MangaList.MangaImageURLSelector)
+		imageUrls, resp.Error = getTextListForSelector(h, sels.MangaImageURLSelector)
 		if resp.Error != nil {
 			return
 		}
@@ -50,7 +52,7 @@ func (s *Scrapper) populateMangas(resp *mangaListResponse) func(h *colly.HTMLEle
 		}
 
 		// checking if the next page exists
-		resp.NextPage, resp.Error = getText(h.DOM.Find(s.src.MangaList.NextPageSelector), s.src.MangaList.NextPageSelector)
+		resp.NextPage, resp.Error = getText(h.DOM.Find(sels.NextPageSelector), sels.NextPageSelector)
 	}
 }
 
@@ -60,17 +62,17 @@ type mangaListResponse struct {
 	Error    error
 }
 
-func (s *Scrapper) GetMangaList() ([]models.Manga, error) {
-	c := s.getColly()
-
+func ScrapeMangaList(ctx web.Context, sels models.MangaListSelectors, rt http.RoundTripper) ([]models.Manga, error) {
 	resp := mangaListResponse{
-		NextPage: s.src.MangaList.URL,
+		NextPage: sels.URL,
 	}
-	c.OnHTML("body", s.populateMangas(&resp))
+
+	c := getColly(ctx, rt)
+	c.OnHTML("body", populateMangas(ctx, sels, &resp))
 
 	for resp.NextPage != "" {
 		if isInternalLink(resp.NextPage) {
-			resp.NextPage = s.src.MangaList.URL + resp.NextPage
+			resp.NextPage = sels.URL + resp.NextPage
 		}
 
 		err := c.Visit(resp.NextPage)

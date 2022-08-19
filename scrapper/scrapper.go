@@ -1,9 +1,10 @@
 package scrapper
 
 import (
-	"fmt"
+	"net/http"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
@@ -11,27 +12,24 @@ type Scrapper struct {
 	src models.Source
 }
 
-func (s *Scrapper) getColly() *colly.Collector {
+func getColly(ctx web.Context, rt http.RoundTripper) *colly.Collector {
 	c := colly.NewCollector(
 		colly.AllowURLRevisit(),
 	)
-	c.WithTransport(s.src.RoundTripper)
+
+	if rt != nil {
+		c.WithTransport(rt)
+	}
 
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Printf("Visiting URL: %+v\n", r.URL.String())
+		ctx.Logger().Debugf("Visiting URL: %+v", r.URL.String())
 	})
 
 	c.OnError(func(r *colly.Response, err error) {
 		if err != nil {
-			fmt.Printf("error requesting page %s, error %+v\n", r.Request.URL.String(), err)
+			ctx.Logger().Debugf("error requesting page %s, error %+v", r.Request.URL.String(), err)
 		}
 	})
 
 	return c
-}
-
-func NewScrapper(src models.Source) *Scrapper {
-	return &Scrapper{
-		src: src,
-	}
 }

@@ -1,23 +1,23 @@
 package scrapper
 
 import (
+	"net/http"
+
 	"github.com/gocolly/colly/v2"
+	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func (s *Scrapper) GetChapterImageURLs(url string) ([]string, error) {
-	c := s.getColly()
-
-	if isInternalLink(url) {
-		url = s.src.MangaList.URL + url
-	}
+func ScrapeChapterPages(ctx web.Context, sels models.ChapterInfoSelectors, rt http.RoundTripper) ([]string, error) {
+	c := getColly(ctx, rt)
 
 	var imageURLs []string
 	var chapterError error
 	c.OnHTML("body", func(h *colly.HTMLElement) {
-		imageURLs, chapterError = getTextListForSelector(h, s.src.ChapterInfo.ImageURLsSelector)
+		imageURLs, chapterError = getTextListForSelector(h, sels.PageSelector)
 	})
 
-	err := c.Visit(url)
+	err := c.Visit(sels.URL)
 	if err != nil {
 		return imageURLs, err
 	}

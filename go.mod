@@ -6,7 +6,11 @@ require (
 	github.com/DaRealFreak/cloudflare-bp-go v1.0.4
 	github.com/PuerkitoBio/goquery v1.7.1
 	github.com/gocolly/colly/v2 v2.1.0
-	github.com/unluckythoughts/go-microservice v0.15.0
+	github.com/pkg/errors v0.9.1
+	github.com/thedevsaddam/gojsonq/v2 v2.5.2
+	github.com/unluckythoughts/go-microservice v0.30.0
+	go.uber.org/zap v1.22.0
+	gorm.io/gorm v1.23.8
 )
 
 require (
@@ -42,12 +46,10 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/mattn/go-sqlite3 v1.14.14 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	github.com/temoto/robotstxt v1.1.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	go.uber.org/zap v1.22.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced // indirect
 	golang.org/x/sys v0.0.0-20220808155132-1c4a2a72c664 // indirect
@@ -56,5 +58,4 @@ require (
 	google.golang.org/protobuf v1.24.0 // indirect
 	gorm.io/driver/postgres v1.3.8 // indirect
 	gorm.io/driver/sqlite v1.3.6 // indirect
-	gorm.io/gorm v1.23.8 // indirect
 )
