@@ -18,7 +18,7 @@ func RegisterRoutes(router web.Router, service *service.Service) {
 
 	router.GET("/library", h.GetFavoriteListHandler)
 	router.POST("/library", h.AddFavoriteHandler)
-	router.PUT("/library", h.UpdateAllFavoriteHandler)
+	router.PUT("/library/updates/all", h.UpdateAllFavoriteHandler)
 	router.GET("/library/:favoriteID/update", h.UpdateFavoriteHandler)
 	router.DELETE("/library/:favoriteID/remove", h.DelFavoriteHandler)
 	router.PUT("/library/:favoriteID/chapter/:chapterID/progress/:pageID", h.UpdateFavoriteProgressHandler)
