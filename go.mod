@@ -7,7 +7,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.7.1
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/pkg/errors v0.9.1
-	github.com/thedevsaddam/gojsonq/v2 v2.5.2
+	github.com/raff/godet v0.0.0-20210821044141-b21ce8c78e0d
 	github.com/unluckythoughts/go-microservice v0.30.0
 	go.uber.org/zap v1.22.0
 	gorm.io/gorm v1.23.8
@@ -21,10 +21,14 @@ require (
 	github.com/antchfx/xpath v1.1.8 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/aws/aws-sdk-go v1.44.72 // indirect
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/caarlos0/env v3.5.0+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
+	github.com/gobs/httpclient v0.0.0-20211109032512-d6e824f366f4 // indirect
+	github.com/gobs/pretty v0.0.0-20180724170744-09732c25a95b // indirect
+	github.com/gobs/simplejson v0.0.0-20181106204727-c70e6bd5e26b // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
@@ -32,6 +36,7 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.13.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
