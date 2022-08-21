@@ -49,6 +49,7 @@ func (h *Handlers) UpdateAllFavoriteHandler(r web.Request) (interface{}, error) 
 	err := h.s.UpdateAllFavorite(r.GetContext())
 	return nil, err
 }
+
 func (h *Handlers) UpdateFavoriteProgressHandler(r web.Request) (interface{}, error) {
 	strFavoriteID := r.GetRouteParam("favoriteID")
 	strChapterID := r.GetRouteParam("chapterID")

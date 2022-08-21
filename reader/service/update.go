@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
 )
@@ -18,6 +20,9 @@ func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.Favori
 
 	for i := range manga.Chapters {
 		manga.Chapters[i].MangaID = favorite.MangaID
+		if manga.Chapters[i].UploadDate == "" {
+			manga.Chapters[i].UploadDate = time.Now().Format("2006-01-02")
+		}
 	}
 
 	err = s.db.UpdateFavoriteChapters(ctx, manga.Chapters)
@@ -40,6 +45,7 @@ func (s *Service) UpdateAllFavorite(ctx web.Context) error {
 	}
 
 	for _, favorite := range favorites {
+		ctx.Logger().Debugf("Updating manga %s", favorite.Manga.Title)
 		manga, err := s.GetSourceManga(ctx, favorite.Manga.URL)
 		if err != nil {
 			ctx.Logger().
@@ -50,6 +56,9 @@ func (s *Service) UpdateAllFavorite(ctx web.Context) error {
 
 		for i := range manga.Chapters {
 			manga.Chapters[i].MangaID = favorite.MangaID
+			if manga.Chapters[i].UploadDate == "" {
+				manga.Chapters[i].UploadDate = time.Now().Format("2006-01-02")
+			}
 		}
 
 		err = s.db.UpdateFavoriteChapters(ctx, manga.Chapters)

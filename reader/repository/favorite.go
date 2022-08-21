@@ -75,7 +75,8 @@ func (r *Repository) UpdateFavoriteChapters(ctx context.Context, chapters []mode
 		WithContext(ctx).
 		Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "url"}},
-			UpdateAll: true,
+			UpdateAll: false,
+			DoNothing: true,
 		}).
 		Save(&chapters).
 		Error
