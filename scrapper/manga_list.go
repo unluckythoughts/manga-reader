@@ -1,31 +1,39 @@
 package scrapper
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
 	"github.com/pkg/errors"
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
+	"go.uber.org/zap"
+)
+
+const (
+	WHOLE_BODY_TAG             = "WHOLE_BODY_TAG"
+	HUMAN_READABLE_DATE_FORMAT = "HUMAN_READABLE_DATE_FORMAT"
 )
 
 func populateMangas(ctx web.Context, sels models.MangaListSelectors, resp *mangaListResponse) func(h *colly.HTMLElement) {
 	return func(h *colly.HTMLElement) {
 		var titles []string
-		titles, resp.Error = getTextListForSelector(h, sels.MangaTitleSelector)
+		titles, resp.Error = getTextListForSelector(h, sels.MangaTitleSelector, false)
 		if resp.Error != nil {
 			return
 		}
 
 		var urls []string
-		urls, resp.Error = getTextListForSelector(h, sels.MangaURLSelector)
+		urls, resp.Error = getTextListForSelector(h, sels.MangaURLSelector, false)
 		if resp.Error != nil {
 			return
 		}
 
 		var imageUrls []string
-		imageUrls, resp.Error = getTextListForSelector(h, sels.MangaImageURLSelector)
+		imageUrls, resp.Error = getTextListForSelector(h, sels.MangaImageURLSelector, false)
 		if resp.Error != nil {
 			return
 		}
@@ -81,6 +89,24 @@ func (opts *ScrapeOptions) SetDefaults() {
 	}
 }
 
+func setupPopulateMangas(ctx web.Context, f colly.HTMLCallback, resp *mangaListResponse) func(r *colly.Response) {
+	return func(r *colly.Response) {
+		dom, err := goquery.NewDocumentFromReader(bytes.NewReader(r.Body))
+		if err != nil {
+			ctx.Logger().With(zap.Error(err)).Debug("error reading response body")
+			resp.Error = err
+			return
+		}
+
+		i := 0
+		for _, n := range dom.Selection.Nodes {
+			el := colly.NewHTMLElementFromSelectionNode(r, dom.Selection, n, i)
+			i++
+			f(el)
+		}
+	}
+}
+
 func ScrapeMangaList(ctx web.Context, sels models.MangaListSelectors, opts *ScrapeOptions) ([]models.Manga, error) {
 	opts.SetDefaults()
 
@@ -89,7 +115,11 @@ func ScrapeMangaList(ctx web.Context, sels models.MangaListSelectors, opts *Scra
 	}
 
 	c := getColly(ctx, opts.RoundTripper)
-	c.OnHTML(opts.InitialHtmlTag, populateMangas(ctx, sels, &resp))
+	if opts.InitialHtmlTag == WHOLE_BODY_TAG {
+		c.OnResponse(setupPopulateMangas(ctx, populateMangas(ctx, sels, &resp), &resp))
+	} else {
+		c.OnHTML(opts.InitialHtmlTag, populateMangas(ctx, sels, &resp))
+	}
 
 	for resp.NextPage != "" {
 		if isInternalLink(resp.NextPage) {

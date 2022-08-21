@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
+	"go.uber.org/zap"
 )
 
 func populateManga(ctx web.Context, sels models.MangaInfoSelectors, resp *mangaInfoResponse) func(h *colly.HTMLElement) {
@@ -25,25 +26,25 @@ func populateManga(ctx web.Context, sels models.MangaInfoSelectors, resp *mangaI
 		}
 
 		var nums []string
-		nums, resp.Error = getTextListForSelector(h, sels.ChapterNumberSelector)
+		nums, resp.Error = getTextListForSelector(h, sels.ChapterNumberSelector, false)
 		if resp.Error != nil {
 			return
 		}
 
 		var urls []string
-		urls, resp.Error = getTextListForSelector(h, sels.ChapterURLSelector)
+		urls, resp.Error = getTextListForSelector(h, sels.ChapterURLSelector, false)
 		if resp.Error != nil {
 			return
 		}
 
 		var titles []string
-		titles, resp.Error = getTextListForSelector(h, sels.ChapterTitleSelector)
+		titles, resp.Error = getTextListForSelector(h, sels.ChapterTitleSelector, false)
 		if resp.Error != nil {
 			return
 		}
 
 		var dates []string
-		dates, resp.Error = getTextListForSelector(h, sels.ChapterUploadDateSelector)
+		dates, resp.Error = getTextListForSelector(h, sels.ChapterUploadDateSelector, false)
 		if resp.Error != nil {
 			return
 		}
@@ -67,7 +68,11 @@ func populateManga(ctx web.Context, sels models.MangaInfoSelectors, resp *mangaI
 				chapter.Number = GetChapterNumber(nums[i])
 			}
 			if len(dates) > 0 {
-				chapter.UploadDate = dates[i]
+				var err error
+				chapter.UploadDate, err = ParseDate(dates[i], sels.ChapterUploadDateFormat)
+				if err != nil {
+					ctx.Logger().With(zap.Error(err)).Debug("could not parse upload date %s", dates[i])
+				}
 			}
 
 			resp.Manga.Chapters = append(resp.Manga.Chapters, chapter)

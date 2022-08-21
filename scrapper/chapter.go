@@ -13,7 +13,7 @@ func ScrapeChapterPages(ctx web.Context, sels models.ChapterInfoSelectors, opts 
 	var imageURLs []string
 	var chapterError error
 	c.OnHTML(opts.InitialHtmlTag, func(h *colly.HTMLElement) {
-		imageURLs, chapterError = getTextListForSelector(h, sels.PageSelector)
+		imageURLs, chapterError = getTextListForSelector(h, sels.PageSelector, true)
 	})
 
 	err := c.Request(opts.RequestMethod, sels.URL, opts.Body, nil, opts.Headers)

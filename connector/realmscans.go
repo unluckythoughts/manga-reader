@@ -31,7 +31,7 @@ func (r *realm) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	sels := models.MangaListSelectors{
 		URL:                   "https://realmscans.com/series",
 		MangaTitleSelector:    "div.listupd > div.bs div.tt",
-		MangaImageURLSelector: "div.listupd > div.bs img[src]",
+		MangaImageURLSelector: "div.listupd > div.bs img[data-src,src]",
 		MangaURLSelector:      "div.listupd > div.bs a[href]",
 		NextPageSelector:      "div.hpage a.r[href]",
 	}
@@ -49,6 +49,7 @@ func (r *realm) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 		ChapterTitleSelector:      "div#chapterlist ul li a span.chapternum",
 		ChapterURLSelector:        "div#chapterlist ul li a[href]",
 		ChapterUploadDateSelector: "div#chapterlist ul li a span.chapterdate",
+		ChapterUploadDateFormat:   "January 2, 2006",
 	}
 
 	return scrapper.ScrapeMangaInfo(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: r.Transport})

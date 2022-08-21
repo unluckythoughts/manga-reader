@@ -49,6 +49,7 @@ func (a *asura) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 		ChapterTitleSelector:      "ul.clstyle li a span.chapternum",
 		ChapterURLSelector:        "ul.clstyle li a[href]",
 		ChapterUploadDateSelector: "ul.clstyle li a span.chapterdate",
+		ChapterUploadDateFormat:   "January 2, 2006",
 	}
 
 	return scrapper.ScrapeMangaInfo(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: a.Transport})

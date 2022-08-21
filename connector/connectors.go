@@ -16,6 +16,7 @@ func GetAllConnectors() []models.IConnector {
 		getLeviatanScansConnector(),
 		getZeroScansConnector(),
 		getrealmScansConnector(),
+		getreaperScansConnector(),
 	)
 }
 

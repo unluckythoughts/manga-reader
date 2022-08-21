@@ -6,6 +6,7 @@ import (
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
 	"github.com/unluckythoughts/manga-reader/scrapper"
+	"go.uber.org/zap"
 )
 
 type zero models.Source
@@ -156,11 +157,17 @@ func (z *zero) getChapters(ctx web.Context, chapterListURL, slug string) ([]mode
 		}
 
 		for _, item := range resp.Data.Data {
+			uploadDate, err := scrapper.ParseDate(item.CreatedAt, scrapper.HUMAN_READABLE_DATE_FORMAT)
+			if err != nil {
+				ctx.Logger().With(zap.Error(err)).Debugf("could not parse date %s", item.CreatedAt)
+				uploadDate = item.CreatedAt
+			}
+
 			chapters = append(chapters, models.Chapter{
 				URL:        "https://zeroscans.com/swordflake/comic/" + slug + "/chapters/" + string(item.ID),
 				Number:     string(item.Name),
 				Title:      "Chapter " + string(item.Name),
-				UploadDate: item.CreatedAt,
+				UploadDate: uploadDate,
 			})
 		}
 

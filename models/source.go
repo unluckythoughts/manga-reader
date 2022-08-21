@@ -33,6 +33,7 @@ type MangaInfoSelectors struct {
 	ChapterTitleSelector      string
 	ChapterURLSelector        string
 	ChapterUploadDateSelector string
+	ChapterUploadDateFormat   string
 }
 
 type ChapterInfoSelectors struct {

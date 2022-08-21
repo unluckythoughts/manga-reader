@@ -2,12 +2,15 @@ package scrapper
 
 import (
 	"fmt"
+	"html"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
+	"github.com/pkg/errors"
 )
 
 func strAdd(a string, b int) string {
@@ -36,16 +39,85 @@ func getText(s *goquery.Selection, selector string) (string, error) {
 		}
 	}
 
+	text = html.UnescapeString(text)
 	text = strings.ReplaceAll(strings.TrimSpace(text), "</br>", "\n")
 
 	return text, nil
 }
 
+func parseHumanReadableFormat(date string) (string, error) {
+	t := strings.Split(strings.TrimSpace(date), " ")
+
+	if len(t) < 3 {
+		t = append([]string{"1"}, t...)
+	}
+
+	if t[2] != "ago" {
+		return date, errors.New("human readable date does not end with 'ago'")
+	}
+
+	var err error
+	var num int64
+	var timeSpan int64
+
+	if t[0] == "a" || t[0] == "an" || t[0] == "1" || t[0] == "few" {
+		num = -1
+	} else {
+		num, err = strconv.ParseInt(t[0], 10, 64)
+		if err != nil {
+			return date, errors.Wrapf(err, "human readable date could not parse num of quantity %s", t[0])
+		}
+
+		num = -1 * num
+	}
+
+	switch {
+	case strings.HasPrefix(t[1], "second"):
+		timeSpan = int64(time.Second)
+	case strings.HasPrefix(t[1], "minute"):
+		timeSpan = int64(time.Minute)
+	case strings.HasPrefix(t[1], "hour"):
+		timeSpan = int64(time.Hour)
+	case strings.HasPrefix(t[1], "day"):
+		timeSpan = int64(24 * time.Hour)
+	case strings.HasPrefix(t[1], "week"):
+		timeSpan = int64(7 * 24 * time.Hour)
+	case strings.HasPrefix(t[1], "month"):
+		timeSpan = int64(30 * 24 * time.Hour)
+	case strings.HasPrefix(t[1], "year"):
+		timeSpan = int64(365 * 24 * time.Hour)
+	default:
+		return date, errors.Errorf("human readable date could not parse time span %s", t[1])
+	}
+
+	newDate := time.Now().Add(time.Duration(num * timeSpan)).Format("2006-01-02")
+
+	return newDate, nil
+}
+
+func ParseDate(date string, format string) (string, error) {
+	if strings.HasSuffix(date, "ago") || format == HUMAN_READABLE_DATE_FORMAT {
+		return parseHumanReadableFormat(date)
+	}
+
+	if format == "" {
+		return date, nil
+	}
+
+	t, err := time.Parse(format, date)
+	if err != nil {
+		return date, err
+	}
+
+	return t.Format("2006-01-02"), nil
+}
+
 func getTextForSelector(h *colly.HTMLElement, sel string) (string, error) {
-	sels := strings.Split(sel, ",")
+	sels := getSelectors(sel)
 	var selectorErr error
 	for _, s := range sels {
-		val, err := getText(h.DOM.Find(s), s)
+		// fmt.Println(h.DOM.Html())
+		val, err := getText(h.DOM.Find(getSelector(s)), s)
 		if val != "" {
 			return val, err
 		}
@@ -58,14 +130,16 @@ func getTextForSelector(h *colly.HTMLElement, sel string) (string, error) {
 	return "", selectorErr
 }
 
-func getTextListForSelector(h *colly.HTMLElement, selector string) (texts []string, err error) {
+func getTextListForSelector(h *colly.HTMLElement, selector string, includeNoScript bool) (texts []string, err error) {
 	// fix for <noscript> tags
-	h.DOM.Find("noscript").Parent().SetHtml(h.DOM.Find("noscript").Text())
+	if includeNoScript {
+		h.DOM.Find("noscript").Parent().SetHtml(h.DOM.Find("noscript").Text())
+	}
 
-	selectors := strings.Split(selector, ",")
+	selectors := getSelectors(selector)
 	var selectorErr error
 	for _, s := range selectors {
-		h.DOM.Find(s).Each(func(i int, sel *goquery.Selection) {
+		h.DOM.Find(getSelector(s)).Each(func(i int, sel *goquery.Selection) {
 			var text string
 			text, err = getText(sel, s)
 			texts = append(texts, text)
@@ -81,6 +155,30 @@ func getTextListForSelector(h *colly.HTMLElement, selector string) (texts []stri
 	}
 
 	return texts, selectorErr
+}
+
+func getSelectors(selector string) []string {
+	pattern, err := regexp.Compile("[^[,]+(\\[[^]]+\\])?")
+	if err != nil {
+		return []string{selector}
+	}
+
+	selector = strings.TrimSpace(selector)
+	selectors := []string{}
+	for _, m := range pattern.FindAllStringSubmatch(selector, -1) {
+		selectors = append(selectors, m[0])
+	}
+
+	return selectors
+}
+
+func getSelector(selector string) string {
+	pattern, err := regexp.Compile("\\[[^]]+\\]")
+	if err != nil {
+		return selector
+	}
+
+	return pattern.ReplaceAllString(selector, "")
 }
 
 func hasDataInAttr(selector string) (string, []string, bool) {
