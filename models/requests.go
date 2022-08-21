@@ -5,3 +5,7 @@ type SourceMangaRequest struct {
 	MangaURL     string `json:"mangaUrl"`
 	ChapterURL   string `json:"chapterUrl"`
 }
+
+type SourceManagaListRequest struct {
+	Domain string `json:"domain"`
+}
