@@ -36,7 +36,7 @@ func (r *realm) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 		NextPageSelector:      "div.hpage a.r[href]",
 	}
 
-	return scrapper.ScrapeMangaList(ctx, sels, r.Transport)
+	return scrapper.ScrapeMangaList(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: r.Transport})
 }
 
 func (r *realm) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
@@ -51,16 +51,22 @@ func (r *realm) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 		ChapterUploadDateSelector: "div#chapterlist ul li a span.chapterdate",
 	}
 
-	return scrapper.ScrapeMangaInfo(ctx, sels, r.Transport)
+	return scrapper.ScrapeMangaInfo(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: r.Transport})
 }
 
 func (r *realm) GetChapterPages(ctx web.Context, chapterInfoUrl string) ([]string, error) {
 	sels := models.ChapterInfoSelectors{
 		URL:          chapterInfoUrl,
-		PageSelector: "#readerarea img[src]",
+		PageSelector: "#readerarea img[data-src,src]",
 	}
 
-	return scrapper.ScrapeChapterPages(ctx, sels, r.Transport)
+	data, err := scrapper.ScrapeChapterPages(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: r.Transport})
+	if err != nil || len(data) == 0 {
+		injScript := scrapper.GetInjectionScript(sels.PageSelector)
+		return scrapper.SimulateBrowser(ctx, chapterInfoUrl, injScript)
+	}
+
+	return data, err
 }
 
 func getrealmScansConnector() models.IConnector {

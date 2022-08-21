@@ -109,7 +109,7 @@ func (l *leviatan) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga,
 		for _, item := range resp.Data.Chapters {
 			manga.Chapters = append(manga.Chapters, models.Chapter{
 				URL:    "https://en.leviatanscans.com/api/chapters-title/" + item.Title,
-				Number: string(item.Number),
+				Number: scrapper.GetChapterNumber(string(item.Number)),
 				Title:  item.Title,
 			})
 		}

@@ -1,6 +1,7 @@
 package scrapper
 
 import (
+	"io"
 	"net/http"
 
 	"github.com/gocolly/colly/v2"
@@ -62,20 +63,40 @@ type mangaListResponse struct {
 	Error    error
 }
 
-func ScrapeMangaList(ctx web.Context, sels models.MangaListSelectors, rt http.RoundTripper) ([]models.Manga, error) {
+type ScrapeOptions struct {
+	RoundTripper   http.RoundTripper
+	Headers        http.Header
+	InitialHtmlTag string
+	RequestMethod  string
+	Body           io.Reader
+}
+
+func (opts *ScrapeOptions) SetDefaults() {
+	if opts.InitialHtmlTag == "" {
+		opts.InitialHtmlTag = "body"
+	}
+
+	if opts.RequestMethod == "" {
+		opts.RequestMethod = http.MethodGet
+	}
+}
+
+func ScrapeMangaList(ctx web.Context, sels models.MangaListSelectors, opts *ScrapeOptions) ([]models.Manga, error) {
+	opts.SetDefaults()
+
 	resp := mangaListResponse{
 		NextPage: sels.URL,
 	}
 
-	c := getColly(ctx, rt)
-	c.OnHTML("body", populateMangas(ctx, sels, &resp))
+	c := getColly(ctx, opts.RoundTripper)
+	c.OnHTML(opts.InitialHtmlTag, populateMangas(ctx, sels, &resp))
 
 	for resp.NextPage != "" {
 		if isInternalLink(resp.NextPage) {
 			resp.NextPage = sels.URL + resp.NextPage
 		}
 
-		err := c.Visit(resp.NextPage)
+		err := c.Request(opts.RequestMethod, resp.NextPage, opts.Body, nil, opts.Headers)
 		if err != nil {
 			return resp.Mangas, err
 		}

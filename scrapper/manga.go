@@ -1,8 +1,6 @@
 package scrapper
 
 import (
-	"net/http"
-
 	"github.com/gocolly/colly/v2"
 	"github.com/pkg/errors"
 	"github.com/unluckythoughts/go-microservice/tools/web"
@@ -77,40 +75,23 @@ func populateManga(ctx web.Context, sels models.MangaInfoSelectors, resp *mangaI
 	}
 }
 
-// func (s *Scrapper) populateMangaFromAPI(resp *mangaInfoResponse) {
-// 	c := web.NewClient(resp.Manga.URL)
-
-// 	apiResp := s.src.APIData.MangaData.APIQueryData.Response
-// 	status, err := c.GetResponse("/", apiResp)
-// 	if err != nil {
-// 		resp.Error = errors.Wrapf(err, "error while get data from %s", resp.Manga.URL)
-// 		return
-// 	}
-
-// 	if status != 200 {
-// 		resp.Error = errors.Errorf("unexpected status %d when get data from %s", status, resp.Manga.URL)
-// 		return
-// 	}
-
-// 	resp.Manga = s.src.APIData.MangaData.GetManga(apiResp)
-// }
-
 type mangaInfoResponse struct {
 	Manga models.Manga
 	Error error
 }
 
-func ScrapeMangaInfo(ctx web.Context, sels models.MangaInfoSelectors, rt http.RoundTripper) (models.Manga, error) {
+func ScrapeMangaInfo(ctx web.Context, sels models.MangaInfoSelectors, opts *ScrapeOptions) (models.Manga, error) {
+	opts.SetDefaults()
 	resp := mangaInfoResponse{
 		Manga: models.Manga{
 			URL: sels.URL,
 		},
 	}
-	c := getColly(ctx, rt)
+	c := getColly(ctx, opts.RoundTripper)
 
-	c.OnHTML("body", populateManga(ctx, sels, &resp))
+	c.OnHTML(opts.InitialHtmlTag, populateManga(ctx, sels, &resp))
 
-	err := c.Visit(sels.URL)
+	err := c.Request(opts.RequestMethod, sels.URL, opts.Body, nil, opts.Headers)
 	if err != nil {
 		return resp.Manga, err
 	}

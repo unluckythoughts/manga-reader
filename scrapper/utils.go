@@ -20,11 +20,13 @@ func strAdd(a string, b int) string {
 
 func getText(s *goquery.Selection, selector string) (string, error) {
 	var text string
-	if attr, inAttr := hasDataInAttr(selector); inAttr {
+	if _, attrs, inAttr := hasDataInAttr(selector); inAttr {
 		var ok bool
-		text, ok = s.Attr(attr)
-		if !ok {
-			return "", nil
+		for _, attr := range attrs {
+			text, ok = s.Attr(attr)
+			if ok || text != "" {
+				break
+			}
 		}
 	} else {
 		var err error
@@ -40,36 +42,62 @@ func getText(s *goquery.Selection, selector string) (string, error) {
 }
 
 func getTextForSelector(h *colly.HTMLElement, sel string) (string, error) {
-	return getText(h.DOM.Find(sel), sel)
+	sels := strings.Split(sel, ",")
+	var selectorErr error
+	for _, s := range sels {
+		val, err := getText(h.DOM.Find(s), s)
+		if val != "" {
+			return val, err
+		}
+
+		if err != nil {
+			selectorErr = err
+		}
+	}
+
+	return "", selectorErr
 }
 
-func getTextListForSelector(h *colly.HTMLElement, s string) (texts []string, err error) {
+func getTextListForSelector(h *colly.HTMLElement, selector string) (texts []string, err error) {
 	// fix for <noscript> tags
 	h.DOM.Find("noscript").Parent().SetHtml(h.DOM.Find("noscript").Text())
 
-	h.DOM.Find(s).Each(func(i int, sel *goquery.Selection) {
-		var text string
-		text, err = getText(sel, s)
-		texts = append(texts, text)
-	})
+	selectors := strings.Split(selector, ",")
+	var selectorErr error
+	for _, s := range selectors {
+		h.DOM.Find(s).Each(func(i int, sel *goquery.Selection) {
+			var text string
+			text, err = getText(sel, s)
+			texts = append(texts, text)
+		})
 
-	return texts, err
+		if len(texts) > 0 {
+			return texts, nil
+		}
+
+		if err != nil {
+			selectorErr = err
+		}
+	}
+
+	return texts, selectorErr
 }
 
-func hasDataInAttr(selector string) (string, bool) {
+func hasDataInAttr(selector string) (string, []string, bool) {
 	pattern, err := regexp.Compile("\\[[^]]+\\]")
 	if err != nil {
-		return "", false
+		return selector, []string{}, false
 	}
 
 	matches := pattern.FindAllString(selector, -1)
 	if len(matches) < 1 {
-		return "", false
+		return selector, []string{}, false
 	}
 
 	attr := strings.Trim(matches[len(matches)-1], "[]")
+	selector = pattern.ReplaceAllString(selector, "")
 
-	return attr, true
+	return selector, strings.Split(attr, ","), true
 }
 
 func isInternalLink(s string) bool {

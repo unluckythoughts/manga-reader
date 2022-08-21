@@ -36,7 +36,7 @@ func (a *asura) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 		NextPageSelector:      "div.hpage a.r[href]",
 	}
 
-	return scrapper.ScrapeMangaList(ctx, sels, a.Transport)
+	return scrapper.ScrapeMangaList(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: a.Transport})
 }
 
 func (a *asura) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
@@ -51,7 +51,7 @@ func (a *asura) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 		ChapterUploadDateSelector: "ul.clstyle li a span.chapterdate",
 	}
 
-	return scrapper.ScrapeMangaInfo(ctx, sels, a.Transport)
+	return scrapper.ScrapeMangaInfo(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: a.Transport})
 }
 
 func (a *asura) GetChapterPages(ctx web.Context, chapterInfoUrl string) ([]string, error) {
@@ -60,7 +60,7 @@ func (a *asura) GetChapterPages(ctx web.Context, chapterInfoUrl string) ([]strin
 		PageSelector: "div#readerarea p img[src]",
 	}
 
-	return scrapper.ScrapeChapterPages(ctx, sels, a.Transport)
+	return scrapper.ScrapeChapterPages(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: a.Transport})
 }
 
 func getAsuraScansConnector() models.IConnector {
