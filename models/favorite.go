@@ -2,8 +2,6 @@ package models
 
 import (
 	"database/sql/driver"
-	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -11,12 +9,12 @@ import (
 type StrIntList [2]int
 
 func (sil *StrIntList) Scan(value interface{}) error {
+	l := StrIntList{0, 0}
 	data, ok := value.(string)
-	if !ok {
-		return errors.New(fmt.Sprint("Failed to unmarshal stringList value:", value))
+	if !ok || data == "" {
+		return nil
 	}
 
-	l := StrIntList{0, 0}
 	sl := strings.Split(data, ",")
 	for i, s := range sl {
 		v, err := strconv.Atoi(s)
