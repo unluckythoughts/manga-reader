@@ -23,7 +23,9 @@ func (r *Repository) GetFavorites(ctx context.Context) ([]models.Favorite, error
 
 func (r *Repository) FindFavorite(ctx context.Context, id int) (models.Favorite, error) {
 	var favorite models.Favorite
-	err := r.db.WithContext(ctx).First(&favorite, id).Error
+	err := r.db.WithContext(ctx).
+		Preload("Manga.Chapters").
+		First(&favorite, id).Error
 	return favorite, err
 }
 
@@ -71,7 +73,10 @@ func (r *Repository) DelFavorite(ctx context.Context, favorite models.Favorite) 
 func (r *Repository) UpdateFavoriteChapters(ctx context.Context, chapters []models.Chapter) error {
 	return r.db.
 		WithContext(ctx).
-		Clauses(clause.OnConflict{UpdateAll: true}).
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "url"}},
+			UpdateAll: true,
+		}).
 		Save(&chapters).
 		Error
 }
