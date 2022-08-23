@@ -6,22 +6,22 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func (s *Service) AddFavorite(ctx web.Context, link string) error {
+func (s *Service) AddFavorite(ctx web.Context, link string) (models.Favorite, error) {
 	conn, err := connector.New(ctx, link)
 	if err != nil {
-		return err
+		return models.Favorite{}, err
 	}
 
 	manga, err := conn.GetMangaInfo(ctx, link)
 	if err != nil {
-		return err
+		return models.Favorite{}, err
 	}
 
 	favorite := models.Favorite{
 		Manga: manga,
 	}
 
-	return s.db.CreateFavorite(ctx, &favorite)
+	return favorite, s.db.CreateFavorite(ctx, &favorite)
 }
 
 func (s *Service) DelFavorite(ctx web.Context, id int) error {

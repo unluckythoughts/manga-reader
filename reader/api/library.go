@@ -15,8 +15,7 @@ func (h *Handlers) AddFavoriteHandler(r web.Request) (interface{}, error) {
 		return nil, err
 	}
 
-	err = h.s.AddFavorite(r.GetContext(), body.MangaURL)
-	return nil, err
+	return h.s.AddFavorite(r.GetContext(), body.MangaURL)
 }
 
 func (h *Handlers) GetFavoriteListHandler(r web.Request) (interface{}, error) {

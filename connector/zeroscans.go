@@ -189,7 +189,9 @@ func (z *zero) getChapters(ctx web.Context, chapterListURL, slug string) ([]mode
 		HasNextPage: hasNextPage,
 	}
 
-	return scrapper.GetChapterListAPI(ctx, q, transform)
+	chapters, err := scrapper.GetChapterListAPI(ctx, q, transform)
+
+	return uniqChapters(chapters), err
 }
 
 func (z *zero) GetChapterPages(ctx web.Context, pageListURL string) ([]string, error) {

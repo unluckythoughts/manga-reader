@@ -97,9 +97,9 @@ func (r *reaper) GetChapterPages(ctx web.Context, chapterInfoUrl string) ([]stri
 
 func getreaperScansConnector() models.IConnector {
 	return &reaper{
-		Name:      "reaper Scans",
+		Name:      "Reaper Scans",
 		Domain:    "reaperscans.com",
-		IconURL:   "https://reaperscans.com/wp-content/uploads/2021/07/logo-reaper-2.png",
+		IconURL:   "https://styles.redditmedia.com/t5_4zgiee/styles/communityIcon_gxpzm2tt41l71.png",
 		Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
 	}
 }

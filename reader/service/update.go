@@ -25,12 +25,16 @@ func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.Favori
 		}
 	}
 
-	err = s.db.UpdateFavoriteChapters(ctx, manga.Chapters)
+	// will return updated chapters
+	err = s.db.UpdateFavoriteChapters(ctx, &manga.Chapters)
 	if err != nil {
 		return models.Favorite{}, err
 	}
 
+	chapters := append(favorite.Manga.Chapters, manga.Chapters...)
 	favorite.Manga = manga
+	favorite.Manga.Chapters = chapters
+
 	return favorite, nil
 }
 
@@ -61,7 +65,7 @@ func (s *Service) UpdateAllFavorite(ctx web.Context) error {
 			}
 		}
 
-		err = s.db.UpdateFavoriteChapters(ctx, manga.Chapters)
+		err = s.db.UpdateFavoriteChapters(ctx, &manga.Chapters)
 		if err != nil {
 			ctx.Logger().
 				With("error", err).

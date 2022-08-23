@@ -218,8 +218,8 @@ github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PK
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/temoto/robotstxt v1.1.1 h1:Gh8RCs8ouX3hRSxxK7B1mO5RFByQ4CmJZDwgom++JaA=
 github.com/temoto/robotstxt v1.1.1/go.mod h1:+1AmkuG3IYkh1kv0d2qEB9Le88ehNO0zwOr3ujewlOo=
-github.com/unluckythoughts/go-microservice v0.30.0 h1:jJlFNzdneOe3OPJa5DqQBnyCbBdltjldb5/HEbMRvUI=
-github.com/unluckythoughts/go-microservice v0.30.0/go.mod h1:8/YffM7thV21jDfow++tmwXgRauq9TSLPSf2DsVvATQ=
+github.com/unluckythoughts/go-microservice v0.31.0 h1:FO6PeHvO795hJc7OAjM0iqi/ZfOZH0JuqZMhOe2bOTo=
+github.com/unluckythoughts/go-microservice v0.31.0/go.mod h1:8/YffM7thV21jDfow++tmwXgRauq9TSLPSf2DsVvATQ=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 go.uber.org/atomic v1.3.2/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
 go.uber.org/atomic v1.4.0/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=

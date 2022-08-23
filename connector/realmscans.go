@@ -72,7 +72,7 @@ func (r *realm) GetChapterPages(ctx web.Context, chapterInfoUrl string) ([]strin
 
 func getrealmScansConnector() models.IConnector {
 	return &realm{
-		Name:      "realm Scans",
+		Name:      "Realm Scans",
 		Domain:    "realmscans.com",
 		IconURL:   "https://cdn.realmscans.com/2021/09/logo-realm-scans-2.webp",
 		Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),

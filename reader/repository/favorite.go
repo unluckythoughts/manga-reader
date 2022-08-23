@@ -11,6 +11,7 @@ func (r *Repository) CreateFavorite(ctx context.Context, f *models.Favorite) err
 	return r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{DoNothing: true, UpdateAll: false}).
+		Clauses(clause.Returning{}).
 		Create(f).
 		Error
 }
@@ -70,14 +71,16 @@ func (r *Repository) DelFavorite(ctx context.Context, favorite models.Favorite) 
 	return tx.Commit().Error
 }
 
-func (r *Repository) UpdateFavoriteChapters(ctx context.Context, chapters []models.Chapter) error {
-	return r.db.
+func (r *Repository) UpdateFavoriteChapters(ctx context.Context, chapters *[]models.Chapter) error {
+	err := r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "url"}},
 			UpdateAll: false,
 			DoNothing: true,
-		}).
-		Save(&chapters).
+		}, clause.Returning{}).
+		Save(chapters).
 		Error
+
+	return err
 }

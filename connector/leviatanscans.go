@@ -157,6 +157,6 @@ func getLeviatanScansConnector() models.IConnector {
 	return &leviatan{
 		Name:    "Leviatan Scans",
 		Domain:  "leviatanscans.com",
-		IconURL: "https://en.leviatanscans.com/assets/logo-web.png",
+		IconURL: "https://styles.redditmedia.com/t5_2hfywp/styles/communityIcon_qdo3swk6vzl41.png",
 	}
 }
