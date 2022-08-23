@@ -21,10 +21,28 @@ func (w *Worker) UpdateSourceMangas(ctx web.Context, domain string, mangas []mod
 			mangas[i].SourceID = source.ID
 		}
 
-		err = w.db.UpdateMangas(ctx, &mangas)
-		if err != nil {
-			ctx.Logger().With(zap.Error(err)).Errorf("could not update manga for %+s", domain)
-			return
+		if len(mangas) > 1000 {
+			batch := 500
+			for i := 0; i < len(mangas); i = i + batch {
+				batchMangas := []models.Manga{}
+				if i+batch > len(mangas) {
+					batchMangas = mangas[i:]
+				} else {
+					batchMangas = mangas[i : i+batch]
+				}
+
+				err = w.db.UpdateMangas(ctx, &batchMangas)
+				if err != nil {
+					ctx.Logger().With(zap.Error(err)).Errorf("could not update manga for %+s", domain)
+					return
+				}
+			}
+		} else {
+			err = w.db.UpdateMangas(ctx, &mangas)
+			if err != nil {
+				ctx.Logger().With(zap.Error(err)).Errorf("could not update manga for %+s", domain)
+				return
+			}
 		}
 
 		source.UpdatedAt = time.Now().Format("2006-01-02")

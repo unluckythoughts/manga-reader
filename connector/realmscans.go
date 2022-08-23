@@ -58,7 +58,7 @@ func (r *realm) GetChapterPages(ctx web.Context, chapterInfoUrl string) ([]strin
 	return data, err
 }
 
-func getrealmScansConnector() models.IConnector {
+func getRealmScansConnector() models.IConnector {
 	return &realm{
 		Name:      "Realm Scans",
 		Domain:    "realmscans.com",

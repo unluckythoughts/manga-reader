@@ -83,7 +83,7 @@ func (r *reaper) GetChapterPages(ctx web.Context, chapterInfoUrl string) ([]stri
 	return scrapper.ScrapeChapterPages(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: r.Transport})
 }
 
-func getreaperScansConnector() models.IConnector {
+func getReaperScansConnector() models.IConnector {
 	return &reaper{
 		Name:      "Reaper Scans",
 		Domain:    "reaperscans.com",

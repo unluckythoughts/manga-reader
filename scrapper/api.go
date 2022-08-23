@@ -1,6 +1,7 @@
 package scrapper
 
 import (
+	"net/http"
 	"net/url"
 
 	"github.com/pkg/errors"
@@ -9,7 +10,7 @@ import (
 )
 
 func getData(ctx web.Context, q models.APIQueryData, cb func(interface{})) error {
-	c := web.NewClient(q.URL)
+	c := web.NewClientWithTransport(q.URL, q.Transport, q.Headers)
 	params := url.Values{}
 	for k, v := range q.QueryParams {
 		params.Add(k, v)
@@ -21,7 +22,11 @@ func getData(ctx web.Context, q models.APIQueryData, cb func(interface{})) error
 		if len(params) > 0 {
 			path = "?" + params.Encode()
 		}
-		status, err := c.GetResponse(path, apiResp)
+		if q.Method == "" {
+			q.Method = http.MethodGet
+		}
+
+		status, err := c.Send(q.Method, path, q.Body, apiResp)
 		if err != nil {
 			return errors.Wrapf(err, "error while get data from %s", q.URL+path)
 		}

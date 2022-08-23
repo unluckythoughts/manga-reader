@@ -8,7 +8,7 @@ require (
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/raff/godet v0.0.0-20210821044141-b21ce8c78e0d
-	github.com/unluckythoughts/go-microservice v0.31.0
+	github.com/unluckythoughts/go-microservice v0.32.0
 	go.uber.org/zap v1.22.0
 	gorm.io/gorm v1.23.8
 )

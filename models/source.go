@@ -40,10 +40,14 @@ type ChapterInfoSelectors struct {
 
 type APIQueryData struct {
 	URL         string
+	Method      string
+	Body        []byte
+	Headers     http.Header
 	PageParam   string
 	QueryParams map[string]string
 	Response    interface{}
 	HasNextPage HasNextPage
+	Transport   http.RoundTripper
 }
 
 type HasNextPage func(resp interface{}) bool
