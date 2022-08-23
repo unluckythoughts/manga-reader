@@ -36,7 +36,7 @@ func findConnector(domain string) (models.IConnector, bool) {
 	domain = getDomain(domain)
 	conns := GetAllConnectors()
 	for i := 0; i < len(conns); i++ {
-		if strings.Contains(domain, conns[i].GetDomain()) {
+		if strings.Contains(domain, conns[i].GetSource().Domain) {
 			return conns[i], true
 		}
 	}

@@ -10,20 +10,8 @@ import (
 
 type leviatan models.Source
 
-func (l *leviatan) Get() models.Source {
+func (l *leviatan) GetSource() models.Source {
 	return models.Source(*l)
-}
-
-func (l *leviatan) GetDomain() string {
-	return l.Domain
-}
-
-func (l *leviatan) GetName() string {
-	return l.Name
-}
-
-func (l *leviatan) GetIconURL() string {
-	return l.IconURL
 }
 
 func (l *leviatan) GetMangaList(ctx web.Context) ([]models.Manga, error) {

@@ -51,7 +51,7 @@ type Favorite struct {
 	Categories StrList    `json:"categories" gorm:"column:categories"`
 }
 
-func (f3556622c9ac203f7800dd88f8efe81126b1bbf8 *Favorite) TableName() string {
+func (f Favorite) TableName() string {
 	return "favorite"
 }
 
@@ -60,7 +60,7 @@ type Category struct {
 	Name string `json:"name" gorm:"column:name"`
 }
 
-func (c *Category) TableName() string {
+func (c Category) TableName() string {
 	return "category"
 }
 
@@ -69,6 +69,6 @@ type User struct {
 	Name string `json:"name" gorm:"column:name"`
 }
 
-func (u *User) TableName() string {
+func (u User) TableName() string {
 	return "user"
 }

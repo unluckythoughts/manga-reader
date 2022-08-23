@@ -11,20 +11,8 @@ import (
 
 type realm models.Source
 
-func (r *realm) Get() models.Source {
+func (r *realm) GetSource() models.Source {
 	return models.Source(*r)
-}
-
-func (r *realm) GetDomain() string {
-	return r.Domain
-}
-
-func (r *realm) GetName() string {
-	return r.Name
-}
-
-func (r *realm) GetIconURL() string {
-	return r.IconURL
 }
 
 func (r *realm) GetMangaList(ctx web.Context) ([]models.Manga, error) {

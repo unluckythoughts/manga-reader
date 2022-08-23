@@ -11,20 +11,8 @@ import (
 
 type zero models.Source
 
-func (z *zero) Get() models.Source {
+func (z *zero) GetSource() models.Source {
 	return models.Source(*z)
-}
-
-func (z *zero) GetDomain() string {
-	return z.Domain
-}
-
-func (z *zero) GetName() string {
-	return z.Name
-}
-
-func (z *zero) GetIconURL() string {
-	return z.IconURL
 }
 
 func (z *zero) GetMangaList(ctx web.Context) ([]models.Manga, error) {

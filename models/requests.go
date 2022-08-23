@@ -1,11 +1,15 @@
 package models
 
 type SourceMangaRequest struct {
-	MangaListURL string `json:"mangaListUrl"`
-	MangaURL     string `json:"mangaUrl"`
-	ChapterURL   string `json:"chapterUrl"`
+	MangaURL string `json:"mangaUrl"`
+	Force    bool   `json:"force"`
+}
+
+type SourceChapterRequest struct {
+	ChapterURL string `json:"chapterUrl"`
 }
 
 type SourceManagaListRequest struct {
 	Domain string `json:"domain"`
+	Force  bool   `json:"force"`
 }

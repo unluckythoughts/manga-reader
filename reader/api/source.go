@@ -2,12 +2,11 @@ package api
 
 import (
 	"github.com/unluckythoughts/go-microservice/tools/web"
-	"github.com/unluckythoughts/manga-reader/connector"
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
 func (h *Handlers) SourceListHandler(r web.Request) (interface{}, error) {
-	return connector.GetAllConnectors(), nil
+	return h.s.GetSourceList(r.GetContext())
 }
 
 func (h *Handlers) SourceMangaListHandler(r web.Request) (interface{}, error) {
@@ -16,7 +15,7 @@ func (h *Handlers) SourceMangaListHandler(r web.Request) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return h.s.GetSourceMangaList(r.GetContext(), body.Domain)
+	return h.s.GetSourceMangaList(r.GetContext(), body.Domain, body.Force)
 }
 
 func (h *Handlers) SourceMangaHandler(r web.Request) (interface{}, error) {
@@ -26,11 +25,11 @@ func (h *Handlers) SourceMangaHandler(r web.Request) (interface{}, error) {
 		return nil, err
 	}
 
-	return h.s.GetSourceManga(r.GetContext(), body.MangaURL)
+	return h.s.GetSourceManga(r.GetContext(), body.MangaURL, body.Force)
 }
 
 func (h *Handlers) SourceMangaChapterHandler(r web.Request) (interface{}, error) {
-	body := models.SourceMangaRequest{}
+	body := models.SourceChapterRequest{}
 	err := r.GetValidatedBody(&body)
 	if err != nil {
 		return nil, err

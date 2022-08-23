@@ -13,20 +13,8 @@ import (
 
 type reaper models.Source
 
-func (r *reaper) Get() models.Source {
+func (r *reaper) GetSource() models.Source {
 	return models.Source(*r)
-}
-
-func (r *reaper) GetDomain() string {
-	return r.Domain
-}
-
-func (r *reaper) GetName() string {
-	return r.Name
-}
-
-func (r *reaper) GetIconURL() string {
-	return r.IconURL
 }
 
 func (r *reaper) GetMangaList(ctx web.Context) ([]models.Manga, error) {

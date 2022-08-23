@@ -11,20 +11,8 @@ import (
 
 type asura models.Source
 
-func (a *asura) Get() models.Source {
+func (a *asura) GetSource() models.Source {
 	return models.Source(*a)
-}
-
-func (a *asura) GetDomain() string {
-	return a.Domain
-}
-
-func (a *asura) GetName() string {
-	return a.Name
-}
-
-func (a *asura) GetIconURL() string {
-	return a.IconURL
 }
 
 func (a *asura) GetMangaList(ctx web.Context) ([]models.Manga, error) {

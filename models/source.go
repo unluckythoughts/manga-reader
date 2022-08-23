@@ -7,10 +7,7 @@ import (
 )
 
 type IConnector interface {
-	Get() Source
-	GetDomain() string
-	GetName() string
-	GetIconURL() string
+	GetSource() Source
 	GetMangaList(ctx web.Context) ([]Manga, error)
 	GetMangaInfo(ctx web.Context, mangaURL string) (Manga, error)
 	GetChapterPages(ctx web.Context, pageListURL string) ([]string, error)
@@ -56,8 +53,14 @@ type ChapterListTransform func(interface{}) []Chapter
 type PagesListTransform func(interface{}) []string
 
 type Source struct {
-	Name      string            `json:"name"`
-	Domain    string            `json:"domain"`
-	IconURL   string            `json:"iconUrl"`
-	Transport http.RoundTripper `json:"-"`
+	ID        int               `json:"id" gorm:"column:id;primarykey"`
+	Name      string            `json:"name" gorm:"column:name"`
+	Domain    string            `json:"domain" gorm:"column:domain"`
+	IconURL   string            `json:"iconUrl" gorm:"column:icon_url"`
+	UpdatedAt string            `json:"updatedAt" gorm:"column:updated_at"`
+	Transport http.RoundTripper `json:"-"  gorm:"-"`
+}
+
+func (m Source) TableName() string {
+	return "source"
 }

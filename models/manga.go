@@ -9,6 +9,8 @@ import (
 
 type Manga struct {
 	ID       int       `json:"id" gorm:"column:id;primarykey"`
+	SourceID int       `json:"-" gorm:"column:source_id"`
+	Source   Source    `json:"source" gorm:"foreignKey:SourceID"`
 	URL      string    `json:"url" gorm:"column:url"`
 	Title    string    `json:"title" gorm:"column:title"`
 	Slug     string    `json:"slug" gorm:"column:slug"`
@@ -18,7 +20,7 @@ type Manga struct {
 	Chapters []Chapter `json:"chapters" gorm:"foreignkey:MangaID"`
 }
 
-func (m *Manga) TableName() string {
+func (m Manga) TableName() string {
 	return "manga"
 }
 
@@ -34,7 +36,7 @@ type Chapter struct {
 	Downloaded bool    `json:"downloaded" gorm:"column:downloaded"`
 }
 
-func (c *Chapter) TableName() string {
+func (c Chapter) TableName() string {
 	return "chapter"
 }
 

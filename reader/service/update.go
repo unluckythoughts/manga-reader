@@ -4,16 +4,23 @@ import (
 	"time"
 
 	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/manga-reader/connector"
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
+// TODO: reuse source manga and delete this
 func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.Favorite, error) {
 	favorite, err := s.db.FindFavorite(ctx, favoriteID)
 	if err != nil {
 		return models.Favorite{}, err
 	}
 
-	manga, err := s.GetSourceManga(ctx, favorite.Manga.URL)
+	conn, err := connector.New(ctx, favorite.Manga.URL)
+	if err != nil {
+		return models.Favorite{}, err
+	}
+
+	manga, err := conn.GetMangaInfo(ctx, favorite.Manga.URL)
 	if err != nil {
 		return models.Favorite{}, err
 	}
@@ -26,7 +33,7 @@ func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.Favori
 	}
 
 	// will return updated chapters
-	err = s.db.UpdateFavoriteChapters(ctx, &manga.Chapters)
+	err = s.db.UpdateChapters(ctx, &manga.Chapters)
 	if err != nil {
 		return models.Favorite{}, err
 	}
@@ -42,6 +49,7 @@ func (s *Service) UpdateFavoriteProgress(ctx web.Context, favoriteID int, progre
 	return s.db.UpdateFavoriteProgress(ctx, favoriteID, progress)
 }
 
+// TODO: move to worker and delete this
 func (s *Service) UpdateAllFavorite(ctx web.Context) error {
 	favorites, err := s.db.GetFavorites(ctx)
 	if err != nil {
@@ -50,7 +58,12 @@ func (s *Service) UpdateAllFavorite(ctx web.Context) error {
 
 	for _, favorite := range favorites {
 		ctx.Logger().Debugf("Updating manga %s", favorite.Manga.Title)
-		manga, err := s.GetSourceManga(ctx, favorite.Manga.URL)
+
+		conn, err := connector.New(ctx, favorite.Manga.URL)
+		if err != nil {
+			return err
+		}
+		manga, err := conn.GetMangaInfo(ctx, favorite.Manga.URL)
 		if err != nil {
 			ctx.Logger().
 				With("error", err).
@@ -65,7 +78,7 @@ func (s *Service) UpdateAllFavorite(ctx web.Context) error {
 			}
 		}
 
-		err = s.db.UpdateFavoriteChapters(ctx, &manga.Chapters)
+		err = s.db.UpdateChapters(ctx, &manga.Chapters)
 		if err != nil {
 			ctx.Logger().
 				With("error", err).

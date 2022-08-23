@@ -30,15 +30,6 @@ func (r *Repository) FindFavorite(ctx context.Context, id int) (models.Favorite,
 	return favorite, err
 }
 
-func (r *Repository) FindFavoriteByMangaURL(ctx context.Context, mangaUrl string) (models.Favorite, error) {
-	var favorite models.Favorite
-	err := r.db.WithContext(ctx).
-		Joins("Manga").
-		Where("Manga.url = ?", mangaUrl).
-		First(&favorite).Error
-	return favorite, err
-}
-
 func (r *Repository) UpdateFavoriteProgress(ctx context.Context, favoriteID int, progress models.StrIntList) error {
 	favorite := &models.Favorite{ID: favoriteID, Progress: progress}
 	return r.db.
@@ -48,39 +39,8 @@ func (r *Repository) UpdateFavoriteProgress(ctx context.Context, favoriteID int,
 }
 
 func (r *Repository) DelFavorite(ctx context.Context, favorite models.Favorite) error {
-	tx := r.db.WithContext(ctx).Begin()
-
-	err := tx.Delete(&models.Favorite{}, favorite.ID).Error
-	if err != nil {
-		_ = tx.Rollback().Error
-		return err
-	}
-
-	err = tx.Delete(&models.Manga{}, favorite.MangaID).Error
-	if err != nil {
-		_ = tx.Rollback().Error
-		return err
-	}
-
-	err = tx.Where("manga_id = ?", favorite.MangaID).Delete(&models.Chapter{}).Error
-	if err != nil {
-		_ = tx.Rollback().Error
-		return err
-	}
-
-	return tx.Commit().Error
-}
-
-func (r *Repository) UpdateFavoriteChapters(ctx context.Context, chapters *[]models.Chapter) error {
-	err := r.db.
+	return r.db.
 		WithContext(ctx).
-		Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "url"}},
-			UpdateAll: false,
-			DoNothing: true,
-		}, clause.Returning{}).
-		Save(chapters).
+		Delete(&models.Favorite{}, favorite.ID).
 		Error
-
-	return err
 }
