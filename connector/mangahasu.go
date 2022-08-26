@@ -69,7 +69,7 @@ func (m *mangahasu) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga
 		RoundTripper: c.Transport,
 	}
 	opts.SetDefaults()
-	return scrapper.NewScrapeMangaInfo(ctx, c, opts)
+	return scrapper.ScrapeMangaInfo(ctx, c, opts)
 }
 
 func (m *mangahasu) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
@@ -79,5 +79,5 @@ func (m *mangahasu) GetChapterPages(ctx web.Context, chapterURL string) (models.
 		RoundTripper: c.Transport,
 	}
 	opts.SetDefaults()
-	return scrapper.NewScrapeChapterPages(ctx, c, opts)
+	return scrapper.ScrapeChapterPages(ctx, c, opts)
 }

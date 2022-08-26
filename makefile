@@ -21,6 +21,14 @@ db-migrate: FLYWAY_CMD=migrate
 db-migrate: flyway-run
 
 
+run:
+	DB_FILE_PATH=db.sqlite \
+	WEB_PORT=5678 \
+	WEB_CORS=true \
+	WEB_PROXY=true \
+	DB_DEBUG=true \
+	go run main.go
+
 .SILENT: test-start test-stop test-db-init
 test-start:
 	@docker-compose --profile test up --build --detach

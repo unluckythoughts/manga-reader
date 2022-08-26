@@ -67,7 +67,7 @@ func (r *realm) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 		RoundTripper: c.Transport,
 	}
 	opts.SetDefaults()
-	return scrapper.NewScrapeMangaInfo(ctx, c, opts)
+	return scrapper.ScrapeMangaInfo(ctx, c, opts)
 }
 
 func (r *realm) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
@@ -77,7 +77,7 @@ func (r *realm) GetChapterPages(ctx web.Context, chapterURL string) (models.Page
 		RoundTripper: c.Transport,
 	}
 	opts.SetDefaults()
-	pages, err := scrapper.NewScrapeChapterPages(ctx, c, opts)
+	pages, err := scrapper.ScrapeChapterPages(ctx, c, opts)
 	if err != nil || len(pages.URLs) == 0 {
 		injScript := scrapper.GetInjectionScript(c.Chapter.ImageUrl)
 		imageURLs, err := scrapper.SimulateBrowser(ctx, chapterURL, injScript)

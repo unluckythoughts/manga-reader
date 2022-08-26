@@ -12,6 +12,18 @@ type Scrapper struct {
 	src models.Source
 }
 
+func GetHeaders(ctx web.Context, url string, roundTripper http.RoundTripper) http.Header {
+	c := getColly(ctx, roundTripper)
+
+	var respHeaders http.Header
+	c.OnResponseHeaders(func(r *colly.Response) {
+		respHeaders = (*r).Headers.Clone()
+	})
+
+	c.Visit(url)
+	return respHeaders
+}
+
 func getColly(ctx web.Context, rt http.RoundTripper) *colly.Collector {
 	c := colly.NewCollector(
 		colly.AllowURLRevisit(),

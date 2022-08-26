@@ -7,87 +7,31 @@ import (
 	"github.com/pkg/errors"
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
-	"github.com/unluckythoughts/manga-reader/utils"
 )
 
-func getData(ctx web.Context, q models.APIQueryData, cb func(interface{})) error {
+func GetAPIResponse(ctx web.Context, q models.APIQueryData) error {
 	c := web.NewClientWithTransport(q.URL, q.Transport, q.Headers)
 	params := url.Values{}
 	for k, v := range q.QueryParams {
 		params.Add(k, v)
 	}
 
-	for {
-		apiResp := q.Response
-		path := "/"
-		if len(params) > 0 {
-			path = "?" + params.Encode()
-		}
-		if q.Method == "" {
-			q.Method = http.MethodGet
-		}
+	path := "/"
+	if len(params) > 0 {
+		path = "?" + params.Encode()
+	}
+	if q.Method == "" {
+		q.Method = http.MethodGet
+	}
 
-		status, err := c.Send(q.Method, path, q.Body, apiResp)
-		if err != nil {
-			return errors.Wrapf(err, "error while get data from %s", q.URL+path)
-		}
+	status, err := c.Send(q.Method, path, q.Body, q.Response)
+	if err != nil {
+		return errors.Wrapf(err, "error while get data from %s", q.URL+path)
+	}
 
-		if status != 200 {
-			return errors.Errorf("unexpected status %d when get data from %s", status, q.URL+path)
-		}
-
-		cb(apiResp)
-
-		if q.HasNextPage != nil && q.HasNextPage(apiResp) {
-			pageParam := "page"
-			if q.PageParam != "" {
-				pageParam = q.PageParam
-			}
-			params.Set(pageParam, utils.StrAdd(params.Get(pageParam), 1))
-		} else {
-			break
-		}
+	if status != 200 {
+		return errors.Errorf("unexpected status %d when get data from %s", status, q.URL+path)
 	}
 
 	return nil
-}
-
-func GetMangaListAPI(ctx web.Context, q models.APIQueryData, t models.MangaListTransform) ([]models.Manga, error) {
-	mangas := []models.Manga{}
-
-	err := getData(ctx, q, func(apiResp interface{}) {
-		mangas = append(mangas, t(apiResp)...)
-	})
-
-	return mangas, err
-}
-
-func GetMangaInfoAPI(ctx web.Context, q models.APIQueryData, t models.MangaInfoTransform) (models.Manga, error) {
-	manga := models.Manga{}
-
-	err := getData(ctx, q, func(apiResp interface{}) {
-		manga = t(apiResp)
-	})
-
-	return manga, err
-}
-
-func GetChapterListAPI(ctx web.Context, q models.APIQueryData, t models.ChapterListTransform) ([]models.Chapter, error) {
-	chapters := []models.Chapter{}
-
-	err := getData(ctx, q, func(apiResp interface{}) {
-		chapters = append(chapters, t(apiResp)...)
-	})
-
-	return chapters, err
-}
-
-func GetPagesListAPI(ctx web.Context, q models.APIQueryData, t models.PagesListTransform) ([]string, error) {
-	pages := []string{}
-
-	err := getData(ctx, q, func(apiResp interface{}) {
-		pages = append(pages, t(apiResp)...)
-	})
-
-	return pages, err
 }

@@ -4,22 +4,20 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
+	"go.uber.org/zap"
 )
 
-func ScrapeChapterPages(ctx web.Context, sels models.ChapterInfoSelectors, opts *ScrapeOptions) ([]string, error) {
-	opts.SetDefaults()
-	c := getColly(ctx, opts.RoundTripper)
+func ScrapeChapterPages(ctx web.Context, c models.Connector, opts *ScrapeOptions) (models.Pages, error) {
+	pages := models.Pages{}
+	GetPageForScrapping(ctx, opts, func(h *colly.HTMLElement) {
+		imageURLs, err := GetImagesListForSelector(h.DOM, c.Chapter.ImageUrl, true)
+		if err != nil {
+			ctx.Logger().With(zap.Error(err)).Debugf("error getting chapter images from %s", c.Source.Domain)
+			return
+		}
 
-	var imageURLs []string
-	var chapterError error
-	c.OnHTML(opts.InitialHtmlTag, func(h *colly.HTMLElement) {
-		imageURLs, chapterError = getTextListForSelector(h, sels.PageSelector, true)
+		pages.URLs = imageURLs
 	})
 
-	err := c.Request(opts.RequestMethod, sels.URL, opts.Body, nil, opts.Headers)
-	if err != nil {
-		return imageURLs, err
-	}
-
-	return imageURLs, chapterError
+	return pages, nil
 }

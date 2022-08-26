@@ -95,7 +95,7 @@ func (r *reaper) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, e
 		RoundTripper: c.Transport,
 	}
 	opts.SetDefaults()
-	return scrapper.NewScrapeMangaInfo(ctx, c, &opts)
+	return scrapper.ScrapeMangaInfo(ctx, c, &opts)
 }
 
 func (r *reaper) GetChapterPages(ctx web.Context, chapterUrl string) (models.Pages, error) {
@@ -105,5 +105,5 @@ func (r *reaper) GetChapterPages(ctx web.Context, chapterUrl string) (models.Pag
 		RoundTripper: c.Transport,
 	}
 	opts.SetDefaults()
-	return scrapper.NewScrapeChapterPages(ctx, c, &opts)
+	return scrapper.ScrapeChapterPages(ctx, c, &opts)
 }

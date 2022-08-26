@@ -69,7 +69,7 @@ func (a *asura) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 		RoundTripper: c.Transport,
 	}
 	opts.SetDefaults()
-	return scrapper.NewScrapeMangaInfo(ctx, c, opts)
+	return scrapper.ScrapeMangaInfo(ctx, c, opts)
 }
 
 func (a *asura) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
@@ -79,5 +79,5 @@ func (a *asura) GetChapterPages(ctx web.Context, chapterURL string) (models.Page
 		RoundTripper: c.Transport,
 	}
 	opts.SetDefaults()
-	return scrapper.NewScrapeChapterPages(ctx, c, opts)
+	return scrapper.ScrapeChapterPages(ctx, c, opts)
 }
