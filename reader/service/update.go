@@ -25,6 +25,14 @@ func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.Favori
 		return models.Favorite{}, err
 	}
 
+	manga.SourceID = favorite.Manga.SourceID
+	err = s.db.UpdateMangas(ctx, &[]models.Manga{manga})
+	if err != nil {
+		ctx.Logger().
+			With("error", err).
+			Warnf("error updating mangas for %s", favorite.Manga.Title)
+	}
+
 	for i := range manga.Chapters {
 		manga.Chapters[i].MangaID = favorite.MangaID
 		if manga.Chapters[i].UploadDate == "" {
@@ -45,7 +53,7 @@ func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.Favori
 	return favorite, nil
 }
 
-func (s *Service) UpdateFavoriteProgress(ctx web.Context, favoriteID int, progress models.StrIntList) error {
+func (s *Service) UpdateFavoriteProgress(ctx web.Context, favoriteID int, progress models.StrFloatList) error {
 	return s.db.UpdateFavoriteProgress(ctx, favoriteID, progress)
 }
 
@@ -69,6 +77,14 @@ func (s *Service) UpdateAllFavorite(ctx web.Context) error {
 				With("error", err).
 				Warnf("error scrapping chapters for %s", favorite.Manga.Title)
 			continue
+		}
+
+		manga.SourceID = favorite.Manga.SourceID
+		err = s.db.UpdateMangas(ctx, &[]models.Manga{manga})
+		if err != nil {
+			ctx.Logger().
+				With("error", err).
+				Warnf("error updating mangas for %s", favorite.Manga.Title)
 		}
 
 		for i := range manga.Chapters {

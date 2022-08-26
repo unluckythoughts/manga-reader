@@ -11,25 +11,54 @@ import (
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-type reaper models.Source
+type reaper models.Connector
+
+func GetReaperScansConnector() models.IConnector {
+	return &reaper{
+		Source: models.Source{
+			Name:      "Reaper Scans",
+			Domain:    "reaperscans.com",
+			IconURL:   "https://styles.redditmedia.com/t5_4zgiee/styles/communityIcon_gxpzm2tt41l71.png",
+			Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+		},
+		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+		BaseURL:       "https://reaperscans.com/",
+		MangaListPath: "wp-admin/admin-ajax.php",
+		Selectors: models.Selectors{
+			List: models.MangaList{
+				MangaContainer: "div.page-item-detail.manga",
+				MangaTitle:     "h3 a",
+				MangaImageURL:  "img[data-src],img[src]",
+				MangaURL:       "h3 a[href]",
+				NextPage:       "",
+			},
+			Info: models.MangaInfo{
+				Title:                   ".container .post-title h1",
+				ImageURL:                ".tab-summary a img[data-src],.tab-summary a img[src],a#roi img[data-src],a#roi img[src],a#roiroi img[data-src],a#roiroi img[src]",
+				Synopsis:                ".container .summary__content",
+				ChapterContainer:        ".listing-chapters_wrap ul.main li",
+				ChapterNumber:           ".chapter-link a > p",
+				ChapterTitle:            ".chapter-link a > p",
+				ChapterURL:              ".chapter-link a[href]",
+				ChapterUploadDate:       ".chapter-link a span i",
+				ChapterUploadDateFormat: "Jan 02, 2006",
+			},
+			Chapter: models.PageSelectors{
+				ImageUrl: ".reading-content img.wp-manga-chapter-img[data-src],.reading-content img.wp-manga-chapter-img[src]",
+			},
+		},
+	}
+}
 
 func (r *reaper) GetSource() models.Source {
-	return models.Source(*r)
+	return r.Source
 }
 
 func (r *reaper) GetMangaList(ctx web.Context) ([]models.Manga, error) {
-	listURL := "https://reaperscans.com/wp-admin/admin-ajax.php"
-	sels := models.MangaListSelectors{
-		URL:                   listURL,
-		MangaTitleSelector:    "div.page-item-detail.manga h3 a",
-		MangaImageURLSelector: "div.page-item-detail.manga img[data-src,src]",
-		MangaURLSelector:      "div.page-item-detail.manga h3 a[href]",
-		NextPageSelector:      "",
-	}
-
+	c := models.Connector(*r)
 	headers := http.Header{}
 	headers.Set("content-type", "application/x-www-form-urlencoded")
-	headers.Set("referer", listURL)
+	headers.Set("referer", c.BaseURL+c.MangaListPath)
 
 	params := url.Values{}
 	params.Add("action", "madara_load_more")
@@ -48,46 +77,33 @@ func (r *reaper) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	params.Add("vars[posts_per_page]", "500")
 
 	opts := scrapper.ScrapeOptions{
-		RoundTripper:   r.Transport,
+		URL:            c.BaseURL + c.MangaListPath,
+		RoundTripper:   c.Transport,
 		RequestMethod:  http.MethodPost,
-		Headers:        headers,
 		InitialHtmlTag: scrapper.WHOLE_BODY_TAG,
+		Headers:        headers,
 		Body:           strings.NewReader(params.Encode()),
 	}
-
-	return scrapper.ScrapeMangaList(ctx, sels, &opts)
+	opts.SetDefaults()
+	return scrapper.ScrapeMangas(ctx, c, &opts)
 }
 
 func (r *reaper) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
-	sels := models.MangaInfoSelectors{
-		URL:                       mangaURL,
-		TitleSelector:             "div.container .post-title h1",
-		ImageURLSelector:          "div.tab-summary a img[data-src,src], a#roi img[data-src,src], a#roiroi img[data-src,src]",
-		SynopsisSelector:          "div.container .summary__content",
-		ChapterNumberSelector:     "div.listing-chapters_wrap ul.main li .chapter-link a > p",
-		ChapterTitleSelector:      "div.listing-chapters_wrap ul.main li .chapter-link a > p",
-		ChapterURLSelector:        "div.listing-chapters_wrap ul.main li .chapter-link a[href]",
-		ChapterUploadDateSelector: "div.listing-chapters_wrap ul.main li .chapter-link a span i",
-		ChapterUploadDateFormat:   "Jan 02, 2006",
+	c := models.Connector(*r)
+	opts := scrapper.ScrapeOptions{
+		URL:          mangaURL,
+		RoundTripper: c.Transport,
 	}
-
-	return scrapper.ScrapeMangaInfo(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: r.Transport})
+	opts.SetDefaults()
+	return scrapper.NewScrapeMangaInfo(ctx, c, &opts)
 }
 
-func (r *reaper) GetChapterPages(ctx web.Context, chapterInfoUrl string) ([]string, error) {
-	sels := models.ChapterInfoSelectors{
-		URL:          chapterInfoUrl,
-		PageSelector: "div.reading-content img.wp-manga-chapter-img[data-src,src]",
+func (r *reaper) GetChapterPages(ctx web.Context, chapterUrl string) (models.Pages, error) {
+	c := models.Connector(*r)
+	opts := scrapper.ScrapeOptions{
+		URL:          chapterUrl,
+		RoundTripper: c.Transport,
 	}
-
-	return scrapper.ScrapeChapterPages(ctx, sels, &scrapper.ScrapeOptions{RoundTripper: r.Transport})
-}
-
-func getReaperScansConnector() models.IConnector {
-	return &reaper{
-		Name:      "Reaper Scans",
-		Domain:    "reaperscans.com",
-		IconURL:   "https://styles.redditmedia.com/t5_4zgiee/styles/communityIcon_gxpzm2tt41l71.png",
-		Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
-	}
+	opts.SetDefaults()
+	return scrapper.NewScrapeChapterPages(ctx, c, &opts)
 }

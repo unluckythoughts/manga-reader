@@ -59,16 +59,16 @@ func (h *Handlers) UpdateFavoriteProgressHandler(r web.Request) (interface{}, er
 		return nil, errors.Wrapf(err, "could get favoriteID route param")
 	}
 
-	chapterID, err := strconv.Atoi(strChapterID)
+	chapterID, err := strconv.ParseFloat(strChapterID, 64)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could get chapterID route param")
 	}
 
-	pageID, err := strconv.Atoi(strPageID)
+	pageID, err := strconv.ParseFloat(strPageID, 64)
 	if err != nil {
 		pageID = 0
 	}
 
-	progress := models.StrIntList{chapterID, pageID}
+	progress := models.StrFloatList{chapterID, pageID}
 	return nil, h.s.UpdateFavoriteProgress(r.GetContext(), favoriteID, progress)
 }

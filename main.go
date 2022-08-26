@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"os"
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/go-microservice"
@@ -16,11 +15,11 @@ func proxyTransport(l *zap.Logger) http.RoundTripper {
 }
 
 func main() {
-	_ = os.Setenv("DB_FILE_PATH", "db.sqlite")
-	_ = os.Setenv("WEB_PORT", "5678")
-	_ = os.Setenv("WEB_CORS", "true")
-	_ = os.Setenv("WEB_PROXY", "true")
-	_ = os.Setenv("DB_DEBUG", "true")
+	// _ = os.Setenv("DB_FILE_PATH", "db.sqlite")
+	// _ = os.Setenv("WEB_PORT", "5678")
+	// _ = os.Setenv("WEB_CORS", "true")
+	// _ = os.Setenv("WEB_PROXY", "true")
+	// _ = os.Setenv("DB_DEBUG", "true")
 
 	opts := microservice.Options{
 		Name:           "manga-reader",

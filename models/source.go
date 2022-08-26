@@ -6,11 +6,16 @@ import (
 	"github.com/unluckythoughts/go-microservice/tools/web"
 )
 
+type Pages struct {
+	Config map[string]interface{} `json:"config"`
+	URLs   []string               `json:"urls"`
+}
+
 type IConnector interface {
 	GetSource() Source
 	GetMangaList(ctx web.Context) ([]Manga, error)
 	GetMangaInfo(ctx web.Context, mangaURL string) (Manga, error)
-	GetChapterPages(ctx web.Context, pageListURL string) ([]string, error)
+	GetChapterPages(ctx web.Context, pageListURL string) (Pages, error)
 }
 
 type MangaListSelectors struct {

@@ -16,6 +16,8 @@ func RegisterRoutes(router web.Router, service *service.Service) {
 	router.POST("/source/manga", h.SourceMangaHandler)
 	router.POST("/source/chapter", h.SourceMangaChapterHandler)
 
+	router.POST("/source/search", h.SourceMangaSearchHandler)
+
 	router.GET("/library", h.GetFavoriteListHandler)
 	router.POST("/library", h.AddFavoriteHandler)
 	router.PATCH("/library", h.UpdateAllFavoriteHandler)

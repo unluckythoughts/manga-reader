@@ -10,12 +10,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
+	"github.com/unluckythoughts/manga-reader/utils"
 	"go.uber.org/zap"
 )
 
 const (
-	WHOLE_BODY_TAG             = "WHOLE_BODY_TAG"
-	HUMAN_READABLE_DATE_FORMAT = "HUMAN_READABLE_DATE_FORMAT"
+	WHOLE_BODY_TAG = "WHOLE_BODY_TAG"
 )
 
 func populateMangas(ctx web.Context, sels models.MangaListSelectors, resp *mangaListResponse) func(h *colly.HTMLElement) {
@@ -72,6 +72,7 @@ type mangaListResponse struct {
 }
 
 type ScrapeOptions struct {
+	URL            string
 	RoundTripper   http.RoundTripper
 	Headers        http.Header
 	InitialHtmlTag string
@@ -122,7 +123,7 @@ func ScrapeMangaList(ctx web.Context, sels models.MangaListSelectors, opts *Scra
 	}
 
 	for resp.NextPage != "" {
-		if isInternalLink(resp.NextPage) {
+		if utils.IsInternalLink(resp.NextPage) {
 			resp.NextPage = sels.URL + resp.NextPage
 		}
 

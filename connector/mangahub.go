@@ -2,9 +2,14 @@ package connector
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/raff/godet"
+	"go.uber.org/zap"
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/go-microservice/tools/web"
@@ -16,10 +21,24 @@ var (
 	accessToken = ""
 )
 
-type mangahub models.Source
+type mangahub models.Connector
+
+func GetMangaHubConnector() models.IConnector {
+	return &mangahub{
+		Source: models.Source{
+
+			Name:      "Manga Hub",
+			Domain:    "mangahub.io",
+			IconURL:   "https://mangahub.io/logo-small.png",
+			Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+		},
+		Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+		BaseURL:   "https://api.mghubcdn.com/graphql",
+	}
+}
 
 func (m *mangahub) GetSource() models.Source {
-	return models.Source(*m)
+	return m.Source
 }
 
 func (m *mangahub) _fetchAccessKey(ctx web.Context) string {
@@ -55,9 +74,25 @@ func (m *mangahub) _getRequestBody(slugs ...string) []byte {
 	return data
 }
 
+func (m *mangahub) _getResponse(ctx web.Context, r interface{}) (*mangahubAPIResponseBody, bool) {
+	resp, ok := r.(*mangahubAPIResponseBody)
+	if !ok {
+		return resp, false
+	}
+
+	if len(resp.Errors) > 0 {
+		ctx.Logger().With("error", resp.Errors[0].Message).Debug("resetting accessToken")
+		accessToken = ""
+		return resp, false
+	}
+
+	return resp, true
+}
+
 func (m *mangahub) _getRequestHeaders(ctx web.Context) http.Header {
 	if accessToken == "" {
 		accessToken = m._fetchAccessKey(ctx)
+		ctx.Logger().With("token", accessToken).Debug("setting access token")
 	}
 
 	headers := http.Header{}
@@ -69,152 +104,202 @@ func (m *mangahub) _getRequestHeaders(ctx web.Context) http.Header {
 	return headers
 }
 
-type apiResp struct {
+type mangahubAPIResponseBody struct {
 	Errors []struct {
 		Message string `json:"message"`
-	} `json:"errors"`
+	} `json:"errors" manga-reader:"error-list"`
 	Data struct {
 		Search struct {
 			Rows []struct {
-				ID    int    `json:"id"`
-				Title string `json:"title"`
-				Slug  string `json:"slug"`
-				Image string `json:"image"`
-			} `json:"rows"`
+				ID          int    `json:"id" manga-reader:"manga.id"`
+				Title       string `json:"title" manga-reader:"manga.title"`
+				Slug        string `json:"slug" manga-reader:"manga.slug"`
+				Image       string `json:"image" manga-reader:"manga.image-url"`
+				Description string `json:"description" manga-reader:"manga.synopsis"`
+			} `json:"rows" manga-reader:"manga-list"`
 		} `json:"search"`
 		Manga struct {
-			ID          int    `json:"id"`
-			Title       string `json:"title"`
-			Slug        string `json:"slug"`
-			Image       string `json:"image"`
-			Description string `json:"description"`
+			ID          int    `json:"id" manga-reader:"manga.id"`
+			Title       string `json:"title" manga-reader:"manga.title"`
+			Slug        string `json:"slug" manga-reader:"manga.slug"`
+			Image       string `json:"image" manga-reader:"manga.image-url"`
+			Description string `json:"description" manga-reader:"manga.synopsis"`
 			Chapters    []struct {
-				ID     int    `json:"id"`
-				Title  string `json:"title"`
-				Number int    `json:"number"`
-				Date   string `json:"date"`
-			} `json:"chapters"`
+				ID     int     `json:"id" manga-reader:"manga.chapter.id"`
+				Title  string  `json:"title" manga-reader:"manga.chapter.title"`
+				Number float64 `json:"number" manga-reader:"manga.chapter.number"`
+				Date   string  `json:"date" manga-reader:"manga.chapter.upload-date|2006-01-02T15:04:05.000Z"`
+			} `json:"chapters"  manga-reader:"manga.chapter-list"`
 		} `json:"manga"`
 		Chapter struct {
-			Pages string `json:"pages"`
+			Pages string `json:"pages" manga-reader:"manga.chapter.page"`
 		} `json:"chapter"`
 	} `json:"data"`
 }
 
 func (m *mangahub) GetMangaList(ctx web.Context) ([]models.Manga, error) {
+	apiResp := mangahubAPIResponseBody{}
 	q := models.APIQueryData{
-		URL:       "https://api.mghubcdn.com/graphql",
+		URL:       m.BaseURL,
 		Method:    http.MethodPost,
 		Body:      m._getRequestBody(),
-		Response:  &apiResp{},
+		Response:  &apiResp,
 		Headers:   m._getRequestHeaders(ctx),
 		Transport: m.Transport,
 	}
 
-	transform := func(r interface{}) (mangas []models.Manga) {
-		resp, ok := r.(*apiResp)
-		if !ok {
-			return []models.Manga{}
-		}
-
-		for _, row := range resp.Data.Search.Rows {
-			mangas = append(mangas, models.Manga{
-				OtherID:  strconv.Itoa(row.ID),
-				ImageURL: "https://thumb.mghubcdn.com/" + row.Image,
-				Slug:     row.Slug,
-				Title:    row.Title,
-				URL:      "https://mangahub.io/manga/" + row.Slug,
-			})
-		}
-
-		return mangas
+	err := scrapper.GetAPIResponse(ctx, q)
+	if err != nil {
+		return []models.Manga{}, err
 	}
 
-	return scrapper.GetMangaListAPI(ctx, q, transform)
+	errorMessages := scrapper.GetErrorsFromTags(apiResp)
+	if len(errorMessages) > 0 {
+		ctx.Logger().With("error", errorMessages[0]).Debug("resetting accessToken")
+		accessToken = ""
+		return []models.Manga{}, errors.New(errorMessages[0])
+	}
+
+	mangas, err := scrapper.GetMangaListFromTags(apiResp)
+	if err != nil {
+		return mangas, err
+	}
+
+	for i, m := range mangas {
+		mangas[i].ImageURL = "https://thumb.mghubcdn.com/" + m.ImageURL
+		mangas[i].URL = "https://mangahub.io/manga/" + m.URL
+	}
+
+	return mangas, nil
 }
 
 func (m *mangahub) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
 	slug := strings.Replace(mangaURL, "https://mangahub.io/manga/", "", -1)
 
+	apiResp := mangahubAPIResponseBody{}
 	q := models.APIQueryData{
-		URL:       "https://api.mghubcdn.com/graphql",
+		URL:       m.BaseURL,
 		Method:    http.MethodPost,
 		Body:      m._getRequestBody(slug),
-		Response:  &apiResp{},
+		Response:  &apiResp,
 		Headers:   m._getRequestHeaders(ctx),
 		Transport: m.Transport,
 	}
 
-	transform := func(r interface{}) models.Manga {
-		resp, ok := r.(*apiResp)
-		if !ok {
-			return models.Manga{}
-		}
-
-		manga := models.Manga{
-			URL:      "https://mangahub.io/manga/" + resp.Data.Manga.Slug,
-			Title:    resp.Data.Manga.Title,
-			ImageURL: "https://thumb.mghubcdn.com/" + resp.Data.Manga.Image,
-			Synopsis: resp.Data.Manga.Description,
-		}
-
-		for _, item := range resp.Data.Manga.Chapters {
-			uploadDate, _ := scrapper.ParseDate(item.Date, "2006-01-02T15:04:05.000Z")
-			manga.Chapters = append(manga.Chapters, models.Chapter{
-				URL:        "https://mangahub.io/chapter/" + manga.Slug + "/chapter-" + strconv.Itoa(item.Number),
-				Number:     strconv.Itoa(item.Number),
-				Title:      item.Title,
-				UploadDate: uploadDate,
-			})
-		}
-
-		return manga
+	err := scrapper.GetAPIResponse(ctx, q)
+	if err != nil {
+		return models.Manga{}, err
 	}
 
-	return scrapper.GetMangaInfoAPI(ctx, q, transform)
+	manga, err := scrapper.GetMangaInfoFromTags(apiResp)
+	if err != nil {
+		return manga, err
+	}
+
+	manga.URL = "https://mangahub.io/manga/" + manga.Slug
+	manga.ImageURL = "https://thumb.mghubcdn.com/" + manga.ImageURL
+
+	for i, c := range manga.Chapters {
+		manga.Chapters[i].URL = "https://mangahub.io/chapter/" + manga.Slug + "/chapter-" + c.Number
+	}
+
+	return manga, nil
 }
 
-func (m *mangahub) GetChapterPages(ctx web.Context, pageListURL string) ([]string, error) {
-	pageListURL = strings.Replace(pageListURL, "https://mangahub.io/chapter/", "", -1)
-	slugs := strings.Split(strings.Replace(pageListURL, "/chapter-", ":", -1), ":")
+func (m *mangahub) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
+	chapterURL = strings.Replace(chapterURL, "https://mangahub.io/chapter/", "", -1)
+	slugs := strings.Split(strings.Replace(chapterURL, "/chapter-", ":", -1), ":")
 
+	apiResp := mangahubAPIResponseBody{}
 	q := models.APIQueryData{
-		URL:       "https://api.mghubcdn.com/graphql",
+		URL:       m.BaseURL,
 		Method:    http.MethodPost,
 		Body:      m._getRequestBody(slugs...),
-		Response:  &apiResp{},
+		Response:  &apiResp,
 		Headers:   m._getRequestHeaders(ctx),
 		Transport: m.Transport,
 	}
 
-	transform := func(r interface{}) (imageURLs []string) {
-		resp, ok := r.(*apiResp)
-		if !ok {
-			return imageURLs
-		}
-
-		pages := map[string]string{}
-		err := json.Unmarshal([]byte(resp.Data.Chapter.Pages), &pages)
-		if err != nil {
-			return []string{}
-		}
-
-		for i := 0; i < len(pages); i++ {
-			index := strconv.Itoa(i + 1)
-			imageURLs = append(imageURLs, "https://thumb.mghubcdn.com/"+pages[index])
-		}
-
-		return imageURLs
+	err := scrapper.GetAPIResponse(ctx, q)
+	if err != nil {
+		return models.Pages{}, err
 	}
 
-	return scrapper.GetPagesListAPI(ctx, q, transform)
-}
+	// pages, err := scrapper.GetChapterPagesFromTags(apiResp)
+	// if err != nil {
+	// 	return pages, err
+	// }
 
-func getMangaHubConnector() models.IConnector {
-	return &mangahub{
-		Name:      "Manga Hub",
-		Domain:    "mangahub.io",
-		IconURL:   "https://mangahub.io/logo-small.png",
-		Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+	strPages := map[string]string{}
+	err = json.Unmarshal([]byte(apiResp.Data.Chapter.Pages), &strPages)
+	if err != nil {
+		return models.Pages{}, err
 	}
+
+	imageURLs := []string{}
+	for i := 0; i < len(strPages); i++ {
+		index := strconv.Itoa(i + 1)
+		imageURLs = append(imageURLs, "https://img.mghubcdn.com/file/imghub/"+strPages[index])
+	}
+
+	if len(imageURLs) > 0 {
+		found := false
+		imageData := []string{}
+		count := 0
+		scrapper.GetBrowserTab(ctx, imageURLs[0], func(r *godet.RemoteDebugger) bool {
+			cookies, err := r.GetAllCookies()
+			if err != nil {
+				ctx.Logger().With(zap.Error(err)).Debug("error getting cookies from the browser")
+				return false
+			}
+
+			for _, c := range cookies {
+				if c.Name == "cf_clearance" {
+
+					_, err := r.Evaluate(`
+						const toDataURL = url => fetch(url)
+						.then(response => response.blob())
+						.then(blob => new Promise((resolve, reject) => {
+							const reader = new FileReader()
+							reader.onloadend = () => resolve(reader.result)
+							reader.onerror = reject
+							reader.readAsDataURL(blob)
+						}))
+					`)
+					if err != nil {
+						ctx.Logger().With(zap.Error(err)).Debugf("error getting image data for %s", imageURLs[count])
+						return true
+					}
+
+					for _, url := range imageURLs {
+						scriptResp, err := r.Evaluate(`
+							url="` + url + `"
+
+							toDataURL(url)
+						`)
+						if err != nil {
+							ctx.Logger().With(zap.Error(err)).Debugf("error getting image data for %s", imageURLs[count])
+							return true
+						}
+						data, _ := scriptResp.(string)
+						imageData = append(imageData, data)
+					}
+
+					count++
+
+					found = true
+					return true
+				}
+			}
+
+			return false
+		})
+
+		for !found {
+			time.Sleep(time.Second)
+		}
+		return models.Pages{URLs: imageData}, nil
+	}
+
+	return models.Pages{URLs: imageURLs}, nil
 }

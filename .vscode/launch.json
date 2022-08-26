@@ -12,6 +12,13 @@
       "program": "${file}"
     },
     {
+      "name": "Launch Test file",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/tmp/test.go"
+    },
+    {
       "name": "Launch Package",
       "type": "go",
       "request": "launch",

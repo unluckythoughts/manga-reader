@@ -11,12 +11,12 @@ type Manga struct {
 	ID       int       `json:"id" gorm:"column:id;primarykey"`
 	SourceID int       `json:"-" gorm:"column:source_id"`
 	Source   Source    `json:"source" gorm:"foreignKey:SourceID"`
-	URL      string    `json:"url" gorm:"column:url"`
-	Title    string    `json:"title" gorm:"column:title"`
-	Slug     string    `json:"slug" gorm:"column:slug"`
-	ImageURL string    `json:"imageUrl" gorm:"column:image_url"`
-	Synopsis string    `json:"synopsis" gorm:"column:synopsis"`
-	OtherID  string    `json:"otherId" gorm:"column:other_id"`
+	URL      string    `json:"url" gorm:"column:url;unique;not null;default:null"`
+	Title    string    `json:"title" gorm:"column:title;not null;default:null"`
+	Slug     string    `json:"slug" gorm:"column:slug;not null;default:null"`
+	ImageURL string    `json:"imageUrl" gorm:"column:image_url;not null;default:null"`
+	Synopsis string    `json:"synopsis" gorm:"column:synopsis;not null;default:null"`
+	OtherID  string    `json:"otherId" gorm:"column:other_id;not null;default:null"`
 	Chapters []Chapter `json:"chapters" gorm:"foreignkey:MangaID"`
 }
 
@@ -26,12 +26,13 @@ func (m Manga) TableName() string {
 
 type Chapter struct {
 	ID         int     `json:"id" gorm:"column:id;primarykey"`
-	URL        string  `json:"url" gorm:"column:url"`
-	Title      string  `json:"title" gorm:"column:title"`
+	URL        string  `json:"url" gorm:"column:url;unique;not null;default:null"`
+	Title      string  `json:"title" gorm:"column:title;not null;default:null"`
 	MangaID    int     `json:"-" gorm:"column:manga_id"`
-	Number     string  `json:"number" gorm:"column:number"`
-	UploadDate string  `json:"uploadDate" gorm:"column:upload_date"`
+	Number     string  `json:"number" gorm:"column:number;not null;default:null"`
+	UploadDate string  `json:"uploadDate" gorm:"column:upload_date;not null;default:null"`
 	ImageURLs  StrList `json:"imageUrls" gorm:"column:image_urls"`
+	OtherID    string  `json:"otherId" gorm:"column:other_id;not null;default:null"`
 	Completed  bool    `json:"completed" gorm:"column:completed"`
 	Downloaded bool    `json:"downloaded" gorm:"column:downloaded"`
 }

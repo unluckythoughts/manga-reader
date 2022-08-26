@@ -1,35 +1,24 @@
 version: "3.5"
 
 services:
-  example-db:
-    image: "postgres:13"
-    hostname: "example-db"
-    container_name: "example-db"
+  manga-reader:
+    build:
+      context: .
+      target: prod
+    hostname: "manga-reader"
+    container_name: "manga-reader"
+    profiles:
+      - test
     environment:
-      POSTGRES_USER: "example"
-      POSTGRES_PASSWORD: "example"
-      POSTGRES_DB: "example"
-    ports:
-      - "5432:5432"
-
-  example-redis:
-    image: "bitnami/redis:latest"
-    hostname: "example-redis"
-    container_name: "example-redis"
-    ports:
-      - "6379:6379"
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-
-  example-stack:
-    image: "localstack/localstack"
-    hostname: "example-stack"
-    container_name: "example-stack"
-    environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - DEBUG=1
-      - SERVICES=sqs
+      DB_FILE_PATH: "test.db"
+      WEB_PORT: 5678
+      WEB_CORS: true
+      WEB_PROXY: true
+      DB_DEBUG: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./tests/helpers/repo/test.db:/app/test.db
     ports:
-      - "4566:4566"
+      - "5678:5678"
+    command:
+      - /app/manga-reader

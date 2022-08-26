@@ -22,6 +22,16 @@ func (s *Service) GetSourceMangaList(ctx web.Context, domain string, force bool)
 	mangas, err := conn.GetMangaList(ctx)
 
 	s.w.UpdateSourceMangas(ctx, domain, mangas)
+
+	if len(mangas) > 200 {
+		return mangas[:200], err
+	}
+	return mangas, err
+}
+
+func (s *Service) SearchSourceManga(ctx web.Context, query string) ([]models.Manga, error) {
+	mangas, err := s.db.SearchMangasByTitle(ctx, query)
+
 	return mangas, err
 }
 
@@ -32,7 +42,7 @@ func (s *Service) GetSourceManga(ctx web.Context, mangaURL string, force bool) (
 
 	conn, err := connector.New(ctx, mangaURL)
 	if err != nil {
-		return models.Manga{}, nil
+		return models.Manga{}, err
 	}
 	manga, err := conn.GetMangaInfo(ctx, mangaURL)
 
@@ -40,10 +50,10 @@ func (s *Service) GetSourceManga(ctx web.Context, mangaURL string, force bool) (
 	return manga, err
 }
 
-func (s *Service) GetSourceMangaChapter(ctx web.Context, chapterURL string) ([]string, error) {
+func (s *Service) GetSourceMangaChapter(ctx web.Context, chapterURL string) (models.Pages, error) {
 	conn, err := connector.New(ctx, chapterURL)
 	if err != nil {
-		return []string{}, nil
+		return models.Pages{}, err
 	}
 
 	return conn.GetChapterPages(ctx, chapterURL)

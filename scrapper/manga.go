@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
+	"github.com/unluckythoughts/manga-reader/utils"
 	"go.uber.org/zap"
 )
 
@@ -69,7 +70,7 @@ func populateManga(ctx web.Context, sels models.MangaInfoSelectors, resp *mangaI
 			}
 			if len(dates) > 0 {
 				var err error
-				chapter.UploadDate, err = ParseDate(dates[i], sels.ChapterUploadDateFormat)
+				chapter.UploadDate, err = utils.ParseDate(dates[i], sels.ChapterUploadDateFormat)
 				if err != nil {
 					ctx.Logger().With(zap.Error(err)).Debug("could not parse upload date %s", dates[i])
 				}

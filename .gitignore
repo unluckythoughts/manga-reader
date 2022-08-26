@@ -2,10 +2,10 @@
 *.exe
 *.exe~
 *.dll
-*.so
 *.dylib
 
 db.sqlite
+*.db
 tmp/
 
 # Test binary, built with `go test -c`

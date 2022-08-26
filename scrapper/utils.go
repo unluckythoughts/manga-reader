@@ -1,25 +1,18 @@
 package scrapper
 
 import (
-	"fmt"
 	"html"
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/unluckythoughts/manga-reader/models"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
 	"github.com/pkg/errors"
+	"github.com/unluckythoughts/manga-reader/utils"
 )
-
-func strAdd(a string, b int) string {
-	numA, err := strconv.Atoi(a)
-	if err != nil {
-		return a + strconv.Itoa(b)
-	}
-	return strconv.Itoa(numA + b)
-}
 
 func getText(s *goquery.Selection, selector string) (string, error) {
 	var text string
@@ -45,79 +38,12 @@ func getText(s *goquery.Selection, selector string) (string, error) {
 	return text, nil
 }
 
-func parseHumanReadableFormat(date string) (string, error) {
-	t := strings.Split(strings.TrimSpace(date), " ")
-
-	if len(t) < 3 {
-		t = append([]string{"1"}, t...)
-	}
-
-	if t[2] != "ago" {
-		return date, errors.New("human readable date does not end with 'ago'")
-	}
-
-	var err error
-	var num int64
-	var timeSpan int64
-
-	if t[0] == "a" || t[0] == "an" || t[0] == "1" || t[0] == "few" {
-		num = -1
-	} else {
-		num, err = strconv.ParseInt(t[0], 10, 64)
-		if err != nil {
-			return date, errors.Wrapf(err, "human readable date could not parse num of quantity %s", t[0])
-		}
-
-		num = -1 * num
-	}
-
-	switch {
-	case strings.HasPrefix(t[1], "second"):
-		timeSpan = int64(time.Second)
-	case strings.HasPrefix(t[1], "minute"):
-		timeSpan = int64(time.Minute)
-	case strings.HasPrefix(t[1], "hour"):
-		timeSpan = int64(time.Hour)
-	case strings.HasPrefix(t[1], "day"):
-		timeSpan = int64(24 * time.Hour)
-	case strings.HasPrefix(t[1], "week"):
-		timeSpan = int64(7 * 24 * time.Hour)
-	case strings.HasPrefix(t[1], "month"):
-		timeSpan = int64(30 * 24 * time.Hour)
-	case strings.HasPrefix(t[1], "year"):
-		timeSpan = int64(365 * 24 * time.Hour)
-	default:
-		return date, errors.Errorf("human readable date could not parse time span %s", t[1])
-	}
-
-	newDate := time.Now().Add(time.Duration(num * timeSpan)).Format("2006-01-02")
-
-	return newDate, nil
-}
-
-func ParseDate(date string, format string) (string, error) {
-	if strings.HasSuffix(date, "ago") || format == HUMAN_READABLE_DATE_FORMAT {
-		return parseHumanReadableFormat(date)
-	}
-
-	if format == "" {
-		return date, nil
-	}
-
-	t, err := time.Parse(format, date)
-	if err != nil {
-		return date, err
-	}
-
-	return t.Format("2006-01-02"), nil
-}
-
 func getTextForSelector(h *colly.HTMLElement, sel string) (string, error) {
 	sels := getSelectors(sel)
 	var selectorErr error
 	for _, s := range sels {
 		// fmt.Println(h.DOM.Html())
-		val, err := getText(h.DOM.Find(getSelector(s)), s)
+		val, err := getText(h.DOM.Find(s), s)
 		if val != "" {
 			return val, err
 		}
@@ -130,6 +56,194 @@ func getTextForSelector(h *colly.HTMLElement, sel string) (string, error) {
 	return "", selectorErr
 }
 
+func GetTextForSelector(selection *goquery.Selection, sel string) (string, error) {
+	if sel == "" {
+		return "", nil
+	}
+	// x, e := selection.Html()
+	// fmt.Println(x, e)
+
+	sels := getSelectors(sel)
+	var selectorErr error
+	for _, s := range sels {
+		selForText := selection
+		if s != "" {
+			selForText = selection.Find(s)
+		}
+
+		val, err := getText(selForText, s)
+		if val != "" {
+			return val, err
+		}
+
+		if err != nil {
+			selectorErr = err
+		}
+	}
+
+	return "", selectorErr
+}
+
+func GetElementForSelector(selection *goquery.Selection, sel string) (*goquery.Selection, bool) {
+	sels := getSelectors(sel)
+	for _, s := range sels {
+		if selection.Find(s).Length() > 0 {
+			return selection.Find(s).First(), true
+		}
+	}
+
+	return nil, false
+}
+
+func getMangaFromSelectors(
+	s *goquery.Selection,
+	titleSelector,
+	uRLSelector,
+	imageURLSelector,
+	slugSelector,
+	synopsisSelector,
+	otherIDSelector string,
+) (models.Manga, error) {
+	manga := models.Manga{}
+
+	title, err := GetTextForSelector(s, titleSelector)
+	if err != nil {
+		return manga, errors.Wrapf(err, "could not get manga title with selector %s", titleSelector)
+	}
+
+	mangaURL, err := GetTextForSelector(s, uRLSelector)
+	if err != nil {
+		return manga, errors.Wrapf(err, "could not get manga url with selector %s", uRLSelector)
+	}
+
+	imageURL, err := GetTextForSelector(s, imageURLSelector)
+	if err != nil {
+		return manga, errors.Wrapf(err, "could not get manga image url with selector %s", imageURLSelector)
+	}
+
+	slug, err := GetTextForSelector(s, slugSelector)
+	if err != nil {
+		return manga, errors.Wrapf(err, "could not get manga slug with selector %s", slugSelector)
+	}
+
+	synopsis, err := GetTextForSelector(s, synopsisSelector)
+	if err != nil {
+		return manga, errors.Wrapf(err, "could not get manga synopsis with selector %s", synopsisSelector)
+	}
+
+	otherID, err := GetTextForSelector(s, otherIDSelector)
+	if err != nil {
+		return manga, errors.Wrapf(err, "could not get manga other id with selector %s", otherIDSelector)
+	}
+
+	manga.Title = title
+	manga.URL = mangaURL
+	manga.ImageURL = imageURL
+	manga.Slug = slug
+	manga.Synopsis = synopsis
+	manga.OtherID = otherID
+
+	return manga, nil
+}
+
+func GetMangaFromListSelectors(s *goquery.Selection, list models.MangaList) (models.Manga, error) {
+	return getMangaFromSelectors(s,
+		list.MangaTitle,
+		list.MangaURL,
+		list.MangaImageURL,
+		list.MangaSlug,
+		"",
+		list.MangaOtherID,
+	)
+}
+
+func GetMangaFromInfoSelectors(s *goquery.Selection, info models.MangaInfo) (models.Manga, error) {
+	return getMangaFromSelectors(s,
+		info.Title,
+		"",
+		info.ImageURL,
+		info.Slug,
+		info.Synopsis,
+		info.OtherID,
+	)
+}
+
+func UniqChapters(chapters []models.Chapter) []models.Chapter {
+	chapterMap := map[string]models.Chapter{}
+	for _, c := range chapters {
+		chapterMap[c.Number] = c
+	}
+
+	chapters = []models.Chapter{}
+	for _, c := range chapterMap {
+		chapters = append(chapters, c)
+	}
+
+	return chapters
+}
+
+func GetChapterFromInfoSelectors(s *goquery.Selection, info models.MangaInfo) (models.Chapter, error) {
+	chapter := models.Chapter{}
+	title, err := GetTextForSelector(s, info.ChapterTitle)
+	if err != nil {
+		return chapter, errors.Wrapf(err, "could not get chapter title with selector %s", info.ChapterTitle)
+	}
+
+	number, err := GetTextForSelector(s, info.ChapterNumber)
+	if err != nil {
+		return chapter, errors.Wrapf(err, "could not get chapter number with selector %s", info.ChapterNumber)
+	}
+	number = GetChapterNumber(number)
+
+	chapterURL, err := GetTextForSelector(s, info.ChapterURL)
+	if err != nil {
+		return chapter, errors.Wrapf(err, "could not get chapter url with selector %s", info.ChapterURL)
+	}
+
+	uploadDate, err := GetTextForSelector(s, info.ChapterUploadDate)
+	if err != nil {
+		return chapter, errors.Wrapf(err, "could not get chapter upload date with selector %s", info.ChapterUploadDate)
+	}
+	parsedDate, err := utils.ParseDate(uploadDate, info.ChapterUploadDateFormat)
+	if err != nil {
+		return chapter, errors.Wrapf(err, "could not parse chapter upload date %s with format %s", uploadDate, info.ChapterUploadDateFormat)
+	}
+
+	chapter.Title = title
+	chapter.Number = number
+	chapter.URL = chapterURL
+	chapter.UploadDate = parsedDate
+
+	return chapter, nil
+}
+
+func GetImagesListForSelector(selection *goquery.Selection, selector string, includeNoScript bool) (images []string, err error) {
+	// fix for <noscript> tags
+	if includeNoScript {
+		selection.Find("noscript").Parent().SetHtml(selection.Find("noscript").Text())
+	}
+
+	selectors := getSelectors(selector)
+	var selectorErr error
+	for _, s := range selectors {
+		selection.Find(s).Each(func(i int, sel *goquery.Selection) {
+			var text string
+			text, selectorErr = getText(sel, s)
+			images = append(images, text)
+		})
+
+		if len(images) > 0 {
+			return images, nil
+		}
+
+		if selectorErr != nil {
+			return images, errors.Wrapf(selectorErr, "could not get chapter image url for selector %s", selector)
+		}
+	}
+
+	return images, selectorErr
+}
+
 func getTextListForSelector(h *colly.HTMLElement, selector string, includeNoScript bool) (texts []string, err error) {
 	// fix for <noscript> tags
 	if includeNoScript {
@@ -139,7 +253,7 @@ func getTextListForSelector(h *colly.HTMLElement, selector string, includeNoScri
 	selectors := getSelectors(selector)
 	var selectorErr error
 	for _, s := range selectors {
-		h.DOM.Find(getSelector(s)).Each(func(i int, sel *goquery.Selection) {
+		h.DOM.Find(s).Each(func(i int, sel *goquery.Selection) {
 			var text string
 			text, err = getText(sel, s)
 			texts = append(texts, text)
@@ -158,7 +272,7 @@ func getTextListForSelector(h *colly.HTMLElement, selector string, includeNoScri
 }
 
 func getSelectors(selector string) []string {
-	pattern, err := regexp.Compile("[^[,]+(\\[[^]]+\\])?")
+	pattern, err := regexp.Compile("[^[,]*(\\[[^]]+\\])?")
 	if err != nil {
 		return []string{selector}
 	}
@@ -170,15 +284,6 @@ func getSelectors(selector string) []string {
 	}
 
 	return selectors
-}
-
-func getSelector(selector string) string {
-	pattern, err := regexp.Compile("\\[[^]]+\\]")
-	if err != nil {
-		return selector
-	}
-
-	return pattern.ReplaceAllString(selector, "")
 }
 
 func hasDataInAttr(selector string) (string, []string, bool) {
@@ -196,20 +301,6 @@ func hasDataInAttr(selector string) (string, []string, bool) {
 	selector = pattern.ReplaceAllString(selector, "")
 
 	return selector, strings.Split(attr, ","), true
-}
-
-func isInternalLink(s string) bool {
-	pattern := regexp.MustCompile("^[?&]")
-
-	return pattern.MatchString(s)
-}
-
-func getString(num float64) string {
-	strFloat := fmt.Sprintf("%f", num)
-	strFloat = strings.TrimRight(strFloat, "0")
-	strFloat = strings.TrimRight(strFloat, ".")
-
-	return strFloat
 }
 
 func GetChapterNumber(text string) string {
@@ -232,7 +323,7 @@ func GetChapterNumber(text string) string {
 	matches := re.FindAllStringSubmatch(text, -1)
 
 	if len(matches) == 1 {
-		return getString(getValue(matches[0]))
+		return utils.GetString(getValue(matches[0]))
 	} else if len(matches) > 1 {
 		var num float64
 		for _, match := range matches {
@@ -241,7 +332,7 @@ func GetChapterNumber(text string) string {
 				num = newNum
 			}
 		}
-		return getString(num)
+		return utils.GetString(num)
 	}
 
 	return ""

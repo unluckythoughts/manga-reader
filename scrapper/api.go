@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
+	"github.com/unluckythoughts/manga-reader/utils"
 )
 
 func getData(ctx web.Context, q models.APIQueryData, cb func(interface{})) error {
@@ -42,7 +43,7 @@ func getData(ctx web.Context, q models.APIQueryData, cb func(interface{})) error
 			if q.PageParam != "" {
 				pageParam = q.PageParam
 			}
-			params.Set(pageParam, strAdd(params.Get(pageParam), 1))
+			params.Set(pageParam, utils.StrAdd(params.Get(pageParam), 1))
 		} else {
 			break
 		}
@@ -54,39 +55,39 @@ func getData(ctx web.Context, q models.APIQueryData, cb func(interface{})) error
 func GetMangaListAPI(ctx web.Context, q models.APIQueryData, t models.MangaListTransform) ([]models.Manga, error) {
 	mangas := []models.Manga{}
 
-	getData(ctx, q, func(apiResp interface{}) {
+	err := getData(ctx, q, func(apiResp interface{}) {
 		mangas = append(mangas, t(apiResp)...)
 	})
 
-	return mangas, nil
+	return mangas, err
 }
 
 func GetMangaInfoAPI(ctx web.Context, q models.APIQueryData, t models.MangaInfoTransform) (models.Manga, error) {
 	manga := models.Manga{}
 
-	getData(ctx, q, func(apiResp interface{}) {
+	err := getData(ctx, q, func(apiResp interface{}) {
 		manga = t(apiResp)
 	})
 
-	return manga, nil
+	return manga, err
 }
 
 func GetChapterListAPI(ctx web.Context, q models.APIQueryData, t models.ChapterListTransform) ([]models.Chapter, error) {
 	chapters := []models.Chapter{}
 
-	getData(ctx, q, func(apiResp interface{}) {
+	err := getData(ctx, q, func(apiResp interface{}) {
 		chapters = append(chapters, t(apiResp)...)
 	})
 
-	return chapters, nil
+	return chapters, err
 }
 
 func GetPagesListAPI(ctx web.Context, q models.APIQueryData, t models.PagesListTransform) ([]string, error) {
 	pages := []string{}
 
-	getData(ctx, q, func(apiResp interface{}) {
+	err := getData(ctx, q, func(apiResp interface{}) {
 		pages = append(pages, t(apiResp)...)
 	})
 
-	return pages, nil
+	return pages, err
 }

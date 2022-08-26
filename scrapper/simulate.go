@@ -2,6 +2,7 @@ package scrapper
 
 import (
 	"log"
+	"net"
 	"net/url"
 	"os/exec"
 	"strings"
@@ -13,9 +14,20 @@ import (
 	"go.uber.org/zap"
 )
 
-func startChromium(ctx web.Context) {
+func startChrome(ctx web.Context, headless bool) {
 	chromeapp := "/usr/bin/chromium"
-	chromeappArg := []string{"--headless", "--hide-scrollbars", "--remote-debugging-port=9222", "--disable-gpu", "--allow-insecure-localhost"}
+	chromeappArg := []string{
+		"--hide-scrollbars",
+		"--remote-debugging-port=9222",
+		"--disable-gpu",
+		"--allow-insecure-localhost",
+		"--incognito",
+		"--hide-crash-restore-bubble",
+	}
+	if headless {
+		chromeappArg = append(chromeappArg, "--headless")
+	}
+
 	cmd := exec.Command(chromeapp, chromeappArg...)
 	err := cmd.Start()
 	if err != nil {
@@ -24,7 +36,7 @@ func startChromium(ctx web.Context) {
 	ctx.Logger().Debug("Started chromium headless")
 }
 
-func killChromium(ctx web.Context) {
+func killChrome(ctx web.Context) {
 	cmd := exec.Command("pkill", "-9", "chromium")
 	err := cmd.Start()
 	if err != nil {
@@ -34,7 +46,7 @@ func killChromium(ctx web.Context) {
 }
 
 func connectToDebugger(ctx web.Context) (*godet.RemoteDebugger, error) {
-	for {
+	for i := 0; i < 20; i++ {
 		time.Sleep(100 * time.Millisecond)
 		remote, err := godet.Connect("localhost:9222", false)
 		if err != nil {
@@ -53,6 +65,7 @@ func connectToDebugger(ctx web.Context) (*godet.RemoteDebugger, error) {
 
 		return remote, nil
 	}
+	return nil, net.ErrClosed
 }
 
 func injectCallback(ctx web.Context, remote *godet.RemoteDebugger, script string, data *respData) godet.EventCallback {
@@ -125,23 +138,30 @@ type respData struct {
 	data []string
 }
 
-func SimulateBrowser(ctx web.Context, url, injectScript string) ([]string, error) {
-	startChromium(ctx)
-	defer killChromium(ctx)
-
+func navigateToUrl(ctx web.Context, url string) (*godet.RemoteDebugger, error) {
 	// connect to Chromium instance
 	remote, err := connectToDebugger(ctx)
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
-
-	// disconnect when done
-	defer remote.Close()
 
 	_, err = remote.Navigate(url)
 	if err != nil {
+		return nil, err
+	}
+
+	return remote, nil
+}
+
+func SimulateBrowser(ctx web.Context, url, injectScript string) ([]string, error) {
+	startChrome(ctx, true)
+	defer killChrome(ctx)
+
+	remote, err := navigateToUrl(ctx, url)
+	if err != nil {
 		return []string{}, err
 	}
+	defer remote.Close()
 
 	resp := respData{}
 	remote.CallbackEvent("Page.frameStoppedLoading", injectCallback(
@@ -157,4 +177,27 @@ func SimulateBrowser(ctx web.Context, url, injectScript string) ([]string, error
 	}
 
 	return []string{}, errors.Errorf("could not get data for url %s", url)
+}
+
+func GetBrowserTab(ctx web.Context, url string, cb func(*godet.RemoteDebugger) bool) {
+	startChrome(ctx, false)
+
+	// connect to Chromium instance
+	remote, err := connectToDebugger(ctx)
+	if err != nil {
+		return
+	}
+	remote.AllEvents(true)
+
+	remote.CallbackEvent("Page.frameStoppedLoading", func(p godet.Params) {
+		if cb(remote) {
+			remote.Close()
+			killChrome(ctx)
+		}
+	})
+
+	_, err = remote.Navigate(url)
+	if err != nil {
+		return
+	}
 }

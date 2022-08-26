@@ -10,6 +10,10 @@ import (
 
 func (w *Worker) UpdateSourceMangas(ctx web.Context, domain string, mangas []models.Manga) {
 	go func() {
+		if len(mangas) == 0 {
+			return
+		}
+
 		ctx = web.NewContext(ctx.Logger().Desugar())
 		source, err := w.db.FindSourceByDomain(ctx, domain)
 		if err != nil {
@@ -44,7 +48,6 @@ func (w *Worker) UpdateSourceMangas(ctx web.Context, domain string, mangas []mod
 				return
 			}
 		}
-
 		source.UpdatedAt = time.Now().Format("2006-01-02")
 
 		err = w.db.SaveSource(ctx, &source)
@@ -52,6 +55,7 @@ func (w *Worker) UpdateSourceMangas(ctx web.Context, domain string, mangas []mod
 			ctx.Logger().With(zap.Error(err)).Errorf("could not update timestamp for %+s", domain)
 			return
 		}
+
 	}()
 }
 
@@ -65,22 +69,27 @@ func (w *Worker) UpdateSourceManga(ctx web.Context, domain string, manga models.
 		}
 
 		manga.SourceID = source.ID
-		for i := range manga.Chapters {
-			if manga.Chapters[i].UploadDate == "" {
-				manga.Chapters[i].UploadDate = time.Now().Format("2006-01-02")
-			}
-		}
-
-		err = w.db.UpdateMangas(ctx, &[]models.Manga{manga})
+		mangas := []models.Manga{manga}
+		err = w.db.UpdateMangas(ctx, &mangas)
 		if err != nil {
 			ctx.Logger().With(zap.Error(err)).Errorf("could not update manga for %+s", domain)
 			return
 		}
+		manga.ID = mangas[0].ID
 
-		// err = w.db.UpdateChapters(ctx, &manga.Chapters)
-		// if err != nil {
-		// 	ctx.Logger().With(zap.Error(err)).Errorf("could not update chapters of %+s for", manga.Title, domain)
-		// 	return
-		// }
+		if len(manga.Chapters) > 1 {
+			for i := range manga.Chapters {
+				manga.Chapters[i].MangaID = manga.ID
+				if manga.Chapters[i].UploadDate == "" {
+					manga.Chapters[i].UploadDate = time.Now().Format("2006-01-02")
+				}
+			}
+
+			err = w.db.UpdateChapters(ctx, &manga.Chapters)
+			if err != nil {
+				ctx.Logger().With(zap.Error(err)).Errorf("could not update chapters of %+s for", manga.Title, domain)
+				return
+			}
+		}
 	}()
 }

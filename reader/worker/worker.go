@@ -7,6 +7,8 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 	"github.com/unluckythoughts/manga-reader/reader/repository"
 	"gorm.io/gorm"
+
+	_ "gitlab.cobalt.rocks/coderdojo/sqlite-regexp.git"
 )
 
 type Worker struct {
@@ -15,12 +17,19 @@ type Worker struct {
 
 func setupConfig(db *gorm.DB) {
 	r := repository.New(db)
+
+	err := db.Exec("SELECT '' REGEXP '';").Error
+	if err != nil {
+		db.Logger.Error(nil, "could not update sources")
+		panic(err)
+	}
+
 	sources := []models.Source{}
 	for _, conn := range connector.GetAllConnectors() {
 		sources = append(sources, conn.GetSource())
 	}
 
-	err := r.CreateSources(context.Background(), &sources)
+	err = r.CreateSources(context.Background(), &sources)
 	if err != nil {
 		db.Logger.Error(nil, "could not update sources")
 		panic(err)

@@ -12,12 +12,12 @@ import (
 func GetAllConnectors() []models.IConnector {
 	return append(
 		[]models.IConnector{},
-		getAsuraScansConnector(),
-		getLeviatanScansConnector(),
-		getZeroScansConnector(),
-		getRealmScansConnector(),
-		getReaperScansConnector(),
-		getMangaHubConnector(),
+		GetAsuraScansConnector(),
+		GetLeviatanScansConnector(),
+		GetZeroScansConnector(),
+		GetRealmScansConnector(),
+		GetReaperScansConnector(),
+		GetMangaHubConnector(),
 	)
 }
 

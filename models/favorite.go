@@ -1,54 +1,13 @@
 package models
 
-import (
-	"database/sql/driver"
-	"strconv"
-	"strings"
-)
-
-type StrIntList [2]int
-
-func (sil *StrIntList) Scan(value interface{}) error {
-	l := StrIntList{0, 0}
-	data, ok := value.(string)
-	if !ok || data == "" {
-		return nil
-	}
-
-	sl := strings.Split(data, ",")
-	for i, s := range sl {
-		v, err := strconv.Atoi(s)
-		if err != nil {
-			return err
-		}
-		l[i] = v
-	}
-
-	*sil = l
-	return nil
-}
-
-func (sil StrIntList) Value() (driver.Value, error) {
-	if len(sil) == 0 {
-		return "", nil
-	}
-
-	l := []string{}
-	for _, v := range sil {
-		l = append(l, strconv.Itoa(v))
-	}
-
-	return strings.Join(l, ","), nil
-}
-
 type Favorite struct {
-	ID         int        `json:"id" gorm:"column:id;primarykey"`
-	UserID     int        `json:"-" gorm:"column:user_id"`
-	User       User       `json:"user" gorm:"foreignkey:UserID"`
-	MangaID    int        `json:"-" gorm:"column:manga_id"`
-	Manga      Manga      `json:"manga" gorm:"foreignkey:MangaID"`
-	Progress   StrIntList `json:"progress" gorm:"column:progress"`
-	Categories StrList    `json:"categories" gorm:"column:categories"`
+	ID         int          `json:"id" gorm:"column:id;primarykey"`
+	UserID     int          `json:"-" gorm:"column:user_id"`
+	User       User         `json:"user" gorm:"foreignkey:UserID"`
+	MangaID    int          `json:"-" gorm:"column:manga_id"`
+	Manga      Manga        `json:"manga" gorm:"foreignkey:MangaID"`
+	Progress   StrFloatList `json:"progress" gorm:"column:progress"`
+	Categories StrList      `json:"categories" gorm:"column:categories"`
 }
 
 func (f Favorite) TableName() string {

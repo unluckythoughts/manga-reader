@@ -1,222 +1,170 @@
 package connector
 
 import (
+	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
 	"github.com/unluckythoughts/manga-reader/scrapper"
-	"go.uber.org/zap"
 )
 
-type zero models.Source
+type zero models.Connector
+
+type zeroAPIResponseBody struct {
+	Data struct {
+		Comics []struct {
+			ID      models.StrFloat `json:"id" manga-reader:"manga.id"`
+			Slug    string          `json:"Slug" manga-reader:"manga.slug"`
+			Name    string          `json:"name" manga-reader:"manga.title"`
+			Summary string          `json:"summary" manga-reader:"manga.synopsis"`
+			Cover   struct {
+				Horizontal string `json:"horizontal" manga-reader:"manga.image-url[2]"`
+				Vertical   string `json:"vertical" manga-reader:"manga.image-url[3]"`
+				Full       string `json:"full" manga-reader:"manga.image-url[1]"`
+			} `json:"cover"`
+		} `json:"comics" manga-reader:"manga-list"`
+		ID      models.StrFloat `json:"id" manga-reader:"manga.id"`
+		Name    string          `json:"name" manga-reader:"manga.title"`
+		Slug    string          `json:"slug" manga-reader:"manga.slug"`
+		Summary string          `json:"summary" manga-reader:"manga.synopsis"`
+		Cover   struct {
+			Horizontal string `json:"horizontal" manga-reader:"manga.image-url[2]"`
+			Vertical   string `json:"vertical" manga-reader:"manga.image-url[3]"`
+			Full       string `json:"full" manga-reader:"manga.image-url[1]"`
+		} `json:"cover"`
+
+		Data []struct {
+			ID        models.StrFloat `json:"id" manga-reader:"manga.chapter.id"`
+			Name      models.StrFloat `json:"name" manga-reader:"manga.chapter.title"`
+			CreatedAt string          `json:"created_at" manga-reader:"manga.chapter.upload-date|"`
+		} `json:"data" manga-reader:"manga.chapter-list"`
+		CurrentPage int    `json:"current_page" manga-reader:"manga.chapter-list.current-page"`
+		LastPage    int    `json:"last_page" manga-reader:"manga.chapter-list.last-page"`
+		NextPageURL string `json:"next_page_url" manga-reader:"manga.chapter-list.next-page-url"`
+
+		Chapter struct {
+			HighQuality []string `json:"high_quality" manga-reader:"manga.chapter.pages-list[1]"`
+			GoodQuality []string `json:"good_quality" manga-reader:"manga.chapter.pages-list[2]"`
+		} `json:"chapter"`
+	} `json:"data"`
+}
+
+func GetZeroScansConnector() models.IConnector {
+	return &zero{
+		Source: models.Source{
+			Name:    "Zero Scans",
+			Domain:  "zeroscans.com",
+			IconURL: "https://zeroscans.com/favicon.ico",
+		},
+		BaseURL:       "https://zeroscans.com/swordflake/",
+		MangaListPath: "comics/",
+	}
+}
 
 func (z *zero) GetSource() models.Source {
-	return models.Source(*z)
+	return z.Source
 }
 
 func (z *zero) GetMangaList(ctx web.Context) ([]models.Manga, error) {
-	type apiRespStruct struct {
-		Data struct {
-			Comics []struct {
-				ID      strFloat `json:"id"`
-				Slug    string   `json:"Slug"`
-				Name    string   `json:"name"`
-				Summary string   `json:"summary"`
-				Cover   struct {
-					Horizontal string `json:"horizontal"`
-					Vertical   string `json:"vertical"`
-					Full       string `json:"full"`
-				} `json:"cover"`
-			} `json:"comics"`
-		} `json:"data"`
-	}
-
+	apiResp := zeroAPIResponseBody{}
 	q := models.APIQueryData{
-		URL:      "https://zeroscans.com/swordflake/comics",
-		Response: &apiRespStruct{},
+		URL:      z.BaseURL + z.MangaListPath,
+		Response: &apiResp,
 	}
 
-	transform := func(r interface{}) (mangas []models.Manga) {
-		resp, ok := r.(*apiRespStruct)
-		if !ok {
-			return mangas
-		}
-
-		for _, item := range resp.Data.Comics {
-			imageURL := item.Cover.Full
-			if imageURL == "" {
-				imageURL = item.Cover.Horizontal
-				if imageURL == "" {
-					imageURL = item.Cover.Vertical
-				}
-			}
-
-			mangas = append(mangas, models.Manga{
-				Title:    item.Name,
-				ImageURL: imageURL,
-				URL:      "https://zeroscans.com/swordflake/comic/" + item.Slug,
-				OtherID:  string(item.ID),
-				Synopsis: item.Summary,
-			})
-		}
-
-		return mangas
+	err := scrapper.GetAPIResponse(ctx, q)
+	if err != nil {
+		return []models.Manga{}, err
 	}
 
-	return scrapper.GetMangaListAPI(ctx, q, transform)
+	mangas, err := scrapper.GetMangaListFromTags(apiResp)
+	if err != nil {
+		return mangas, err
+	}
+
+	for i, m := range mangas {
+		mangas[i].URL = z.BaseURL + z.MangaListPath + m.Slug
+	}
+
+	return mangas, nil
 }
 
 func (z *zero) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
-	type apiRespStruct struct {
-		Data struct {
-			ID      strFloat `json:"id"`
-			Name    string   `json:"name"`
-			Slug    string   `json:"slug"`
-			Summary string   `json:"summary"`
-			Cover   struct {
-				Horizontal string `json:"horizontal"`
-				Vertical   string `json:"vertical"`
-				Full       string `json:"full"`
-			} `json:"cover"`
-		} `json:"data"`
-	}
-
-	transform := func(r interface{}) models.Manga {
-		resp, ok := r.(*apiRespStruct)
-		if !ok {
-			return models.Manga{}
-		}
-
-		imageURL := resp.Data.Cover.Full
-		if imageURL == "" {
-			imageURL = resp.Data.Cover.Horizontal
-			if imageURL == "" {
-				imageURL = resp.Data.Cover.Vertical
-			}
-		}
-
-		manga := models.Manga{
-			URL:      "https://zeroscans.com/swordflake/comic/" + url.PathEscape(resp.Data.Slug),
-			Title:    resp.Data.Name,
-			ImageURL: imageURL,
-			Slug:     resp.Data.Slug,
-			Synopsis: resp.Data.Summary,
-			OtherID:  string(resp.Data.ID),
-		}
-
-		return manga
-	}
-
+	apiResp := zeroAPIResponseBody{}
 	q := models.APIQueryData{
 		URL:      mangaURL,
-		Response: &apiRespStruct{},
+		Response: &apiResp,
 	}
 
-	manga, err := scrapper.GetMangaInfoAPI(ctx, q, transform)
+	err := scrapper.GetAPIResponse(ctx, q)
+	if err != nil {
+		return models.Manga{}, err
+	}
+
+	manga, err := scrapper.GetMangaInfoFromTags(apiResp)
 	if err != nil {
 		return manga, err
 	}
+	manga.URL = z.BaseURL + "comic/" + url.PathEscape(manga.Slug)
 
-	chapterListURL := "https://zeroscans.com/swordflake/comic/" + manga.OtherID + "/chapters"
-	manga.Chapters, err = z.getChapters(ctx, chapterListURL, manga.Slug)
+	chaptersURL := z.BaseURL + "comic/" + manga.OtherID + "/chapters"
+	params := map[string]string{
+		"page": "1",
+	}
+	for {
+		apiResp := zeroAPIResponseBody{}
+		q := models.APIQueryData{
+			URL:         chaptersURL,
+			Response:    &apiResp,
+			QueryParams: params,
+		}
+
+		err := scrapper.GetAPIResponse(ctx, q)
+		if err != nil {
+			return models.Manga{}, err
+		}
+
+		mangaChapters, err := scrapper.GetMangaInfoFromTags(apiResp)
+		if err != nil {
+			return manga, err
+		}
+
+		manga.Chapters = append(manga.Chapters, mangaChapters.Chapters...)
+
+		currentPage, lastPage, _ := scrapper.GetChapterListPageData(apiResp)
+		if currentPage == lastPage {
+			break
+		}
+
+		q.QueryParams["page"] = strconv.Itoa(currentPage + 1)
+	}
+
+	for i, c := range manga.Chapters {
+		manga.Chapters[i].URL = z.BaseURL + "comic/" + manga.Slug + "/chapters/" + c.OtherID
+		manga.Chapters[i].Title = "Chapter " + string(c.Title)
+		manga.Chapters[i].Number = c.Title
+	}
 
 	return manga, err
 }
 
-func (z *zero) getChapters(ctx web.Context, chapterListURL, slug string) ([]models.Chapter, error) {
-	type apiRespStruct struct {
-		Data struct {
-			Data []struct {
-				ID        strFloat `json:"id"`
-				Name      strFloat `json:"name"`
-				CreatedAt string   `json:"created_at"`
-			} `json:"data"`
-			CurrentPage int `json:"current_page"`
-			LastPage    int `json:"last_page"`
-		} `json:"data"`
-	}
+func (z *zero) GetChapterPages(ctx web.Context, pageListURL string) (models.Pages, error) {
+	headers := http.Header{}
+	headers.Add("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
 
-	transform := func(r interface{}) []models.Chapter {
-		chapters := []models.Chapter{}
-		resp, ok := r.(*apiRespStruct)
-		if !ok {
-			return chapters
-		}
-
-		for _, item := range resp.Data.Data {
-			uploadDate, err := scrapper.ParseDate(item.CreatedAt, scrapper.HUMAN_READABLE_DATE_FORMAT)
-			if err != nil {
-				ctx.Logger().With(zap.Error(err)).Debugf("could not parse date %s", item.CreatedAt)
-				uploadDate = item.CreatedAt
-			}
-
-			chapters = append(chapters, models.Chapter{
-				URL:        "https://zeroscans.com/swordflake/comic/" + slug + "/chapters/" + string(item.ID),
-				Number:     string(item.Name),
-				Title:      "Chapter " + string(item.Name),
-				UploadDate: uploadDate,
-			})
-		}
-
-		return chapters
-	}
-
-	hasNextPage := func(r interface{}) bool {
-		resp, ok := r.(*apiRespStruct)
-		if !ok {
-			return false
-		}
-
-		return resp.Data.CurrentPage < resp.Data.LastPage
-	}
-
-	q := models.APIQueryData{
-		URL:         chapterListURL,
-		Response:    &apiRespStruct{},
-		HasNextPage: hasNextPage,
-	}
-
-	chapters, err := scrapper.GetChapterListAPI(ctx, q, transform)
-
-	return uniqChapters(chapters), err
-}
-
-func (z *zero) GetChapterPages(ctx web.Context, pageListURL string) ([]string, error) {
-	type apiRespStruct struct {
-		Data struct {
-			Chapter struct {
-				HighQuality []string `json:"high_quality"`
-				GoodQuality []string `json:"good_quality"`
-			} `json:"chapter"`
-		} `json:"data"`
-	}
-
-	transform := func(r interface{}) (imageURLs []string) {
-		resp, ok := r.(*apiRespStruct)
-		if !ok {
-			return imageURLs
-		}
-
-		if len(resp.Data.Chapter.HighQuality) >= len(resp.Data.Chapter.GoodQuality) {
-			return resp.Data.Chapter.HighQuality
-		}
-
-		return resp.Data.Chapter.GoodQuality
-	}
-
+	apiResp := zeroAPIResponseBody{}
 	q := models.APIQueryData{
 		URL:      pageListURL,
-		Response: &apiRespStruct{},
+		Response: &apiResp,
+		Headers:  headers,
 	}
 
-	return scrapper.GetPagesListAPI(ctx, q, transform)
-}
-
-func getZeroScansConnector() models.IConnector {
-	return &zero{
-		Name:    "Zero Scans",
-		Domain:  "zeroscans.com",
-		IconURL: "https://zeroscans.com/favicon.ico",
+	err := scrapper.GetAPIResponse(ctx, q)
+	if err != nil {
+		return models.Pages{}, err
 	}
+
+	return scrapper.GetChapterPagesFromTags(apiResp)
 }

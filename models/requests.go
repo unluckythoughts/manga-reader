@@ -13,3 +13,7 @@ type SourceManagaListRequest struct {
 	Domain string `json:"domain"`
 	Force  bool   `json:"force"`
 }
+
+type SearchSourceManagaRequest struct {
+	Query string `json:"query"`
+}
