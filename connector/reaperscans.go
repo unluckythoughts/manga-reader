@@ -16,10 +16,9 @@ type reaper models.Connector
 func GetReaperScansConnector() models.IConnector {
 	return &reaper{
 		Source: models.Source{
-			Name:      "Reaper Scans",
-			Domain:    "reaperscans.com",
-			IconURL:   "https://styles.redditmedia.com/t5_4zgiee/styles/communityIcon_gxpzm2tt41l71.png",
-			Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+			Name:    "Reaper Scans",
+			Domain:  "reaperscans.com",
+			IconURL: "https://styles.redditmedia.com/t5_4zgiee/styles/communityIcon_gxpzm2tt41l71.png",
 		},
 		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
 		BaseURL:       "https://reaperscans.com/",

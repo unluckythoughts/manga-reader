@@ -6,10 +6,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/raff/godet"
-	"go.uber.org/zap"
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/go-microservice/tools/web"
@@ -26,11 +22,9 @@ type mangahub models.Connector
 func GetMangaHubConnector() models.IConnector {
 	return &mangahub{
 		Source: models.Source{
-
-			Name:      "Manga Hub",
-			Domain:    "mangahub.io",
-			IconURL:   "https://mangahub.io/logo-small.png",
-			Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+			Name:    "Manga Hub",
+			Domain:  "mangahub.io",
+			IconURL: "https://mangahub.io/logo-small.png",
 		},
 		Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
 		BaseURL:   "https://api.mghubcdn.com/graphql",
@@ -237,68 +231,16 @@ func (m *mangahub) GetChapterPages(ctx web.Context, chapterURL string) (models.P
 	}
 
 	imageURLs := []string{}
+	// ordering the image urls map based on index
 	for i := 0; i < len(strPages); i++ {
 		index := strconv.Itoa(i + 1)
-		imageURLs = append(imageURLs, "https://img.mghubcdn.com/file/imghub/"+strPages[index])
+		if len(strPages[index]) > 0 {
+			imageURLs = append(imageURLs, "https://img.mghubcdn.com/file/imghub/"+strPages[index])
+		}
 	}
 
 	if len(imageURLs) > 0 {
-		found := false
-		imageData := []string{}
-		count := 0
-		scrapper.GetBrowserTab(ctx, imageURLs[0], func(r *godet.RemoteDebugger) bool {
-			cookies, err := r.GetAllCookies()
-			if err != nil {
-				ctx.Logger().With(zap.Error(err)).Debug("error getting cookies from the browser")
-				return false
-			}
-
-			for _, c := range cookies {
-				if c.Name == "cf_clearance" {
-
-					_, err := r.Evaluate(`
-						const toDataURL = url => fetch(url)
-						.then(response => response.blob())
-						.then(blob => new Promise((resolve, reject) => {
-							const reader = new FileReader()
-							reader.onloadend = () => resolve(reader.result)
-							reader.onerror = reject
-							reader.readAsDataURL(blob)
-						}))
-					`)
-					if err != nil {
-						ctx.Logger().With(zap.Error(err)).Debugf("error getting image data for %s", imageURLs[count])
-						return true
-					}
-
-					for _, url := range imageURLs {
-						scriptResp, err := r.Evaluate(`
-							url="` + url + `"
-
-							toDataURL(url)
-						`)
-						if err != nil {
-							ctx.Logger().With(zap.Error(err)).Debugf("error getting image data for %s", imageURLs[count])
-							return true
-						}
-						data, _ := scriptResp.(string)
-						imageData = append(imageData, data)
-					}
-
-					count++
-
-					found = true
-					return true
-				}
-			}
-
-			return false
-		})
-
-		for !found {
-			time.Sleep(time.Second)
-		}
-		return models.Pages{URLs: imageData}, nil
+		return models.Pages{URLs: scrapper.GetImagesAsDataUrls(ctx, imageURLs)}, nil
 	}
 
 	return models.Pages{URLs: imageURLs}, nil

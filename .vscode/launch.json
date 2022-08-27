@@ -23,6 +23,13 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
+      "env": {
+        "WEB_PORT": "5678",
+        "DB_FILE_PATH": "db.sqlite",
+        "WEB_CORS": "true",
+        "WEB_PROXY": "true",
+        "DB_DEBUG": "true",
+      },
       "program": "${workspaceFolder}/main.go"
     }
   ]

@@ -14,19 +14,19 @@ type realm models.Connector
 func GetRealmScansConnector() models.IConnector {
 	return &realm{
 		Source: models.Source{
-			Name:      "Realm Scans",
-			Domain:    "realmscans.com",
-			IconURL:   "https://cdn.realmscans.com/2021/09/logo-realm-scans-2.webp",
-			Transport: cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+			Name:    "Realm Scans",
+			Domain:  "realmscans.com",
+			IconURL: "https://cdn.realmscans.com/2021/09/logo-realm-scans-2.webp",
 		},
 		BaseURL:       "https://realmscans.com/",
+		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
 		MangaListPath: "series",
 		Selectors: models.Selectors{
 			List: models.MangaList{
 				MangaContainer: "div.listupd > div.bs",
 				MangaTitle:     ".tt",
-				MangaURL:       "img[data-src], img[src]",
-				MangaImageURL:  "a[href]",
+				MangaImageURL:  "img[data-src], img[src]",
+				MangaURL:       "a[href]",
 				NextPage:       "div.hpage a.r[href]",
 			},
 			Info: models.MangaInfo{
@@ -54,6 +54,7 @@ func (r *realm) GetSource() models.Source {
 func (r *realm) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	c := models.Connector(*r)
 	opts := &scrapper.ScrapeOptions{
+		URL:          c.BaseURL + c.MangaListPath,
 		RoundTripper: c.Transport,
 	}
 	opts.SetDefaults()

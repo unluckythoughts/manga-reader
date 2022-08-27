@@ -1,12 +1,41 @@
 package scrapper
 
 import (
+	"io"
 	"net/http"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
 )
+
+const (
+	WHOLE_BODY_TAG = "WHOLE_BODY_TAG"
+)
+
+type ScrapeOptions struct {
+	URL            string
+	RoundTripper   http.RoundTripper
+	Headers        http.Header
+	InitialHtmlTag string
+	RequestMethod  string
+	Body           io.Reader
+}
+
+func (opts *ScrapeOptions) SetDefaults() {
+	if opts.InitialHtmlTag == "" {
+		opts.InitialHtmlTag = "body"
+	}
+
+	if opts.RequestMethod == "" {
+		opts.RequestMethod = http.MethodGet
+	}
+}
+
+func (opts *ScrapeOptions) Clone() *ScrapeOptions {
+	n := *opts
+	return &n
+}
 
 type Scrapper struct {
 	src models.Source

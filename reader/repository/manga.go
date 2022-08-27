@@ -37,7 +37,7 @@ func (r *Repository) UpdateMangas(ctx context.Context, mangas *[]models.Manga) e
 	err := r.db.WithContext(ctx).
 		Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "url"}},
-			UpdateAll: true,
+			DoUpdates: clause.AssignmentColumns([]string{"synopsis", "image_url", "slug", "other_id"}),
 		}, clause.Returning{}).
 		Save(mangas).
 		Error
@@ -62,8 +62,7 @@ func (r *Repository) UpdateChapters(ctx context.Context, chapters *[]models.Chap
 		WithContext(ctx).
 		Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "url"}},
-			UpdateAll: false,
-			DoNothing: true,
+			DoUpdates: clause.AssignmentColumns([]string{"number", "title", "other_id"}),
 		}, clause.Returning{}).
 		Save(chapters).
 		Error

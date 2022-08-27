@@ -9,18 +9,18 @@ import (
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-type asura models.Connector
+type flame models.Connector
 
-func GetAsuraScansConnector() models.IConnector {
-	return &asura{
+func GetFlameScansConnector() models.IConnector {
+	return &flame{
 		Source: models.Source{
-			Name:    "Asura Scans",
-			Domain:  "asurascans.com",
-			IconURL: "https://www.asurascans.com/wp-content/uploads/2021/03/Group_1.png",
+			Name:    "Flame Scans",
+			Domain:  "flamescans.org",
+			IconURL: "https://flamescans.org/favicon.ico",
 		},
 		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
-		BaseURL:       "http://asurascans.com/",
-		MangaListPath: "manga/",
+		BaseURL:       "http://flamescans.org/",
+		MangaListPath: "series/",
 		Selectors: models.Selectors{
 			List: models.MangaList{
 				MangaContainer: ".listupd > .bs",
@@ -30,10 +30,10 @@ func GetAsuraScansConnector() models.IConnector {
 				NextPage:       ".hpage a.r[href]",
 			},
 			Info: models.MangaInfo{
-				Title:                   ".infox > h1",
-				ImageURL:                ".thumb img[src]",
-				Synopsis:                ".infox > .wd-full .entry-content",
-				ChapterContainer:        "#chapterlist ul.clstyle li",
+				Title:                   ".info-half h1.entry-title",
+				ImageURL:                ".thumb-half .thumb img[src]",
+				Synopsis:                ".info-half .summary .wd-full .entry-content",
+				ChapterContainer:        "#chapterlist ul li",
 				ChapterNumber:           "[data-num]",
 				ChapterTitle:            "a span.chapternum",
 				ChapterURL:              "a[href]",
@@ -47,12 +47,12 @@ func GetAsuraScansConnector() models.IConnector {
 	}
 }
 
-func (a *asura) GetSource() models.Source {
-	return a.Source
+func (f *flame) GetSource() models.Source {
+	return f.Source
 }
 
-func (a *asura) GetMangaList(ctx web.Context) ([]models.Manga, error) {
-	c := models.Connector(*a)
+func (f *flame) GetMangaList(ctx web.Context) ([]models.Manga, error) {
+	c := models.Connector(*f)
 	opts := &scrapper.ScrapeOptions{
 		URL:          c.BaseURL + c.MangaListPath,
 		RoundTripper: c.Transport,
@@ -61,8 +61,8 @@ func (a *asura) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	return scrapper.ScrapeMangas(ctx, c, opts)
 }
 
-func (a *asura) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
-	c := models.Connector(*a)
+func (f *flame) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
+	c := models.Connector(*f)
 	opts := &scrapper.ScrapeOptions{
 		URL:          mangaURL,
 		RoundTripper: c.Transport,
@@ -71,8 +71,8 @@ func (a *asura) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 	return scrapper.ScrapeMangaInfo(ctx, c, opts)
 }
 
-func (a *asura) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
-	c := models.Connector(*a)
+func (f *flame) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
+	c := models.Connector(*f)
 	opts := &scrapper.ScrapeOptions{
 		URL:          chapterURL,
 		RoundTripper: c.Transport,

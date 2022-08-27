@@ -9,7 +9,6 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gocolly/colly/v2"
 	"github.com/pkg/errors"
 	"github.com/unluckythoughts/manga-reader/utils"
 )
@@ -25,35 +24,13 @@ func getText(s *goquery.Selection, selector string) (string, error) {
 			}
 		}
 	} else {
-		var err error
-		text, err = s.Html()
-		if err != nil {
-			return text, err
-		}
+		text = s.Text()
 	}
 
 	text = html.UnescapeString(text)
 	text = strings.ReplaceAll(strings.TrimSpace(text), "</br>", "\n")
 
 	return text, nil
-}
-
-func getTextForSelector(h *colly.HTMLElement, sel string) (string, error) {
-	sels := getSelectors(sel)
-	var selectorErr error
-	for _, s := range sels {
-		// fmt.Println(h.DOM.Html())
-		val, err := getText(h.DOM.Find(s), s)
-		if val != "" {
-			return val, err
-		}
-
-		if err != nil {
-			selectorErr = err
-		}
-	}
-
-	return "", selectorErr
 }
 
 func GetTextForSelector(selection *goquery.Selection, sel string) (string, error) {
@@ -67,7 +44,7 @@ func GetTextForSelector(selection *goquery.Selection, sel string) (string, error
 	var selectorErr error
 	for _, s := range sels {
 		selForText := selection
-		if s != "" {
+		if !strings.HasPrefix(s, "[") {
 			selForText = selection.Find(s)
 		}
 
@@ -244,33 +221,6 @@ func GetImagesListForSelector(selection *goquery.Selection, selector string, inc
 	return images, selectorErr
 }
 
-func getTextListForSelector(h *colly.HTMLElement, selector string, includeNoScript bool) (texts []string, err error) {
-	// fix for <noscript> tags
-	if includeNoScript {
-		h.DOM.Find("noscript").Parent().SetHtml(h.DOM.Find("noscript").Text())
-	}
-
-	selectors := getSelectors(selector)
-	var selectorErr error
-	for _, s := range selectors {
-		h.DOM.Find(s).Each(func(i int, sel *goquery.Selection) {
-			var text string
-			text, err = getText(sel, s)
-			texts = append(texts, text)
-		})
-
-		if len(texts) > 0 {
-			return texts, nil
-		}
-
-		if err != nil {
-			selectorErr = err
-		}
-	}
-
-	return texts, selectorErr
-}
-
 func getSelectors(selector string) []string {
 	pattern, err := regexp.Compile("[^[,]*(\\[[^]]+\\])?")
 	if err != nil {
@@ -318,7 +268,10 @@ func GetChapterNumber(text string) string {
 
 	re := regexp.MustCompile("^[0-9.]+")
 	if !re.MatchString(text) {
-		re = regexp.MustCompile("(?m)\\b([0-9.]+)\\b")
+		re = regexp.MustCompile("[Cc]hapter[ :-]*([0-9.]+)")
+		if !re.MatchString(text) {
+			re = regexp.MustCompile("(?m)\\b([0-9.]+)\\b")
+		}
 	}
 	matches := re.FindAllStringSubmatch(text, -1)
 

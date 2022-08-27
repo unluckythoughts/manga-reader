@@ -16,13 +16,11 @@ flyway-run:
 		--network host flyway/flyway:latest-alpine \
 		-url=jdbc:sqlite:/flyway/db $(FLYWAY_OPTS) $(FLYWAY_CMD)
 
-
 db-migrate: FLYWAY_CMD=migrate
 db-migrate: flyway-run
 
-
 run:
-	DB_FILE_PATH=db.sqlite \
+	@DB_FILE_PATH=db.sqlite \
 	WEB_PORT=5678 \
 	WEB_CORS=true \
 	WEB_PROXY=true \

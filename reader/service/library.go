@@ -7,14 +7,17 @@ import (
 )
 
 func (s *Service) AddFavorite(ctx web.Context, link string) (models.Favorite, error) {
-	conn, err := connector.New(ctx, link)
+	manga, err := s.db.GetManga(ctx, link)
 	if err != nil {
-		return models.Favorite{}, err
-	}
+		conn, err := connector.New(ctx, link)
+		if err != nil {
+			return models.Favorite{}, err
+		}
 
-	manga, err := conn.GetMangaInfo(ctx, link)
-	if err != nil {
-		return models.Favorite{}, err
+		manga, err = conn.GetMangaInfo(ctx, link)
+		if err != nil {
+			return models.Favorite{}, err
+		}
 	}
 
 	favorite := models.Favorite{

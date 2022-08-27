@@ -10,7 +10,10 @@ import (
 func (r *Repository) CreateSources(ctx context.Context, sources *[]models.Source) error {
 	return r.db.
 		WithContext(ctx).
-		Clauses(clause.OnConflict{DoNothing: true, UpdateAll: false}).
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "domain"}},
+			DoNothing: false, UpdateAll: true,
+		}).
 		Clauses(clause.Returning{}).
 		Create(sources).
 		Error

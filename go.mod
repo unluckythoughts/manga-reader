@@ -5,13 +5,16 @@ go 1.19
 require (
 	github.com/DaRealFreak/cloudflare-bp-go v1.0.4
 	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/chromedp/cdproto v0.0.0-20220827030233-358ed4af73cf
+	github.com/chromedp/chromedp v0.8.5
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/raff/godet v0.0.0-20210821044141-b21ce8c78e0d
 	github.com/stretchr/testify v1.8.0
-	github.com/unluckythoughts/go-microservice v0.34.0
+	github.com/unluckythoughts/go-microservice v0.35.0
 	gitlab.cobalt.rocks/coderdojo/sqlite-regexp.git v0.0.0-20220716212233-b66ac651b397
 	go.uber.org/zap v1.23.0
+	golang.org/x/exp v0.0.0-20220826205824-bd9bcdd0b820
 	gorm.io/gorm v1.23.8
 )
 
@@ -26,6 +29,7 @@ require (
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/caarlos0/env v3.5.0+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
@@ -51,9 +55,11 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/josharian/intern v1.0.0 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
