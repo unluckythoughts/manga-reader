@@ -59,7 +59,7 @@ func (m *mangahasu) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 		URL:          c.BaseURL + c.MangaListPath,
 		RoundTripper: c.Transport,
 	}
-		return scrapper.ScrapeMangasParallel(ctx, c, opts)
+	return scrapper.ScrapeMangasParallel(ctx, c, opts)
 }
 
 func (m *mangahasu) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
@@ -68,12 +68,12 @@ func (m *mangahasu) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga
 		URL:          mangaURL,
 		RoundTripper: c.Transport,
 	}
-		manga, err := scrapper.ScrapeMangaInfo(ctx, c, opts)
+	manga, err := scrapper.ScrapeMangaInfo(ctx, c, opts)
 
 	for i, c := range manga.Chapters {
 		texts := strings.Split(c.Title, "</span>")
 		if len(texts) > 1 {
-			manga.Chapters[i].Title = texts[1]
+			manga.Chapters[i].Title = scrapper.GetChapterTitle(texts[1])
 			manga.Chapters[i].Number = scrapper.GetChapterNumber(texts[1])
 		}
 	}
@@ -92,5 +92,5 @@ func (m *mangahasu) GetChapterPages(ctx web.Context, chapterURL string) (models.
 		RoundTripper: c.Transport,
 		Headers:      headers,
 	}
-		return scrapper.ScrapeChapterPages(ctx, c, opts)
+	return scrapper.ScrapeChapterPages(ctx, c, opts)
 }

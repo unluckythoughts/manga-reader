@@ -159,12 +159,22 @@ func UniqChapters(chapters []models.Chapter) []models.Chapter {
 	return chapters
 }
 
+func GetChapterTitle(title string) string {
+	pattern := regexp.MustCompile(`(?i).*chapter`)
+	if pattern.MatchString(title) {
+		return pattern.ReplaceAllString(title, "Chapter")
+	}
+
+	return title
+}
+
 func GetChapterFromInfoSelectors(s *goquery.Selection, info models.MangaInfo) (models.Chapter, error) {
 	chapter := models.Chapter{}
 	title, err := GetTextForSelector(s, info.ChapterTitle)
 	if err != nil {
 		return chapter, errors.Wrapf(err, "could not get chapter title with selector %s", info.ChapterTitle)
 	}
+	title = GetChapterTitle(title)
 
 	number, err := GetTextForSelector(s, info.ChapterNumber)
 	if err != nil {
