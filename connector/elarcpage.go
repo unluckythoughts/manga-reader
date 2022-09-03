@@ -9,31 +9,31 @@ import (
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-type realm models.Connector
+type elarcpage models.Connector
 
-func GetRealmScansConnector() models.IConnector {
-	return &realm{
+func GetElarcPageConnector() models.IConnector {
+	return &elarcpage{
 		Source: models.Source{
-			Name:    "Realm Scans",
-			Domain:  "realmscans.com",
-			IconURL: "https://cdn.realmscans.com/2021/09/logo-realm-scans-2.webp",
+			Name:    "Elarc Page",
+			Domain:  "elarcpage.com",
+			IconURL: "https://elarcpage.com/favicon.ico",
 		},
-		BaseURL:       "https://realmscans.com/",
 		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
-		MangaListPath: "series",
+		BaseURL:       "http://elarcpage.com/",
+		MangaListPath: "manga/",
 		Selectors: models.Selectors{
 			List: models.MangaList{
-				MangaContainer: "div.listupd > div.bs",
+				MangaContainer: ".listupd > .bs",
 				MangaTitle:     ".tt",
-				MangaImageURL:  "img[data-src], img[src]",
+				MangaImageURL:  "img[src]",
 				MangaURL:       "a[href]",
-				NextPage:       "div.hpage a.r[href]",
+				NextPage:       ".hpage a.r[href]",
 			},
 			Info: models.MangaInfo{
-				Title:                   ".info-right h1",
-				ImageURL:                ".thumb img[src]",
+				Title:                   ".info-right h1.entry-title",
+				ImageURL:                ".info-left .thumb img[src]",
 				Synopsis:                ".info-right .wd-full .entry-content p",
-				ChapterContainer:        "div#chapterlist ul li",
+				ChapterContainer:        "#chapterlist ul li",
 				ChapterNumber:           "[data-num]",
 				ChapterTitle:            "a span.chapternum",
 				ChapterURL:              "a[href]",
@@ -41,18 +41,18 @@ func GetRealmScansConnector() models.IConnector {
 				ChapterUploadDateFormat: "January 2, 2006",
 			},
 			Chapter: models.PageSelectors{
-				ImageUrl: "#readerarea img[data-src,src]",
+				ImageUrl: "#readerarea img[src]",
 			},
 		},
 	}
 }
 
-func (r *realm) GetSource() models.Source {
-	return r.Source
+func (e *elarcpage) GetSource() models.Source {
+	return e.Source
 }
 
-func (r *realm) GetMangaList(ctx web.Context) ([]models.Manga, error) {
-	c := models.Connector(*r)
+func (e *elarcpage) GetMangaList(ctx web.Context) ([]models.Manga, error) {
+	c := models.Connector(*e)
 	opts := &scrapper.ScrapeOptions{
 		URL:          c.BaseURL + c.MangaListPath,
 		RoundTripper: c.Transport,
@@ -60,8 +60,8 @@ func (r *realm) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	return scrapper.ScrapeMangas(ctx, c, opts)
 }
 
-func (r *realm) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
-	c := models.Connector(*r)
+func (e *elarcpage) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
+	c := models.Connector(*e)
 	opts := &scrapper.ScrapeOptions{
 		URL:          mangaURL,
 		RoundTripper: c.Transport,
@@ -69,12 +69,13 @@ func (r *realm) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 	return scrapper.ScrapeMangaInfo(ctx, c, opts)
 }
 
-func (r *realm) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
-	c := models.Connector(*r)
+func (e *elarcpage) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
+	c := models.Connector(*e)
 	opts := &scrapper.ScrapeOptions{
 		URL:          chapterURL,
 		RoundTripper: c.Transport,
 	}
+
 	pages, err := scrapper.ScrapeChapterPages(ctx, c, opts)
 	if err != nil || len(pages.URLs) == 0 {
 		injScript := scrapper.GetInjectionScript(c.Chapter.ImageUrl)

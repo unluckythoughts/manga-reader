@@ -17,7 +17,7 @@ func GetAllConnectors() []models.IConnector {
 		GetZeroScansConnector(),
 		GetRealmScansConnector(),
 		GetReaperScansConnector(),
-		// GetMangaHubConnector(),
+		GetElarcPageConnector(),
 		GetMangaHasuConnector(),
 		GetFlameScansConnector(),
 	)

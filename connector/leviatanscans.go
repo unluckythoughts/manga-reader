@@ -66,8 +66,7 @@ func (r *leviatan) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga,
 		URL:          mangaURL,
 		RoundTripper: c.Transport,
 	}
-	opts.SetDefaults()
-	manga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
+		manga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
 	if err != nil {
 		return manga, err
 	}
@@ -91,6 +90,5 @@ func (r *leviatan) GetChapterPages(ctx web.Context, chapterUrl string) (models.P
 		URL:          chapterUrl,
 		RoundTripper: c.Transport,
 	}
-	opts.SetDefaults()
-	return scrapper.ScrapeChapterPages(ctx, c, &opts)
+		return scrapper.ScrapeChapterPages(ctx, c, &opts)
 }

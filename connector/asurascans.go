@@ -57,8 +57,7 @@ func (a *asura) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 		URL:          c.BaseURL + c.MangaListPath,
 		RoundTripper: c.Transport,
 	}
-	opts.SetDefaults()
-	return scrapper.ScrapeMangas(ctx, c, opts)
+		return scrapper.ScrapeMangas(ctx, c, opts)
 }
 
 func (a *asura) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
@@ -67,8 +66,7 @@ func (a *asura) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 		URL:          mangaURL,
 		RoundTripper: c.Transport,
 	}
-	opts.SetDefaults()
-	return scrapper.ScrapeMangaInfo(ctx, c, opts)
+		return scrapper.ScrapeMangaInfo(ctx, c, opts)
 }
 
 func (a *asura) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
@@ -77,6 +75,5 @@ func (a *asura) GetChapterPages(ctx web.Context, chapterURL string) (models.Page
 		URL:          chapterURL,
 		RoundTripper: c.Transport,
 	}
-	opts.SetDefaults()
-	return scrapper.ScrapeChapterPages(ctx, c, opts)
+		return scrapper.ScrapeChapterPages(ctx, c, opts)
 }
