@@ -17,7 +17,7 @@ func GetLeviatanScansConnector() models.IConnector {
 		Source: models.Source{
 			Name:    "Leviatan Scans",
 			Domain:  "leviatanscans.com",
-			IconURL: "https://styles.redditmedia.com/t5_2hfywp/styles/communityIcon_qdo3swk6vzl41.png",
+			IconURL: "https://leviatanscans.com/wp-content/uploads/2021/03/cropped-isotiponegro.png",
 		},
 		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
 		BaseURL:       "https://leviatanscans.com/",
@@ -66,7 +66,7 @@ func (r *leviatan) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga,
 		URL:          mangaURL,
 		RoundTripper: c.Transport,
 	}
-		manga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
+	manga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
 	if err != nil {
 		return manga, err
 	}
@@ -90,5 +90,5 @@ func (r *leviatan) GetChapterPages(ctx web.Context, chapterUrl string) (models.P
 		URL:          chapterUrl,
 		RoundTripper: c.Transport,
 	}
-		return scrapper.ScrapeChapterPages(ctx, c, &opts)
+	return scrapper.ScrapeChapterPages(ctx, c, &opts)
 }

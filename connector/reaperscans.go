@@ -17,7 +17,7 @@ func GetReaperScansConnector() models.IConnector {
 		Source: models.Source{
 			Name:    "Reaper Scans",
 			Domain:  "reaperscans.com",
-			IconURL: "https://styles.redditmedia.com/t5_4zgiee/styles/communityIcon_gxpzm2tt41l71.png",
+			IconURL: "https://reaperscans.com/wp-content/uploads/2021/07/cropped-ms-icon-310x310-1.png",
 		},
 		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
 		BaseURL:       "https://reaperscans.com/",
@@ -65,7 +65,7 @@ func (r *reaper) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, e
 		URL:          mangaURL,
 		RoundTripper: c.Transport,
 	}
-		return scrapper.ScrapeMangaInfo(ctx, c, &opts)
+	return scrapper.ScrapeMangaInfo(ctx, c, &opts)
 }
 
 func (r *reaper) GetChapterPages(ctx web.Context, chapterUrl string) (models.Pages, error) {
@@ -74,5 +74,5 @@ func (r *reaper) GetChapterPages(ctx web.Context, chapterUrl string) (models.Pag
 		URL:          chapterUrl,
 		RoundTripper: c.Transport,
 	}
-		return scrapper.ScrapeChapterPages(ctx, c, &opts)
+	return scrapper.ScrapeChapterPages(ctx, c, &opts)
 }

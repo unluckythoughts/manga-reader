@@ -16,7 +16,7 @@ func GetRealmScansConnector() models.IConnector {
 		Source: models.Source{
 			Name:    "Realm Scans",
 			Domain:  "realmscans.com",
-			IconURL: "https://cdn.realmscans.com/2021/09/logo-realm-scans-2.webp",
+			IconURL: "https://realmscans.com/wp-content/uploads/2022/08/realm-scans-fav.png",
 		},
 		BaseURL:       "https://realmscans.com/",
 		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
