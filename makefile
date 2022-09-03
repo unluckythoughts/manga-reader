@@ -24,7 +24,7 @@ run:
 	WEB_PORT=5678 \
 	WEB_CORS=true \
 	WEB_PROXY=true \
-	DB_DEBUG=true \
+	DB_DEBUG=false \
 	go run main.go
 
 .SILENT: test-start test-stop test-db-init

@@ -10,7 +10,7 @@ import (
 
 func ScrapeMangaInfo(ctx web.Context, c models.Connector, opts *ScrapeOptions) (models.Manga, error) {
 	manga := models.Manga{}
-	GetPageForScrapping(ctx, opts, func(h *colly.HTMLElement) {
+	if err := GetPageForScrapping(ctx, opts, func(h *colly.HTMLElement) {
 		var err error
 		manga, err = GetMangaFromInfoSelectors(h.DOM, c.Selectors.Info)
 		if err != nil {
@@ -28,7 +28,9 @@ func ScrapeMangaInfo(ctx web.Context, c models.Connector, opts *ScrapeOptions) (
 
 			manga.Chapters = append(manga.Chapters, chapter)
 		})
-	})
+	}); err != nil {
+		return manga, err
+	}
 
 	return manga, nil
 }

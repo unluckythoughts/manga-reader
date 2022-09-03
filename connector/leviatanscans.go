@@ -1,10 +1,11 @@
 package connector
 
 import (
-	"net/url"
-	"strconv"
+	"net/http"
 
+	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/manga-reader/connector/theme"
 	"github.com/unluckythoughts/manga-reader/models"
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
@@ -18,138 +19,78 @@ func GetLeviatanScansConnector() models.IConnector {
 			Domain:  "leviatanscans.com",
 			IconURL: "https://styles.redditmedia.com/t5_2hfywp/styles/communityIcon_qdo3swk6vzl41.png",
 		},
-		BaseURL:       "https://en.leviatanscans.com/api/",
-		MangaListPath: "comics/",
+		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+		BaseURL:       "https://leviatanscans.com/",
+		MangaListPath: "wp-admin/admin-ajax.php",
+		Selectors: models.Selectors{
+			List: models.MangaList{
+				MangaContainer: "div.page-item-detail.manga",
+				MangaTitle:     "h3 a",
+				MangaImageURL:  "img[data-src],img[src]",
+				MangaURL:       "h3 a[href]",
+				NextPage:       "",
+			},
+			Info: models.MangaInfo{
+				Title:                   "#manga-title h1",
+				ImageURL:                ".profile-manga .summary_image a img[data-src],.profile-manga .summary_image a img[src]",
+				OtherID:                 "#manga-chapters-holder[data-id]",
+				Synopsis:                ".summary_content .post-content_item:last-of-type p span",
+				ChapterContainer:        "ul.main li",
+				ChapterNumber:           "a",
+				ChapterTitle:            "a",
+				ChapterURL:              "a[href]",
+				ChapterUploadDate:       "a+span i",
+				ChapterUploadDateFormat: "Jan 2, 2006",
+			},
+			Chapter: models.PageSelectors{
+				ImageUrl: ".reading-content img.wp-manga-chapter-img[data-src],.reading-content img.wp-manga-chapter-img[src]",
+			},
+		},
 	}
 }
 
-func (l *leviatan) GetSource() models.Source {
-	return l.Source
+func (r *leviatan) GetSource() models.Source {
+	return r.Source
 }
 
-func (l *leviatan) GetMangaList(ctx web.Context) ([]models.Manga, error) {
-	type apiRespBody struct {
-		Data []struct {
-			ImagePath string `json:"imagePath" manga-reader:"manga.image-url"`
-			Title     string `json:"title" manga-reader:"manga.title"`
-		} `json:"data" manga-reader:"manga-list"`
-		MetaData struct {
-			CurrentPage int `json:"currentPage" manga-reader:"manga-list.current-page"`
-			PerPage     int `json:"perPage"`
-			Total       int `json:"total"`
-			LastPage    int `json:"lastPage" manga-reader:"manga-list.last-page"`
-		} `json:"metadata"`
-	}
+func (r *leviatan) GetMangaList(ctx web.Context) ([]models.Manga, error) {
+	c := models.Connector(*r)
+	opts := theme.GetMadaraScrapeOptsForMangaList(c)
 
-	params := map[string]string{
-		"page":            "1",
-		"limit":           "100",
-		"bilibiliEnabled": "false",
-	}
-
-	mangas := []models.Manga{}
-
-	for {
-		apiResp := apiRespBody{}
-		q := models.APIQueryData{
-			URL:         l.BaseURL + l.MangaListPath,
-			QueryParams: params,
-			Response:    &apiResp,
-		}
-		err := scrapper.GetAPIResponse(ctx, q)
-		if err != nil {
-			return []models.Manga{}, err
-		}
-
-		pageMangas, err := scrapper.GetMangaListFromTags(apiResp)
-		if err != nil {
-			return mangas, err
-		}
-
-		mangas = append(mangas, pageMangas...)
-
-		currentPage, lastPage, _ := scrapper.GetMangaListPageData(apiResp)
-		if currentPage >= lastPage {
-			break
-		}
-
-		params["page"] = strconv.Itoa(currentPage + 1)
-	}
-
-	for i, m := range mangas {
-		mangas[i].ImageURL = "https://en.leviatanscans.com/" + m.ImageURL
-		mangas[i].URL = l.BaseURL + "comics-title/" + url.PathEscape(m.Title)
-	}
-
-	return mangas, nil
+	return scrapper.ScrapeMangas(ctx, c, &opts)
 }
 
-func (l *leviatan) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
-	type apiResonseBody struct {
-		Data struct {
-			ImagePath string `json:"imagePath" manga-reader:"manga.image-url"`
-			Title     string `json:"title" manga-reader:"manga.title"`
-			Synopsis  string `json:"synopsis" manga-reader:"manga.synopsis"`
-			Chapters  []struct {
-				Number models.StrFloat `json:"number" manga-reader:"manga.chapter.number"`
-				Title  string          `json:"title" manga-reader:"manga.chapter.title"`
-			} `json:"chapters" manga-reader:"manga.chapter-list"`
-		} `json:"data"`
+func (r *leviatan) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
+	c := models.Connector(*r)
+	opts := scrapper.ScrapeOptions{
+		URL:          mangaURL,
+		RoundTripper: c.Transport,
 	}
-
-	apiResp := apiResonseBody{}
-	q := models.APIQueryData{
-		URL:      mangaURL,
-		Response: &apiResp,
-	}
-
-	err := scrapper.GetAPIResponse(ctx, q)
-	if err != nil {
-		return models.Manga{}, err
-	}
-
-	manga, err := scrapper.GetMangaInfoFromTags(apiResp)
+	opts.SetDefaults()
+	manga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
 	if err != nil {
 		return manga, err
 	}
 
-	manga.URL = l.BaseURL + "comics-title/" + url.PathEscape(manga.Title)
-	manga.ImageURL = "https://en.leviatanscans.com/" + manga.ImageURL
+	if len(manga.Chapters) == 0 {
+		opts = theme.GetMadaraScrapeOptsForChapterList(c, manga.OtherID, mangaURL+"ajax/chapters")
+		chaptersManga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
+		if err != nil {
+			return manga, err
+		}
 
-	for i, c := range manga.Chapters {
-		manga.Chapters[i].URL = l.BaseURL + "chapters-title/" + c.Title
-		manga.Chapters[i].Number = scrapper.GetChapterNumber(string(c.Number))
+		manga.Chapters = chaptersManga.Chapters
 	}
 
-	return manga, nil
+	return manga, err
 }
 
-func (l *leviatan) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
-	type apiResonseBody struct {
-		Data struct {
-			Content []string `json:"content" manga-reader:"manga.chapter.pages-list"`
-		} `json:"data"`
+func (r *leviatan) GetChapterPages(ctx web.Context, chapterUrl string) (models.Pages, error) {
+	c := models.Connector(*r)
+	opts := scrapper.ScrapeOptions{
+		URL:          chapterUrl,
+		RoundTripper: c.Transport,
 	}
-
-	apiResp := apiResonseBody{}
-	q := models.APIQueryData{
-		URL:      chapterURL,
-		Response: &apiResp,
-	}
-
-	err := scrapper.GetAPIResponse(ctx, q)
-	if err != nil {
-		return models.Pages{}, err
-	}
-
-	pages, err := scrapper.GetChapterPagesFromTags(apiResp)
-	if err != nil {
-		return pages, err
-	}
-
-	for i, url := range pages.URLs {
-		pages.URLs[i] = "https://en.leviatanscans.com/" + url
-	}
-
-	return pages, nil
+	opts.SetDefaults()
+	return scrapper.ScrapeChapterPages(ctx, c, &opts)
 }

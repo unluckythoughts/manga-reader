@@ -21,7 +21,9 @@ func (s *Service) GetSourceMangaList(ctx web.Context, domain string, force bool)
 	}
 	mangas, err := conn.GetMangaList(ctx)
 
-	s.w.UpdateSourceMangas(ctx, domain, mangas)
+	if err == nil {
+		s.w.UpdateSourceMangas(ctx, domain, mangas)
+	}
 
 	if len(mangas) > 200 {
 		return mangas[:200], err
@@ -46,7 +48,9 @@ func (s *Service) GetSourceManga(ctx web.Context, mangaURL string, force bool) (
 	}
 	manga, err := conn.GetMangaInfo(ctx, mangaURL)
 
-	s.w.UpdateSourceManga(ctx, conn.GetSource().Domain, manga)
+	if err == nil {
+		s.w.UpdateSourceManga(ctx, conn.GetSource().Domain, manga)
+	}
 	return manga, err
 }
 

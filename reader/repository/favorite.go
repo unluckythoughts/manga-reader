@@ -18,7 +18,11 @@ func (r *Repository) CreateFavorite(ctx context.Context, f *models.Favorite) err
 
 func (r *Repository) GetFavorites(ctx context.Context) ([]models.Favorite, error) {
 	var favorites []models.Favorite
-	err := r.db.Model(&models.Favorite{}).Preload("Manga.Chapters").Find(&favorites).Error
+	err := r.db.
+		Model(&models.Favorite{}).
+		Preload("Manga.Chapters").
+		Preload("Manga.Source").
+		Find(&favorites).Error
 	return favorites, err
 }
 

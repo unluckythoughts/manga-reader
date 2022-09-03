@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/raff/godet v0.0.0-20210821044141-b21ce8c78e0d
 	github.com/stretchr/testify v1.8.0
-	github.com/unluckythoughts/go-microservice v0.35.0
+	github.com/unluckythoughts/go-microservice v0.36.0
 	gitlab.cobalt.rocks/coderdojo/sqlite-regexp.git v0.0.0-20220716212233-b66ac651b397
 	go.uber.org/zap v1.23.0
 	golang.org/x/exp v0.0.0-20220826205824-bd9bcdd0b820
