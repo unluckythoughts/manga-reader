@@ -62,3 +62,9 @@ func GetSlicedResults[T any](outChan <-chan []T) []T {
 
 	return results
 }
+
+func RunParallel[T any, S any](count int, payloads []T, workerFn func(T, chan<- S)) []S {
+	inChan, outChan := StartWorkers[T, S](count, workerFn)
+	SendPayloads[T](payloads, inChan)
+	return GetResults[S](outChan)
+}
