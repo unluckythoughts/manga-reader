@@ -5,11 +5,13 @@ import (
 	"net/url"
 	"strings"
 
+	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
+	"github.com/unluckythoughts/go-microservice/tools/web"
 	"github.com/unluckythoughts/manga-reader/models"
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-func GetMadaraScrapeOptsForMangaList(c models.Connector) scrapper.ScrapeOptions {
+func _getMadaraScrapeOptsForMangaList(c models.Connector) scrapper.ScrapeOptions {
 	headers := http.Header{}
 	headers.Set("content-type", "application/x-www-form-urlencoded")
 	headers.Set("referer", c.BaseURL+c.MangaListPath)
@@ -42,7 +44,7 @@ func GetMadaraScrapeOptsForMangaList(c models.Connector) scrapper.ScrapeOptions 
 	return opts
 }
 
-func GetMadaraScrapeOptsForChapterList(c models.Connector, manga_id, chaptersURL string) scrapper.ScrapeOptions {
+func _getMadaraScrapeOptsForChapterList(c models.Connector, manga_id, chaptersURL string) scrapper.ScrapeOptions {
 	headers := http.Header{}
 	headers.Set("content-type", "application/x-www-form-urlencoded")
 	headers.Set("referer", c.BaseURL)
@@ -64,4 +66,81 @@ func GetMadaraScrapeOptsForChapterList(c models.Connector, manga_id, chaptersURL
 	}
 
 	return opts
+}
+
+type madara models.Connector
+
+func GetMadaraConnector() *madara {
+	return &madara{
+		MangaListPath: "wp-admin/admin-ajax.php",
+		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
+		Selectors: models.Selectors{
+			List: models.MangaList{
+				MangaContainer: "div.page-item-detail.manga",
+				MangaTitle:     "h3 a",
+				MangaImageURL:  "img[src],img[data-src]",
+				MangaURL:       "h3 a[href]",
+				NextPage:       "",
+			},
+			Info: models.MangaInfo{
+				Title:                   ".post-title h1",
+				ImageURL:                ".profile-manga .summary_image a img[data-src],.profile-manga .summary_image a img[src]",
+				OtherID:                 ".add-bookmark a[data-post]",
+				Synopsis:                ".summary__content p:last-of-type",
+				ChapterContainer:        "ul.main li",
+				ChapterNumber:           "a",
+				ChapterTitle:            "a",
+				ChapterURL:              "a[href]",
+				ChapterUploadDate:       "a+span i",
+				ChapterUploadDateFormat: "January 2, 2006",
+			},
+			Chapter: models.PageSelectors{
+				ImageUrl: ".reading-content img.wp-manga-chapter-img[data-src],.reading-content img.wp-manga-chapter-img[src]",
+			},
+		},
+	}
+}
+
+func (m *madara) GetSource() models.Source {
+	return m.Source
+}
+
+func (m *madara) GetMangaList(ctx web.Context) ([]models.Manga, error) {
+	c := models.Connector(*m)
+	opts := _getMadaraScrapeOptsForMangaList(c)
+
+	return scrapper.ScrapeMangas(ctx, c, &opts)
+}
+
+func (m *madara) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
+	c := models.Connector(*m)
+	opts := scrapper.ScrapeOptions{
+		URL:          mangaURL,
+		RoundTripper: c.Transport,
+	}
+	manga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
+	if err != nil {
+		return manga, err
+	}
+
+	if len(manga.Chapters) == 0 {
+		opts = _getMadaraScrapeOptsForChapterList(c, manga.OtherID, mangaURL+"ajax/chapters")
+		chaptersManga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
+		if err != nil {
+			return manga, err
+		}
+
+		manga.Chapters = chaptersManga.Chapters
+	}
+
+	return manga, err
+}
+
+func (m *madara) GetChapterPages(ctx web.Context, chapterUrl string) (models.Pages, error) {
+	c := models.Connector(*m)
+	opts := scrapper.ScrapeOptions{
+		URL:          chapterUrl,
+		RoundTripper: c.Transport,
+	}
+	return scrapper.ScrapeChapterPages(ctx, c, &opts)
 }
