@@ -15,11 +15,5 @@ func GetInfernalVoidScansConnector() models.IConnector {
 	}
 	c.BaseURL = "https://void-scans.com/"
 
-	c.Selectors.Info.Title = ".info-right h1.entry-title"
-	c.Selectors.Info.ImageURL = ".info-left .thumb img[src]"
-	c.Selectors.Info.Synopsis = ".info-right .wd-full .entry-content p"
-
-	c.Selectors.Chapter.ImageUrl = "#readerarea img[src]"
-
 	return c
 }
