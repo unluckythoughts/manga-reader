@@ -3,6 +3,7 @@ package theme
 import (
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
@@ -11,7 +12,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-func _getMadaraScrapeOptsForMangaList(c models.Connector) scrapper.ScrapeOptions {
+func _getMadaraScrapeOptsForMangaList(c models.Connector, page string) scrapper.ScrapeOptions {
 	headers := http.Header{}
 	headers.Set("content-type", "application/x-www-form-urlencoded")
 	headers.Set("referer", c.BaseURL+c.MangaListPath)
@@ -19,7 +20,7 @@ func _getMadaraScrapeOptsForMangaList(c models.Connector) scrapper.ScrapeOptions
 	params := url.Values{}
 	params.Add("action", "madara_load_more")
 	params.Add("template", "madara-core/content/content-archive")
-	params.Add("page", "0")
+	params.Add("page", page)
 	params.Add("vars[paged]", "1")
 	params.Add("vars[orderby]", "post_title")
 	params.Add("vars[template]", "archive")
@@ -107,9 +108,23 @@ func (m *madara) GetSource() models.Source {
 
 func (m *madara) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	c := models.Connector(*m)
-	opts := _getMadaraScrapeOptsForMangaList(c)
 
-	return scrapper.ScrapeMangas(ctx, c, &opts)
+	var mangas []models.Manga
+	for i := 0; true; i++ {
+		opts := _getMadaraScrapeOptsForMangaList(c, strconv.Itoa(i))
+		pageMangas, err := scrapper.ScrapeMangas(ctx, c, &opts)
+		if err != nil {
+			return mangas, err
+		}
+
+		mangas = append(mangas, pageMangas...)
+
+		if len(pageMangas) <= 0 {
+			break
+		}
+	}
+
+	return mangas, nil
 }
 
 func (m *madara) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {

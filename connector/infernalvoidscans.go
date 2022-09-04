@@ -9,7 +9,7 @@ func GetInfernalVoidScansConnector() models.IConnector {
 	c := theme.GetBasicWordPressConnector()
 
 	c.Source = models.Source{
-		Name:    "Invefernal Void Scans",
+		Name:    "Infernal Void Scans",
 		Domain:  "void-scans.com",
 		IconURL: "https://void-scans.com/wp-content/uploads/2021/09/cropped-weblogo-1.png",
 	}
