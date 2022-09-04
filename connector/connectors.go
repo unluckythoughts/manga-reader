@@ -21,6 +21,7 @@ func GetAllConnectors() []models.IConnector {
 		GetAquaMangaConnector(),
 		GetMangaHasuConnector(),
 		GetInfernalVoidScansConnector(),
+		GetLuminousScansConnector(),
 		GetFlameScansConnector(),
 	)
 }
