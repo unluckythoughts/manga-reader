@@ -12,7 +12,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-func _getMadaraScrapeOptsForMangaList(c models.Connector, page string) scrapper.ScrapeOptions {
+func GetMadaraScrapeOptsForMangaList(c models.Connector, page string) scrapper.ScrapeOptions {
 	headers := http.Header{}
 	headers.Set("content-type", "application/x-www-form-urlencoded")
 	headers.Set("referer", c.BaseURL+c.MangaListPath)
@@ -45,7 +45,7 @@ func _getMadaraScrapeOptsForMangaList(c models.Connector, page string) scrapper.
 	return opts
 }
 
-func _getMadaraScrapeOptsForChapterList(c models.Connector, manga_id, chaptersURL string) scrapper.ScrapeOptions {
+func GetMadaraScrapeOptsForChapterList(c models.Connector, manga_id, chaptersURL string) scrapper.ScrapeOptions {
 	headers := http.Header{}
 	headers.Set("content-type", "application/x-www-form-urlencoded")
 	headers.Set("referer", c.BaseURL)
@@ -111,7 +111,7 @@ func (m *madara) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 
 	var mangas []models.Manga
 	for i := 0; true; i++ {
-		opts := _getMadaraScrapeOptsForMangaList(c, strconv.Itoa(i))
+		opts := GetMadaraScrapeOptsForMangaList(c, strconv.Itoa(i))
 		pageMangas, err := scrapper.ScrapeMangas(ctx, c, &opts)
 		if err != nil {
 			return mangas, err
@@ -139,7 +139,7 @@ func (m *madara) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, e
 	}
 
 	if len(manga.Chapters) == 0 {
-		opts = _getMadaraScrapeOptsForChapterList(c, manga.OtherID, mangaURL+"ajax/chapters")
+		opts = GetMadaraScrapeOptsForChapterList(c, manga.OtherID, mangaURL+"ajax/chapters")
 		chaptersManga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
 		if err != nil {
 			return manga, err
