@@ -2,6 +2,7 @@ package theme
 
 import (
 	"net/http"
+	"strings"
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/go-microservice/tools/web"
@@ -51,6 +52,11 @@ func (b *basic) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 		URL:          c.BaseURL + c.MangaListPath,
 		RoundTripper: c.Transport,
 	}
+
+	if c.List.LastPage != "" && strings.Contains(c.List.PageParam, scrapper.MANGA_LIST_PAGE_ID) {
+		return scrapper.ScrapeMangasParallel(ctx, c, opts)
+	}
+
 	return scrapper.ScrapeMangas(ctx, c, opts)
 }
 

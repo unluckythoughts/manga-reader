@@ -1,7 +1,7 @@
 package scrapper
 
 import (
-	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -10,6 +10,10 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 	"github.com/unluckythoughts/manga-reader/utils"
 	"go.uber.org/zap"
+)
+
+const (
+	MANGA_LIST_PAGE_ID = "::pageId::"
 )
 
 func _scrapLastPage(ctx web.Context, c models.Connector, opts *ScrapeOptions) string {
@@ -82,15 +86,13 @@ func ScrapeMangas(ctx web.Context, c models.Connector, opts *ScrapeOptions) ([]m
 
 func ScrapeMangasParallel(ctx web.Context, c models.Connector, opts *ScrapeOptions) ([]models.Manga, error) {
 	mangas := []models.Manga{}
-	if c.List.LastPage == "" {
-		return mangas, nil
-	}
 
 	lastPage := _scrapLastPage(ctx, c, opts)
 	count := utils.GetInt(lastPage)
 
 	workerFn := func(page int64, out chan<- []models.Manga) {
-		url := fmt.Sprintf("%s?page=%d", opts.URL, page)
+		params := strings.Replace(c.List.PageParam, MANGA_LIST_PAGE_ID, strconv.Itoa(int(page)), 1)
+		url := opts.URL + params
 		newOpts := opts.Clone()
 		newOpts.URL = url
 		mangas, _, err := _scrapMangasInPage(ctx, c, newOpts)

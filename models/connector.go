@@ -11,6 +11,7 @@ type MangaList struct {
 	MangaOtherID   string
 	NextPage       string
 	LastPage       string
+	PageParam      string
 }
 
 type MangaInfo struct {

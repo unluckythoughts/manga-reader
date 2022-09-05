@@ -3,6 +3,7 @@ package connector
 import (
 	"github.com/unluckythoughts/manga-reader/connector/theme"
 	"github.com/unluckythoughts/manga-reader/models"
+	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
 func GetMangaHasuConnector() models.IConnector {
@@ -20,8 +21,8 @@ func GetMangaHasuConnector() models.IConnector {
 	c.Selectors.List.MangaTitle = ".info-manga a h3"
 	c.Selectors.List.MangaURL = ".info-manga a[href]"
 	c.Selectors.List.MangaImageURL = ".wrapper_imagage img[src],img[src],.wrapper_imagage a[src]"
-	c.Selectors.List.NextPage = ".pagination-ct a[title='Tiếp']"
 	c.Selectors.List.LastPage = ".pagination-ct a[title='Trang cuối']"
+	c.Selectors.List.PageParam = "?page=" + scrapper.MANGA_LIST_PAGE_ID
 
 	c.Selectors.Info.Title = ".wrapper_content .info-title h1"
 	c.Selectors.Info.ImageURL = ".wrapper_content .info-img img[src]"
