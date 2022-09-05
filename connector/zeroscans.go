@@ -85,7 +85,7 @@ func (z *zero) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	}
 
 	for i, m := range mangas {
-		mangas[i].URL = z.BaseURL + z.MangaListPath + m.Slug
+		mangas[i].URL = z.BaseURL + "comic/" + m.Slug
 	}
 
 	return mangas, nil

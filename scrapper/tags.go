@@ -158,7 +158,7 @@ func getInterfaceValueWithOrder(data interface{}, option string, oVal *orderedVa
 
 		if areOptionsEqual(option, tagOption) {
 			if _, order, ok := hasOrderPreference(tagOption); ok {
-				if oVal.Value == nil || oVal.Order >= order {
+				if oVal.Value == nil || (oVal.Order >= order && !isEmpty(v.Field(i).Interface())) {
 					oVal.Order = order
 					oVal.Value = v.Field(i).Interface()
 				}
@@ -170,6 +170,43 @@ func getInterfaceValueWithOrder(data interface{}, option string, oVal *orderedVa
 			}
 		}
 	}
+}
+
+func isEmpty(data interface{}) bool {
+	if data == nil {
+		return true
+	}
+
+	switch v := data.(type) {
+	case string:
+		return len(v) == 0
+	case int:
+		return v == 0
+	case int8:
+		return v == 0
+	case int16:
+		return v == 0
+	case int32:
+		return v == 0
+	case int64:
+		return v == 0
+	case uint:
+		return v == 0
+	case uint8:
+		return v == 0
+	case uint16:
+		return v == 0
+	case uint32:
+		return v == 0
+	case uint64:
+		return v == 0
+	case float32:
+		return v == 0
+	case float64:
+		return v == 0
+	}
+
+	return false
 }
 
 func getString(data interface{}) (string, bool) {

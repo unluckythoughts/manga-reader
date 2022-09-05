@@ -232,35 +232,32 @@ func GetImagesListForSelector(selection *goquery.Selection, selector string, inc
 }
 
 func getSelectors(selector string) []string {
-	pattern, err := regexp.Compile("[^[,]*(\\[[^]]+\\])?")
+	pattern, err := regexp.Compile(`(?im)[^\n,(]*(?:\([^)]*\))?`)
 	if err != nil {
 		return []string{selector}
 	}
 
 	selector = strings.TrimSpace(selector)
-	selectors := []string{}
-	for _, m := range pattern.FindAllStringSubmatch(selector, -1) {
-		selectors = append(selectors, m[0])
-	}
-
-	return selectors
+	return pattern.FindAllString(selector, -1)
 }
 
 func hasDataInAttr(selector string) (string, []string, bool) {
-	pattern, err := regexp.Compile("\\[[^]]+\\]")
-	if err != nil {
-		return selector, []string{}, false
-	}
+	multiAttrPattern := regexp.MustCompile(`(?i):(?:is|matches)\([^)]*\)`)
+	pattern := regexp.MustCompile(`(?i)\[[^]]+\]`)
 
 	matches := pattern.FindAllString(selector, -1)
 	if len(matches) < 1 {
 		return selector, []string{}, false
 	}
 
-	attr := strings.Trim(matches[len(matches)-1], "[]")
+	attrs := []string{}
+	for _, match := range matches {
+		attrs = append(attrs, strings.Trim(match, "[]"))
+	}
 	selector = pattern.ReplaceAllString(selector, "")
+	selector = multiAttrPattern.ReplaceAllString(selector, "")
 
-	return selector, strings.Split(attr, ","), true
+	return selector, attrs, true
 }
 
 func GetChapterNumber(text string) string {

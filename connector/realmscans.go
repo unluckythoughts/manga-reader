@@ -20,7 +20,7 @@ func GetRealmScansConnector() models.IConnector {
 	c.Selectors.Info.ImageURL = ".thumb img[src]"
 	c.Selectors.Info.Synopsis = ".info-right .wd-full .entry-content p"
 
-	c.Selectors.Chapter.ImageUrl = "#readerarea img[data-src], #readerarea img[src]"
+	c.Selectors.Chapter.ImageUrl = "#readerarea img:is([data-src],[src])"
 
 	return c
 }

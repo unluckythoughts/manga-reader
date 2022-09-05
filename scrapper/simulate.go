@@ -98,10 +98,14 @@ func validOutput(data []string) bool {
 }
 
 func GetInjectionScript(selector string) string {
-	innerHTMLSnippet := `data.push(e.InnerHtml())`
+	innerHTMLSnippet := `
+		if (e.InnerHtml() !== '') {
+			data.push(e.InnerHtml())
+		}
+	`
 
 	attrSnippet := `
-		if (e.getAttribute('###Attribute###') !== '') {
+		if (e.getAttribute('###Attribute###')) {
 			data.push(e.getAttribute('###Attribute###'))
 		}
 	`

@@ -17,7 +17,9 @@ func GetLuminousScansConnector() models.IConnector {
 	c.MangaListPath = "series/"
 	c.Selectors.Info.Title = ".info-right h1.entry-title"
 	c.Selectors.Info.ImageURL = ".info-left .thumb img[src]"
-	c.Selectors.Info.Synopsis = ".info-right .summary .wd-full .entry-content"
+	c.Selectors.Info.Synopsis = ".info-right .wd-full .entry-content"
+
+	c.Selectors.Chapter.ImageUrl = "#readerarea img[class*='wp-image'][src]"
 
 	return c
 }
