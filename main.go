@@ -22,8 +22,9 @@ func main() {
 		ProxyTransport: proxyTransport,
 	}
 	s := microservice.New(opts)
-
 	readerService := service.New(s.GetDB())
+
+	s.HttpRouter().ServeFiles("/static/*filepath", http.Dir("./manga-reader-ui/dist"))
 	reader.RegisterRoutes(s.HttpRouter(), readerService)
 	s.Start()
 }

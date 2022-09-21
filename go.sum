@@ -244,8 +244,8 @@ github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO
 github.com/temoto/robotstxt v1.1.1/go.mod h1:+1AmkuG3IYkh1kv0d2qEB9Le88ehNO0zwOr3ujewlOo=
 github.com/temoto/robotstxt v1.1.2 h1:W2pOjSJ6SWvldyEuiFXNxz3xZ8aiWX5LbfDiOFd7Fxg=
 github.com/temoto/robotstxt v1.1.2/go.mod h1:+1AmkuG3IYkh1kv0d2qEB9Le88ehNO0zwOr3ujewlOo=
-github.com/unluckythoughts/go-microservice v0.36.0 h1:nEcCVCg0ZILpqRdAU/9PtsmEiSsAVWAFbnTDOSjoq1M=
-github.com/unluckythoughts/go-microservice v0.36.0/go.mod h1:JkHnCN9C7q1X4AL8btKSXHYJ+MiQ2h+FYVHoOSPNY5M=
+github.com/unluckythoughts/go-microservice v0.37.0 h1:1j6xghUc7jFtHtOrSm0zShvx4visKU+yHmLOCcNK1j8=
+github.com/unluckythoughts/go-microservice v0.37.0/go.mod h1:JkHnCN9C7q1X4AL8btKSXHYJ+MiQ2h+FYVHoOSPNY5M=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 gitlab.cobalt.rocks/coderdojo/sqlite-regexp.git v0.0.0-20220716212233-b66ac651b397 h1:fdRnYy6NNRVmyLspWSPtombt01dID8d+xpWO+8jInpY=
 gitlab.cobalt.rocks/coderdojo/sqlite-regexp.git v0.0.0-20220716212233-b66ac651b397/go.mod h1:XJn+X4NCTfbXKtctNltsdX0JV9B5H+dOEV3l7WR8hrg=

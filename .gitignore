@@ -7,6 +7,7 @@
 db.sqlite
 *.db
 tmp/
+static/
 
 # Test binary, built with `go test -c`
 *.test

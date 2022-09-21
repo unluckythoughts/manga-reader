@@ -3,11 +3,14 @@ SHELL = /bin/bash
 MIGRATIONS_FOLDER=$(PWD)/migrations
 DB_FILE=$(PWD)/db.sqlite
 MAKEFLAGS += --no-print-directory
+UI_DIR = "manga-reader-ui"
 
 init:
 	@rm -rf vendor
 	go mod tidy
 	go mod vendor -v
+	cd $(UI_DIR)
+	npm i
 
 flyway-run:
 	@docker run \
@@ -18,6 +21,10 @@ flyway-run:
 
 db-migrate: FLYWAY_CMD=migrate
 db-migrate: flyway-run
+
+ui-build:
+	cd $(UI_DIR)
+	npm run build
 
 run:
 	@DB_FILE_PATH=db.sqlite \
