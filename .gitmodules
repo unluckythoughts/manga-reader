@@ -1,0 +1,3 @@
+[submodule "manga-reader-ui"]
+	path = manga-reader-ui
+	url = https://github.com/unluckythoughts/manga-reader-ui
