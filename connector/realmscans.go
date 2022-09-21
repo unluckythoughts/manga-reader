@@ -13,7 +13,7 @@ func GetRealmScansConnector() models.IConnector {
 		Domain:  "realmscans.com",
 		IconURL: "https://realmscans.com/wp-content/uploads/2022/08/realm-scans-fav.png",
 	}
-	c.BaseURL = "http://realmscans.org/"
+	c.BaseURL = "http://realmscans.com/"
 	c.MangaListPath = "series/"
 
 	c.Selectors.Info.Title = ".info-right h1"

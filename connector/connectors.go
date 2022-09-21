@@ -23,6 +23,7 @@ func GetAllConnectors() []models.IConnector {
 		GetInfernalVoidScansConnector(),
 		GetLuminousScansConnector(),
 		GetFlameScansConnector(),
+		GetAstraScansConnector(),
 	)
 }
 
