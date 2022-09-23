@@ -8,11 +8,11 @@ import (
 )
 
 type leviatan struct {
-	c    models.IConnector
+	c    models.IMangaConnector
 	conn models.Connector
 }
 
-func GetLeviatanScansConnector() models.IConnector {
+func GetLeviatanScansConnector() models.IMangaConnector {
 	c := theme.GetBasicWordPressConnector()
 
 	c.Source = models.Source{

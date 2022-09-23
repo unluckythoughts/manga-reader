@@ -7,7 +7,7 @@ import (
 
 type aquamanga models.Connector
 
-func GetAquaMangaConnector() models.IConnector {
+func GetAquaMangaConnector() models.IMangaConnector {
 	c := theme.GetMadaraConnector()
 	c.Source = models.Source{
 		Name:    "Aqua Manga",

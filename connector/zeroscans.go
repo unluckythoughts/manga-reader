@@ -51,7 +51,7 @@ type zeroAPIResponseBody struct {
 	} `json:"data"`
 }
 
-func GetZeroScansConnector() models.IConnector {
+func GetZeroScansConnector() models.IMangaConnector {
 	return &zero{
 		Source: models.Source{
 			Name:    "Zero Scans",

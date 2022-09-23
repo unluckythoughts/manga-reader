@@ -5,7 +5,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func GetRealmScansConnector() models.IConnector {
+func GetRealmScansConnector() models.IMangaConnector {
 	c := theme.GetBasicWordPressConnector()
 
 	c.Source = models.Source{

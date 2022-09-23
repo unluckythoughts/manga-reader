@@ -9,9 +9,9 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func GetAllConnectors() []models.IConnector {
+func GetAllMangaConnectors() []models.IMangaConnector {
 	return append(
-		[]models.IConnector{},
+		[]models.IMangaConnector{},
 		GetAsuraScansConnector(),
 		GetLeviatanScansConnector(),
 		GetZeroScansConnector(),
@@ -39,9 +39,9 @@ func getDomain(link string) string {
 	return linkURL.Hostname()
 }
 
-func findConnector(domain string) (models.IConnector, bool) {
+func findConnector(domain string) (models.IMangaConnector, bool) {
 	domain = getDomain(domain)
-	conns := GetAllConnectors()
+	conns := GetAllMangaConnectors()
 	for i := 0; i < len(conns); i++ {
 		if strings.Contains(domain, conns[i].GetSource().Domain) {
 			return conns[i], true
@@ -51,7 +51,7 @@ func findConnector(domain string) (models.IConnector, bool) {
 	return nil, false
 }
 
-func New(ctx web.Context, domain string) (models.IConnector, error) {
+func New(ctx web.Context, domain string) (models.IMangaConnector, error) {
 	conn, ok := findConnector(domain)
 	if !ok {
 		return nil, errors.Errorf("could not find config for %s", domain)

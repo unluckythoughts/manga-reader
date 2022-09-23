@@ -8,11 +8,11 @@ import (
 )
 
 type astra struct {
-	c    models.IConnector
+	c    models.IMangaConnector
 	conn models.Connector
 }
 
-func GetAstraScansConnector() models.IConnector {
+func GetAstraScansConnector() models.IMangaConnector {
 	c := theme.GetBasicWordPressConnector()
 
 	c.Source = models.Source{

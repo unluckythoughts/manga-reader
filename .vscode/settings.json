@@ -1,0 +1,5 @@
+{
+  "files.exclude": {
+    "**/manga-reader-ui": true
+  }
+}

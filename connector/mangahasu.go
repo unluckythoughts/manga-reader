@@ -6,7 +6,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-func GetMangaHasuConnector() models.IConnector {
+func GetMangaHasuConnector() models.IMangaConnector {
 	c := theme.GetBasicWordPressConnector()
 
 	c.Source = models.Source{

@@ -11,7 +11,7 @@ type Pages struct {
 	URLs   []string               `json:"urls"`
 }
 
-type IConnector interface {
+type IMangaConnector interface {
 	GetSource() Source
 	GetMangaList(ctx web.Context) ([]Manga, error)
 	GetMangaInfo(ctx web.Context, mangaURL string) (Manga, error)

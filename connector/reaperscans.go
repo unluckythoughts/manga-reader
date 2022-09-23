@@ -7,7 +7,7 @@ import (
 
 type reaper models.Connector
 
-func GetReaperScansConnector() models.IConnector {
+func GetReaperScansConnector() models.IMangaConnector {
 	c := theme.GetMadaraConnector()
 
 	c.Source = models.Source{

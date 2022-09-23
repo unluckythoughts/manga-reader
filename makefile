@@ -23,7 +23,7 @@ db-migrate: FLYWAY_CMD=migrate
 db-migrate: flyway-run
 
 ui-build:
-	cd $(UI_DIR)
+	@cd $(UI_DIR)
 	npm run build
 
 run:

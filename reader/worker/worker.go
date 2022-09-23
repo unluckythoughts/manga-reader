@@ -25,7 +25,7 @@ func setupConfig(db *gorm.DB) {
 	}
 
 	sources := []models.Source{}
-	for _, conn := range connector.GetAllConnectors() {
+	for _, conn := range connector.GetAllMangaConnectors() {
 		sources = append(sources, conn.GetSource())
 	}
 

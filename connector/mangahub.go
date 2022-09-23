@@ -19,7 +19,7 @@ var (
 
 type mangahub models.Connector
 
-func GetMangaHubConnector() models.IConnector {
+func GetMangaHubConnector() models.IMangaConnector {
 	return &mangahub{
 		Source: models.Source{
 			Name:    "Manga Hub",
