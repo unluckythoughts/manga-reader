@@ -8,7 +8,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.MangaFavorite, error) {
+func (s *Service) UpdateMangaFavorite(ctx web.Context, favoriteID int) (models.MangaFavorite, error) {
 	favorite, err := s.db.FindFavorite(ctx, favoriteID)
 	if err != nil {
 		return models.MangaFavorite{}, err
@@ -50,11 +50,11 @@ func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.MangaF
 	return favorite, nil
 }
 
-func (s *Service) UpdateFavoriteProgress(ctx web.Context, favoriteID int, progress models.StrFloatList) error {
+func (s *Service) UpdateMangaFavoriteProgress(ctx web.Context, favoriteID int, progress models.StrFloatList) error {
 	return s.db.UpdateFavoriteProgress(ctx, favoriteID, progress)
 }
 
-func (s *Service) UpdateAllFavorite(ctx web.Context) error {
+func (s *Service) UpdateAllMangaFavorite(ctx web.Context) error {
 	return s.w.UpdateFavorites(ctx)
 }
 

@@ -186,13 +186,13 @@ func GetMangaFromInfoSelectors(s *goquery.Selection, info models.MangaInfo) (mod
 	)
 }
 
-func UniqChapters(chapters []models.Chapter) []models.Chapter {
-	chapterMap := map[string]models.Chapter{}
+func UniqChapters(chapters []models.MangaChapter) []models.MangaChapter {
+	chapterMap := map[string]models.MangaChapter{}
 	for _, c := range chapters {
 		chapterMap[c.Number] = c
 	}
 
-	chapters = []models.Chapter{}
+	chapters = []models.MangaChapter{}
 	for _, c := range chapterMap {
 		chapters = append(chapters, c)
 	}
@@ -209,8 +209,8 @@ func GetChapterTitle(title string) string {
 	return title
 }
 
-func GetChapterFromInfoSelectors(s *goquery.Selection, info models.MangaInfo) (models.Chapter, error) {
-	chapter := models.Chapter{}
+func GetChapterFromInfoSelectors(s *goquery.Selection, info models.MangaInfo) (models.MangaChapter, error) {
+	chapter := models.MangaChapter{}
 	title, err := GetTextForSelector(s, info.ChapterTitle)
 	if err != nil {
 		return chapter, errors.Wrapf(err, "could not get chapter title with selector %s", info.ChapterTitle)

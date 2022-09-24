@@ -8,7 +8,7 @@ import (
 
 func (h *Handlers) SourceListHandler(r web.Request) (interface{}, error) {
 	if isMangaRequest(r) {
-		return h.s.GetSourceList(r.GetContext())
+		return h.s.GetMangaSourceList(r.GetContext())
 	} else if isNovelRequest(r) {
 		return h.s.GetNovelSourceList(r.GetContext())
 	}

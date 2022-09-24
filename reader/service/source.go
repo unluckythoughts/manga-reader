@@ -6,7 +6,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func (s *Service) GetSourceList(ctx web.Context) ([]models.Source, error) {
+func (s *Service) GetMangaSourceList(ctx web.Context) ([]models.Source, error) {
 	return s.db.GetSources(ctx)
 }
 

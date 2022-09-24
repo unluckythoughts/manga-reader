@@ -6,7 +6,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func (s *Service) AddFavorite(ctx web.Context, link string) (models.MangaFavorite, error) {
+func (s *Service) AddMangaFavorite(ctx web.Context, link string) (models.MangaFavorite, error) {
 	manga, err := s.db.GetManga(ctx, link)
 	if err != nil {
 		conn, err := connector.NewMangaConnector(ctx, link)
@@ -27,7 +27,7 @@ func (s *Service) AddFavorite(ctx web.Context, link string) (models.MangaFavorit
 	return favorite, s.db.CreateFavorite(ctx, &favorite)
 }
 
-func (s *Service) DelFavorite(ctx web.Context, id int) error {
+func (s *Service) DelMangaFavorite(ctx web.Context, id int) error {
 	favorite, err := s.db.FindFavorite(ctx, id)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func (s *Service) DelFavorite(ctx web.Context, id int) error {
 	return s.db.DelFavorite(ctx, favorite)
 }
 
-func (s *Service) GetFavorites(ctx web.Context) ([]models.MangaFavorite, error) {
+func (s *Service) GetMangaFavorites(ctx web.Context) ([]models.MangaFavorite, error) {
 	return s.db.GetFavorites(ctx)
 }
 

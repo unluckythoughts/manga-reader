@@ -8,23 +8,23 @@ import (
 )
 
 type Manga struct {
-	ID       int       `json:"id" gorm:"column:id;primarykey"`
-	SourceID int       `json:"-" gorm:"column:source_id"`
-	Source   Source    `json:"source" gorm:"foreignKey:SourceID"`
-	URL      string    `json:"url" gorm:"column:url;unique"`
-	Title    string    `json:"title" gorm:"column:title"`
-	Slug     string    `json:"slug" gorm:"column:slug"`
-	ImageURL string    `json:"imageUrl" gorm:"column:image_url"`
-	Synopsis string    `json:"synopsis" gorm:"column:synopsis"`
-	OtherID  string    `json:"otherId" gorm:"column:other_id"`
-	Chapters []Chapter `json:"chapters" gorm:"foreignkey:MangaID"`
+	ID       int            `json:"id" gorm:"column:id;primarykey"`
+	SourceID int            `json:"-" gorm:"column:source_id"`
+	Source   Source         `json:"source" gorm:"foreignKey:SourceID"`
+	URL      string         `json:"url" gorm:"column:url;unique"`
+	Title    string         `json:"title" gorm:"column:title"`
+	Slug     string         `json:"slug" gorm:"column:slug"`
+	ImageURL string         `json:"imageUrl" gorm:"column:image_url"`
+	Synopsis string         `json:"synopsis" gorm:"column:synopsis"`
+	OtherID  string         `json:"otherId" gorm:"column:other_id"`
+	Chapters []MangaChapter `json:"chapters" gorm:"foreignkey:MangaID"`
 }
 
 func (m Manga) TableName() string {
 	return "manga"
 }
 
-type Chapter struct {
+type MangaChapter struct {
 	ID         int     `json:"id" gorm:"column:id;primarykey"`
 	URL        string  `json:"url" gorm:"column:url;unique"`
 	Title      string  `json:"title" gorm:"column:title"`
@@ -37,7 +37,7 @@ type Chapter struct {
 	Downloaded bool    `json:"downloaded" gorm:"column:downloaded"`
 }
 
-func (c Chapter) TableName() string {
+func (c MangaChapter) TableName() string {
 	return "chapter"
 }
 

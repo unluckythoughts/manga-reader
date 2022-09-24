@@ -57,7 +57,7 @@ func (r *Repository) GetManga(ctx context.Context, url string) (models.Manga, er
 	return manga, err
 }
 
-func (r *Repository) UpdateChapters(ctx context.Context, chapters *[]models.Chapter) error {
+func (r *Repository) UpdateChapters(ctx context.Context, chapters *[]models.MangaChapter) error {
 	err := r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{

@@ -330,8 +330,8 @@ func getManga(data interface{}) models.Manga {
 	return manga
 }
 
-func getChapter(data interface{}) models.Chapter {
-	chapter := models.Chapter{}
+func getChapter(data interface{}) models.MangaChapter {
+	chapter := models.MangaChapter{}
 
 	chapter.OtherID, _ = getStringValueWithOrder(data, optionChapterOtherID)
 	chapter.Title, _ = getStringValueWithOrder(data, optionChapterTitle)
@@ -360,8 +360,8 @@ func getMangas(data interface{}) ([]models.Manga, error) {
 	return mangas, nil
 }
 
-func getChapters(data interface{}) ([]models.Chapter, bool) {
-	chapters := []models.Chapter{}
+func getChapters(data interface{}) ([]models.MangaChapter, bool) {
+	chapters := []models.MangaChapter{}
 	v := reflect.ValueOf(data)
 
 	if v.Kind() != reflect.Slice {

@@ -16,7 +16,7 @@ func (h *Handlers) AddFavoriteHandler(r web.Request) (interface{}, error) {
 	}
 
 	if isMangaRequest(r) {
-		return h.s.AddFavorite(r.GetContext(), body.URL)
+		return h.s.AddMangaFavorite(r.GetContext(), body.URL)
 	} else if isNovelRequest(r) {
 		return h.s.AddNovelFavorite(r.GetContext(), body.URL)
 	}
@@ -26,7 +26,7 @@ func (h *Handlers) AddFavoriteHandler(r web.Request) (interface{}, error) {
 
 func (h *Handlers) GetFavoriteListHandler(r web.Request) (interface{}, error) {
 	if isMangaRequest(r) {
-		return h.s.GetFavorites(r.GetContext())
+		return h.s.GetMangaFavorites(r.GetContext())
 	} else if isNovelRequest(r) {
 		return h.s.GetNovelFavorites(r.GetContext())
 	}
@@ -43,7 +43,7 @@ func (h *Handlers) DelFavoriteHandler(r web.Request) (interface{}, error) {
 	}
 
 	if isMangaRequest(r) {
-		return nil, h.s.DelFavorite(r.GetContext(), id)
+		return nil, h.s.DelMangaFavorite(r.GetContext(), id)
 	} else if isNovelRequest(r) {
 		return nil, h.s.DelNovelFavorite(r.GetContext(), id)
 	}
@@ -60,7 +60,7 @@ func (h *Handlers) UpdateFavoriteHandler(r web.Request) (interface{}, error) {
 	}
 
 	if isMangaRequest(r) {
-		return h.s.UpdateFavorite(r.GetContext(), id)
+		return h.s.UpdateMangaFavorite(r.GetContext(), id)
 	} else if isNovelRequest(r) {
 		return h.s.UpdateNovelFavorite(r.GetContext(), id)
 	}
@@ -71,7 +71,7 @@ func (h *Handlers) UpdateFavoriteHandler(r web.Request) (interface{}, error) {
 
 func (h *Handlers) UpdateAllFavoriteHandler(r web.Request) (interface{}, error) {
 	if isMangaRequest(r) {
-		return nil, h.s.UpdateAllFavorite(r.GetContext())
+		return nil, h.s.UpdateAllMangaFavorite(r.GetContext())
 	} else if isNovelRequest(r) {
 		return nil, h.s.UpdateAllNovelFavorite(r.GetContext())
 	}
@@ -101,7 +101,7 @@ func (h *Handlers) UpdateFavoriteProgressHandler(r web.Request) (interface{}, er
 
 	progress := models.StrFloatList{chapterID, pageID}
 	if isMangaRequest(r) {
-		return nil, h.s.UpdateFavoriteProgress(r.GetContext(), favoriteID, progress)
+		return nil, h.s.UpdateMangaFavoriteProgress(r.GetContext(), favoriteID, progress)
 	} else if isNovelRequest(r) {
 		return nil, h.s.UpdateNovelFavoriteProgress(r.GetContext(), favoriteID, progress)
 	}
