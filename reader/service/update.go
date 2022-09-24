@@ -14,7 +14,7 @@ func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.Favori
 		return models.Favorite{}, err
 	}
 
-	conn, err := connector.New(ctx, favorite.Manga.URL)
+	conn, err := connector.NewMangaConnector(ctx, favorite.Manga.URL)
 	if err != nil {
 		return models.Favorite{}, err
 	}

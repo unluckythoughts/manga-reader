@@ -133,7 +133,7 @@ type mangahubAPIResponseBody struct {
 
 func (m *mangahub) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	apiResp := mangahubAPIResponseBody{}
-	q := models.APIQueryData{
+	q := scrapper.APIQueryData{
 		URL:       m.BaseURL,
 		Method:    http.MethodPost,
 		Body:      m._getRequestBody(),
@@ -171,7 +171,7 @@ func (m *mangahub) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga,
 	slug := strings.Replace(mangaURL, "https://mangahub.io/manga/", "", -1)
 
 	apiResp := mangahubAPIResponseBody{}
-	q := models.APIQueryData{
+	q := scrapper.APIQueryData{
 		URL:       m.BaseURL,
 		Method:    http.MethodPost,
 		Body:      m._getRequestBody(slug),
@@ -205,7 +205,7 @@ func (m *mangahub) GetChapterPages(ctx web.Context, chapterURL string) (models.P
 	slugs := strings.Split(strings.Replace(chapterURL, "/chapter-", ":", -1), ":")
 
 	apiResp := mangahubAPIResponseBody{}
-	q := models.APIQueryData{
+	q := scrapper.APIQueryData{
 		URL:       m.BaseURL,
 		Method:    http.MethodPost,
 		Body:      m._getRequestBody(slugs...),

@@ -1,6 +1,22 @@
 package models
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/unluckythoughts/go-microservice/tools/web"
+)
+
+type IMangaConnector interface {
+	GetSource() Source
+	GetMangaList(ctx web.Context) ([]Manga, error)
+	GetMangaInfo(ctx web.Context, mangaURL string) (Manga, error)
+	GetChapterPages(ctx web.Context, pageListURL string) (Pages, error)
+}
+
+type Pages struct {
+	Config map[string]interface{} `json:"config"`
+	URLs   []string               `json:"urls"`
+}
 
 type MangaList struct {
 	MangaContainer string

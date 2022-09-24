@@ -1,6 +1,17 @@
 package models
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/unluckythoughts/go-microservice/tools/web"
+)
+
+type INovelConnector interface {
+	GetSource() Source
+	GetNovelList(ctx web.Context) ([]Novel, error)
+	GetNovelInfo(ctx web.Context, novelURL string) (Novel, error)
+	GetNovelChapter(ctx web.Context, chapterURL string) ([]string, error)
+}
 
 type NovelList struct {
 	NovelContainer string

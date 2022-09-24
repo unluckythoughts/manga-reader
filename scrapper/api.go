@@ -6,10 +6,23 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/unluckythoughts/go-microservice/tools/web"
-	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func GetAPIResponse(ctx web.Context, q models.APIQueryData) error {
+type APIQueryData struct {
+	URL         string
+	Method      string
+	Body        []byte
+	Headers     http.Header
+	PageParam   string
+	QueryParams map[string]string
+	Response    interface{}
+	HasNextPage HasNextPage
+	Transport   http.RoundTripper
+}
+
+type HasNextPage func(resp interface{}) bool
+
+func GetAPIResponse(ctx web.Context, q APIQueryData) error {
 	c := web.NewClientWithTransport(q.URL, q.Transport, q.Headers)
 	params := url.Values{}
 	for k, v := range q.QueryParams {

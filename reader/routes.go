@@ -24,4 +24,18 @@ func RegisterRoutes(router web.Router, service *service.Service) {
 	router.GET("/library/:favoriteID/update", h.UpdateFavoriteHandler)
 	router.DELETE("/library/:favoriteID/remove", h.DelFavoriteHandler)
 	router.PUT("/library/:favoriteID/chapter/:chapterID/progress/:pageID", h.UpdateFavoriteProgressHandler)
+
+	router.GET("/novel/source", h.SourceListHandler)
+	router.POST("/novel/source", h.SourceMangaListHandler)
+	router.POST("/novel/source/manga", h.SourceMangaHandler)
+	router.POST("/novel/source/chapter", h.SourceMangaChapterHandler)
+
+	router.POST("/novel/source/search", h.SourceMangaSearchHandler)
+
+	router.GET("/novel/library", h.GetFavoriteListHandler)
+	router.POST("/novel/library", h.AddFavoriteHandler)
+	router.PATCH("/novel/library", h.UpdateAllFavoriteHandler)
+	router.GET("/novel/library/:favoriteID/update", h.UpdateFavoriteHandler)
+	router.DELETE("/novel/library/:favoriteID/remove", h.DelFavoriteHandler)
+	router.PUT("/library/:favoriteID/chapter/:chapterID/progress", h.UpdateFavoriteProgressHandler)
 }

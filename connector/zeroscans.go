@@ -69,7 +69,7 @@ func (z *zero) GetSource() models.Source {
 
 func (z *zero) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	apiResp := zeroAPIResponseBody{}
-	q := models.APIQueryData{
+	q := scrapper.APIQueryData{
 		URL:      z.BaseURL + z.MangaListPath,
 		Response: &apiResp,
 	}
@@ -93,7 +93,7 @@ func (z *zero) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 
 func (z *zero) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
 	apiResp := zeroAPIResponseBody{}
-	q := models.APIQueryData{
+	q := scrapper.APIQueryData{
 		URL:      mangaURL,
 		Response: &apiResp,
 	}
@@ -115,7 +115,7 @@ func (z *zero) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, err
 	}
 	for {
 		apiResp := zeroAPIResponseBody{}
-		q := models.APIQueryData{
+		q := scrapper.APIQueryData{
 			URL:         chaptersURL,
 			Response:    &apiResp,
 			QueryParams: params,
@@ -155,7 +155,7 @@ func (z *zero) GetChapterPages(ctx web.Context, pageListURL string) (models.Page
 	headers.Add("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
 
 	apiResp := zeroAPIResponseBody{}
-	q := models.APIQueryData{
+	q := scrapper.APIQueryData{
 		URL:      pageListURL,
 		Response: &apiResp,
 		Headers:  headers,

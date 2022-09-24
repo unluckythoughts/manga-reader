@@ -19,7 +19,7 @@ func (w *Worker) UpdateFavorites(ctx web.Context) error {
 	workerFn := func(favorite models.Favorite, errChan chan<- error) {
 		ctx.Logger().Debugf("Updating manga %s", favorite.Manga.Title)
 
-		conn, err := connector.New(ctx, favorite.Manga.Source.Domain)
+		conn, err := connector.NewMangaConnector(ctx, favorite.Manga.Source.Domain)
 		if err != nil {
 			errChan <- errors.Wrapf(err, "error getting connector for %s", favorite.Manga.Source.Domain)
 			return

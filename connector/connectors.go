@@ -39,7 +39,7 @@ func getDomain(link string) string {
 	return linkURL.Hostname()
 }
 
-func findConnector(domain string) (models.IMangaConnector, bool) {
+func findMangaConnector(domain string) (models.IMangaConnector, bool) {
 	domain = getDomain(domain)
 	conns := GetAllMangaConnectors()
 	for i := 0; i < len(conns); i++ {
@@ -51,8 +51,8 @@ func findConnector(domain string) (models.IMangaConnector, bool) {
 	return nil, false
 }
 
-func New(ctx web.Context, domain string) (models.IMangaConnector, error) {
-	conn, ok := findConnector(domain)
+func NewMangaConnector(ctx web.Context, domain string) (models.IMangaConnector, error) {
+	conn, ok := findMangaConnector(domain)
 	if !ok {
 		return nil, errors.Errorf("could not find config for %s", domain)
 	}

@@ -15,7 +15,7 @@ func (s *Service) GetSourceMangaList(ctx web.Context, domain string, force bool)
 		return s.db.GetSourceMangas(ctx, domain)
 	}
 
-	conn, err := connector.New(ctx, domain)
+	conn, err := connector.NewMangaConnector(ctx, domain)
 	if err != nil {
 		return []models.Manga{}, err
 	}
@@ -42,7 +42,7 @@ func (s *Service) GetSourceManga(ctx web.Context, mangaURL string, force bool) (
 		return s.db.GetManga(ctx, mangaURL)
 	}
 
-	conn, err := connector.New(ctx, mangaURL)
+	conn, err := connector.NewMangaConnector(ctx, mangaURL)
 	if err != nil {
 		return models.Manga{}, err
 	}
@@ -55,7 +55,7 @@ func (s *Service) GetSourceManga(ctx web.Context, mangaURL string, force bool) (
 }
 
 func (s *Service) GetSourceMangaChapter(ctx web.Context, chapterURL string) (models.Pages, error) {
-	conn, err := connector.New(ctx, chapterURL)
+	conn, err := connector.NewMangaConnector(ctx, chapterURL)
 	if err != nil {
 		return models.Pages{}, err
 	}
