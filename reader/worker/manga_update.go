@@ -16,7 +16,7 @@ func (w *Worker) UpdateFavorites(ctx web.Context) error {
 		return err
 	}
 
-	workerFn := func(favorite models.Favorite, errChan chan<- error) {
+	workerFn := func(favorite models.MangaFavorite, errChan chan<- error) {
 		ctx.Logger().Debugf("Updating manga %s", favorite.Manga.Title)
 
 		conn, err := connector.NewMangaConnector(ctx, favorite.Manga.Source.Domain)
@@ -53,7 +53,7 @@ func (w *Worker) UpdateFavorites(ctx web.Context) error {
 	}
 
 	workerCount := 5
-	errorList := utils.RunParallel[models.Favorite, error](workerCount, favorites, workerFn)
+	errorList := utils.RunParallel[models.MangaFavorite, error](workerCount, favorites, workerFn)
 
 	for _, err := range errorList {
 		ctx.Logger().

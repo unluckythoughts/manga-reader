@@ -9,7 +9,7 @@ import (
 
 type leviatan struct {
 	c    models.IMangaConnector
-	conn models.Connector
+	conn models.MangaConnector
 }
 
 func GetLeviatanScansConnector() models.IMangaConnector {
@@ -23,26 +23,26 @@ func GetLeviatanScansConnector() models.IMangaConnector {
 
 	c.BaseURL = "https://en.leviatanscans.com/"
 
-	c.Selectors.List.MangaContainer = ".page-content-listing .manga"
-	c.Selectors.List.MangaTitle = ".item-summary h3 a,.item-summary h5 a"
-	c.Selectors.List.MangaURL = ".item-summary h3 a[href],.item-summary h5 a[href]"
-	c.Selectors.List.MangaImageURL = ".item-thumb a img[data-src],.item-thumb a img[src]"
-	c.Selectors.List.LastPage = ".wp-pagenavi a.last"
-	c.Selectors.List.PageParam = "/page/" + scrapper.MANGA_LIST_PAGE_ID
+	c.MangaSelectors.List.MangaContainer = ".page-content-listing .manga"
+	c.MangaSelectors.List.MangaTitle = ".item-summary h3 a,.item-summary h5 a"
+	c.MangaSelectors.List.MangaURL = ".item-summary h3 a[href],.item-summary h5 a[href]"
+	c.MangaSelectors.List.MangaImageURL = ".item-thumb a img[data-src],.item-thumb a img[src]"
+	c.MangaSelectors.List.LastPage = ".wp-pagenavi a.last"
+	c.MangaSelectors.List.PageParam = "/page/" + scrapper.MANGA_LIST_PAGE_ID
 
-	c.Selectors.Info.Title = "#manga-title h1"
-	c.Selectors.Info.ImageURL = ".profile-manga .summary_image img[data-src], .profile-manga .summary_image img[src]"
-	c.Selectors.Info.Synopsis = ".profile-manga .post-content_item:last-of-type p"
-	c.Selectors.Info.ChapterContainer = "ul.main li"
-	c.Selectors.Info.ChapterNumber = "a"
-	c.Selectors.Info.ChapterTitle = "a"
-	c.Selectors.Info.ChapterURL = "a[href]"
-	c.Selectors.Info.ChapterUploadDate = "span.chapter-release-date"
-	c.Selectors.Info.ChapterUploadDateFormat = "Jan 2, 2006"
+	c.MangaSelectors.Info.Title = "#manga-title h1"
+	c.MangaSelectors.Info.ImageURL = ".profile-manga .summary_image img[data-src], .profile-manga .summary_image img[src]"
+	c.MangaSelectors.Info.Synopsis = ".profile-manga .post-content_item:last-of-type p"
+	c.MangaSelectors.Info.ChapterContainer = "ul.main li"
+	c.MangaSelectors.Info.ChapterNumber = "a"
+	c.MangaSelectors.Info.ChapterTitle = "a"
+	c.MangaSelectors.Info.ChapterURL = "a[href]"
+	c.MangaSelectors.Info.ChapterUploadDate = "span.chapter-release-date"
+	c.MangaSelectors.Info.ChapterUploadDateFormat = "Jan 2, 2006"
 
-	c.Selectors.Chapter.ImageUrl = ".reading-content img[data-src],.reading-content img[src]"
+	c.MangaSelectors.Chapter.ImageUrl = ".reading-content img[data-src],.reading-content img[src]"
 
-	return &leviatan{c: c, conn: models.Connector(*c)}
+	return &leviatan{c: c, conn: models.MangaConnector(*c)}
 }
 
 func (l *leviatan) GetSource() models.Source {

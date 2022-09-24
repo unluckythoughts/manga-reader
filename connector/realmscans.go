@@ -16,11 +16,11 @@ func GetRealmScansConnector() models.IMangaConnector {
 	c.BaseURL = "http://realmscans.com/"
 	c.MangaListPath = "series/"
 
-	c.Selectors.Info.Title = ".info-right h1"
-	c.Selectors.Info.ImageURL = ".thumb img[src]"
-	c.Selectors.Info.Synopsis = ".info-right .wd-full .entry-content p"
+	c.MangaSelectors.Info.Title = ".info-right h1"
+	c.MangaSelectors.Info.ImageURL = ".thumb img[src]"
+	c.MangaSelectors.Info.Synopsis = ".info-right .wd-full .entry-content p"
 
-	c.Selectors.Chapter.ImageUrl = "#readerarea img:is([data-src],[src])"
+	c.MangaSelectors.Chapter.ImageUrl = "#readerarea img:is([data-src],[src])"
 
 	return c
 }

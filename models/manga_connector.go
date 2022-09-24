@@ -48,16 +48,16 @@ type PageSelectors struct {
 	ImageUrl string
 }
 
-type Selectors struct {
+type MangaSelectors struct {
 	List    MangaList
 	Info    MangaInfo
 	Chapter PageSelectors
 }
 
-type Connector struct {
+type MangaConnector struct {
 	BaseURL       string
 	Transport     http.RoundTripper
 	MangaListPath string
 	Source
-	Selectors
+	MangaSelectors
 }

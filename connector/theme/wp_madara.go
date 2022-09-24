@@ -12,7 +12,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-func GetMadaraScrapeOptsForMangaList(c models.Connector, page string) scrapper.ScrapeOptions {
+func GetMadaraScrapeOptsForMangaList(c models.MangaConnector, page string) scrapper.ScrapeOptions {
 	headers := http.Header{}
 	headers.Set("content-type", "application/x-www-form-urlencoded")
 	headers.Set("referer", c.BaseURL+c.MangaListPath)
@@ -45,7 +45,7 @@ func GetMadaraScrapeOptsForMangaList(c models.Connector, page string) scrapper.S
 	return opts
 }
 
-func GetMadaraScrapeOptsForChapterList(c models.Connector, manga_id, chaptersURL string) scrapper.ScrapeOptions {
+func GetMadaraScrapeOptsForChapterList(c models.MangaConnector, manga_id, chaptersURL string) scrapper.ScrapeOptions {
 	headers := http.Header{}
 	headers.Set("content-type", "application/x-www-form-urlencoded")
 	headers.Set("referer", c.BaseURL)
@@ -69,13 +69,13 @@ func GetMadaraScrapeOptsForChapterList(c models.Connector, manga_id, chaptersURL
 	return opts
 }
 
-type madara models.Connector
+type madara models.MangaConnector
 
 func GetMadaraConnector() *madara {
 	return &madara{
 		MangaListPath: "wp-admin/admin-ajax.php",
 		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
-		Selectors: models.Selectors{
+		MangaSelectors: models.MangaSelectors{
 			List: models.MangaList{
 				MangaContainer: "div.page-item-detail.manga",
 				MangaTitle:     "h3 a",
@@ -107,7 +107,7 @@ func (m *madara) GetSource() models.Source {
 }
 
 func (m *madara) GetMangaList(ctx web.Context) ([]models.Manga, error) {
-	c := models.Connector(*m)
+	c := models.MangaConnector(*m)
 
 	var mangas []models.Manga
 	for i := 0; true; i++ {
@@ -128,7 +128,7 @@ func (m *madara) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 }
 
 func (m *madara) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
-	c := models.Connector(*m)
+	c := models.MangaConnector(*m)
 	opts := scrapper.ScrapeOptions{
 		URL:          mangaURL,
 		RoundTripper: c.Transport,
@@ -152,7 +152,7 @@ func (m *madara) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, e
 }
 
 func (m *madara) GetChapterPages(ctx web.Context, chapterUrl string) (models.Pages, error) {
-	c := models.Connector(*m)
+	c := models.MangaConnector(*m)
 	opts := scrapper.ScrapeOptions{
 		URL:          chapterUrl,
 		RoundTripper: c.Transport,

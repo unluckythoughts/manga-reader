@@ -17,7 +17,7 @@ var (
 	accessToken = ""
 )
 
-type mangahub models.Connector
+type mangahub models.MangaConnector
 
 func GetMangaHubConnector() models.IMangaConnector {
 	return &mangahub{

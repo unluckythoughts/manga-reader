@@ -1,6 +1,6 @@
 package models
 
-type Favorite struct {
+type MangaFavorite struct {
 	ID         int          `json:"id" gorm:"column:id;primarykey"`
 	UserID     int          `json:"-" gorm:"column:user_id"`
 	User       User         `json:"user" gorm:"foreignkey:UserID"`
@@ -10,7 +10,7 @@ type Favorite struct {
 	Categories StrList      `json:"categories" gorm:"column:categories"`
 }
 
-func (f Favorite) TableName() string {
+func (f MangaFavorite) TableName() string {
 	return "favorite"
 }
 

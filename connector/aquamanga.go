@@ -5,7 +5,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-type aquamanga models.Connector
+type aquamanga models.MangaConnector
 
 func GetAquaMangaConnector() models.IMangaConnector {
 	c := theme.GetMadaraConnector()

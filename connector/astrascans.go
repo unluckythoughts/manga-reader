@@ -9,7 +9,7 @@ import (
 
 type astra struct {
 	c    models.IMangaConnector
-	conn models.Connector
+	conn models.MangaConnector
 }
 
 func GetAstraScansConnector() models.IMangaConnector {
@@ -24,24 +24,24 @@ func GetAstraScansConnector() models.IMangaConnector {
 	c.BaseURL = "https://astrascans.com/"
 	c.MangaListPath = "manga/"
 
-	c.Selectors.List.MangaContainer = ".manga"
-	c.Selectors.List.MangaTitle = ".post-title h3 a,.post-title .h5 a"
-	c.Selectors.List.MangaURL = ".post-title h3 a[href],.post-title .h5 a[href]"
-	c.Selectors.List.MangaImageURL = ".item-thumb a img[data-src],.item-thumb a img[src]"
+	c.MangaSelectors.List.MangaContainer = ".manga"
+	c.MangaSelectors.List.MangaTitle = ".post-title h3 a,.post-title .h5 a"
+	c.MangaSelectors.List.MangaURL = ".post-title h3 a[href],.post-title .h5 a[href]"
+	c.MangaSelectors.List.MangaImageURL = ".item-thumb a img[data-src],.item-thumb a img[src]"
 
-	c.Selectors.Info.Title = ".manga-excerpt h1"
-	c.Selectors.Info.ImageURL = ".profile-manga .summary_image img[data-src], .profile-manga .summary_image img[src]"
-	c.Selectors.Info.Synopsis = ".manga-excerpt"
-	c.Selectors.Info.ChapterContainer = "ul.main li"
-	c.Selectors.Info.ChapterNumber = "a"
-	c.Selectors.Info.ChapterTitle = "a"
-	c.Selectors.Info.ChapterURL = "a[href]"
-	c.Selectors.Info.ChapterUploadDate = "span.chapter-release-date,span.chapter-release-date a[title]"
-	c.Selectors.Info.ChapterUploadDateFormat = "January 2, 2006"
+	c.MangaSelectors.Info.Title = ".manga-excerpt h1"
+	c.MangaSelectors.Info.ImageURL = ".profile-manga .summary_image img[data-src], .profile-manga .summary_image img[src]"
+	c.MangaSelectors.Info.Synopsis = ".manga-excerpt"
+	c.MangaSelectors.Info.ChapterContainer = "ul.main li"
+	c.MangaSelectors.Info.ChapterNumber = "a"
+	c.MangaSelectors.Info.ChapterTitle = "a"
+	c.MangaSelectors.Info.ChapterURL = "a[href]"
+	c.MangaSelectors.Info.ChapterUploadDate = "span.chapter-release-date,span.chapter-release-date a[title]"
+	c.MangaSelectors.Info.ChapterUploadDateFormat = "January 2, 2006"
 
-	c.Selectors.Chapter.ImageUrl = ".reading-content img[data-src],.reading-content img[src]"
+	c.MangaSelectors.Chapter.ImageUrl = ".reading-content img[data-src],.reading-content img[src]"
 
-	return &astra{c: c, conn: models.Connector(*c)}
+	return &astra{c: c, conn: models.MangaConnector(*c)}
 }
 
 func (l *astra) GetSource() models.Source {

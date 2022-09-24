@@ -10,7 +10,7 @@ import (
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-type zero models.Connector
+type zero models.MangaConnector
 
 type zeroAPIResponseBody struct {
 	Data struct {

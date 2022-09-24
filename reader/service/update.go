@@ -8,20 +8,20 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.Favorite, error) {
+func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.MangaFavorite, error) {
 	favorite, err := s.db.FindFavorite(ctx, favoriteID)
 	if err != nil {
-		return models.Favorite{}, err
+		return models.MangaFavorite{}, err
 	}
 
 	conn, err := connector.NewMangaConnector(ctx, favorite.Manga.URL)
 	if err != nil {
-		return models.Favorite{}, err
+		return models.MangaFavorite{}, err
 	}
 
 	manga, err := conn.GetMangaInfo(ctx, favorite.Manga.URL)
 	if err != nil {
-		return models.Favorite{}, err
+		return models.MangaFavorite{}, err
 	}
 
 	manga.SourceID = favorite.Manga.SourceID
@@ -42,7 +42,7 @@ func (s *Service) UpdateFavorite(ctx web.Context, favoriteID int) (models.Favori
 	// will return updated chapters
 	err = s.db.UpdateChapters(ctx, &manga.Chapters)
 	if err != nil {
-		return models.Favorite{}, err
+		return models.MangaFavorite{}, err
 	}
 
 	favorite.Manga = manga

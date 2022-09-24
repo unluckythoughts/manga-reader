@@ -16,10 +16,10 @@ const (
 	MANGA_LIST_PAGE_ID = "::pageId::"
 )
 
-func _scrapLastPage(ctx web.Context, c models.Connector, opts *ScrapeOptions) string {
+func _scrapLastPage(ctx web.Context, c models.MangaConnector, opts *ScrapeOptions) string {
 	lastPageURL := ""
 	err := GetPageForScrapping(ctx, opts, func(h *colly.HTMLElement) {
-		if lastPageElement, ok := GetElementForSelector(h.DOM, c.Selectors.List.LastPage); ok {
+		if lastPageElement, ok := GetElementForSelector(h.DOM, c.MangaSelectors.List.LastPage); ok {
 			if link, ok := lastPageElement.Attr("href"); ok {
 				lastPageURL = link
 			}
@@ -33,12 +33,12 @@ func _scrapLastPage(ctx web.Context, c models.Connector, opts *ScrapeOptions) st
 	return lastPageURL
 }
 
-func _scrapMangasInPage(ctx web.Context, c models.Connector, opts *ScrapeOptions) ([]models.Manga, string, error) {
+func _scrapMangasInPage(ctx web.Context, c models.MangaConnector, opts *ScrapeOptions) ([]models.Manga, string, error) {
 	mangas := []models.Manga{}
 	nexPageURL := ""
 	err := GetPageForScrapping(ctx, opts, func(h *colly.HTMLElement) {
-		h.DOM.Find(c.Selectors.List.MangaContainer).Each(func(i int, s *goquery.Selection) {
-			manga, err := GetMangaFromListSelectors(s, c.Selectors.List)
+		h.DOM.Find(c.MangaSelectors.List.MangaContainer).Each(func(i int, s *goquery.Selection) {
+			manga, err := GetMangaFromListSelectors(s, c.MangaSelectors.List)
 			if err != nil {
 				ctx.Logger().With(zap.Error(err)).Debugf("error getting manga info from %s", c.Source.Domain)
 				return
@@ -50,7 +50,7 @@ func _scrapMangasInPage(ctx web.Context, c models.Connector, opts *ScrapeOptions
 
 		})
 
-		if nextPageElement, ok := GetElementForSelector(h.DOM, c.Selectors.List.NextPage); ok {
+		if nextPageElement, ok := GetElementForSelector(h.DOM, c.MangaSelectors.List.NextPage); ok {
 			if link, ok := nextPageElement.Attr("href"); ok {
 				if strings.HasPrefix(link, c.MangaListPath) {
 					nexPageURL = c.BaseURL + link
@@ -68,7 +68,7 @@ func _scrapMangasInPage(ctx web.Context, c models.Connector, opts *ScrapeOptions
 	return mangas, nexPageURL, err
 }
 
-func ScrapeMangas(ctx web.Context, c models.Connector, opts *ScrapeOptions) ([]models.Manga, error) {
+func ScrapeMangas(ctx web.Context, c models.MangaConnector, opts *ScrapeOptions) ([]models.Manga, error) {
 	mangas := []models.Manga{}
 	// url := c.BaseURL + c.MangaListPath
 	for opts.URL != "" {
@@ -84,7 +84,7 @@ func ScrapeMangas(ctx web.Context, c models.Connector, opts *ScrapeOptions) ([]m
 	return mangas, nil
 }
 
-func ScrapeMangasParallel(ctx web.Context, c models.Connector, opts *ScrapeOptions) ([]models.Manga, error) {
+func ScrapeMangasParallel(ctx web.Context, c models.MangaConnector, opts *ScrapeOptions) ([]models.Manga, error) {
 	mangas := []models.Manga{}
 
 	lastPage := _scrapLastPage(ctx, c, opts)

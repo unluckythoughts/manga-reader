@@ -10,13 +10,13 @@ import (
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
 
-type basic models.Connector
+type basic models.MangaConnector
 
 func GetBasicWordPressConnector() *basic {
 	return &basic{
 		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
 		MangaListPath: "manga/",
-		Selectors: models.Selectors{
+		MangaSelectors: models.MangaSelectors{
 			List: models.MangaList{
 				MangaContainer: ".listupd > .bs",
 				MangaTitle:     ".tt",
@@ -47,7 +47,7 @@ func (b *basic) GetSource() models.Source {
 }
 
 func (b *basic) GetMangaList(ctx web.Context) ([]models.Manga, error) {
-	c := models.Connector(*b)
+	c := models.MangaConnector(*b)
 	opts := &scrapper.ScrapeOptions{
 		URL:          c.BaseURL + c.MangaListPath,
 		RoundTripper: c.Transport,
@@ -61,7 +61,7 @@ func (b *basic) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 }
 
 func (b *basic) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
-	c := models.Connector(*b)
+	c := models.MangaConnector(*b)
 	opts := &scrapper.ScrapeOptions{
 		URL:          mangaURL,
 		RoundTripper: c.Transport,
@@ -70,7 +70,7 @@ func (b *basic) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, er
 }
 
 func (b *basic) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
-	c := models.Connector(*b)
+	c := models.MangaConnector(*b)
 
 	headers := http.Header{}
 	headers.Set("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")

@@ -15,9 +15,9 @@ func GetFlameScansConnector() models.IMangaConnector {
 	}
 	c.BaseURL = "http://flamescans.org/"
 	c.MangaListPath = "series/"
-	c.Selectors.Info.Title = ".info-half h1.entry-title"
-	c.Selectors.Info.ImageURL = ".thumb-half .thumb img[src]"
-	c.Selectors.Info.Synopsis = ".info-half .summary .wd-full .entry-content"
+	c.MangaSelectors.Info.Title = ".info-half h1.entry-title"
+	c.MangaSelectors.Info.ImageURL = ".thumb-half .thumb img[src]"
+	c.MangaSelectors.Info.Synopsis = ".info-half .summary .wd-full .entry-content"
 
 	return c
 }

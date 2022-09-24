@@ -15,11 +15,11 @@ func GetLuminousScansConnector() models.IMangaConnector {
 	}
 	c.BaseURL = "http://luminousscans.com/"
 	c.MangaListPath = "series/"
-	c.Selectors.Info.Title = ".info-right h1.entry-title"
-	c.Selectors.Info.ImageURL = ".info-left .thumb img[src]"
-	c.Selectors.Info.Synopsis = ".info-right .wd-full .entry-content"
+	c.MangaSelectors.Info.Title = ".info-right h1.entry-title"
+	c.MangaSelectors.Info.ImageURL = ".info-left .thumb img[src]"
+	c.MangaSelectors.Info.Synopsis = ".info-right .wd-full .entry-content"
 
-	c.Selectors.Chapter.ImageUrl = "#readerarea img[class*='wp-image'][src]"
+	c.MangaSelectors.Chapter.ImageUrl = "#readerarea img[class*='wp-image'][src]"
 
 	return c
 }

@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func ScrapeChapterPages(ctx web.Context, c models.Connector, opts *ScrapeOptions) (models.Pages, error) {
+func ScrapeChapterPages(ctx web.Context, c models.MangaConnector, opts *ScrapeOptions) (models.Pages, error) {
 	pages := models.Pages{}
 	GetPageForScrapping(ctx, opts, func(h *colly.HTMLElement) {
 		imageURLs, err := GetImagesListForSelector(h.DOM, c.Chapter.ImageUrl, false)

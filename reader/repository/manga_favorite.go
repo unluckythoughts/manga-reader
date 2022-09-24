@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (r *Repository) CreateFavorite(ctx context.Context, f *models.Favorite) error {
+func (r *Repository) CreateFavorite(ctx context.Context, f *models.MangaFavorite) error {
 	return r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{DoNothing: true, UpdateAll: false}).
@@ -16,18 +16,18 @@ func (r *Repository) CreateFavorite(ctx context.Context, f *models.Favorite) err
 		Error
 }
 
-func (r *Repository) GetFavorites(ctx context.Context) ([]models.Favorite, error) {
-	var favorites []models.Favorite
+func (r *Repository) GetFavorites(ctx context.Context) ([]models.MangaFavorite, error) {
+	var favorites []models.MangaFavorite
 	err := r.db.
-		Model(&models.Favorite{}).
+		Model(&models.MangaFavorite{}).
 		Preload("Manga.Chapters").
 		Preload("Manga.Source").
 		Find(&favorites).Error
 	return favorites, err
 }
 
-func (r *Repository) FindFavorite(ctx context.Context, id int) (models.Favorite, error) {
-	var favorite models.Favorite
+func (r *Repository) FindFavorite(ctx context.Context, id int) (models.MangaFavorite, error) {
+	var favorite models.MangaFavorite
 	err := r.db.WithContext(ctx).
 		Preload("Manga.Chapters").
 		Preload("Manga.Source").
@@ -36,16 +36,16 @@ func (r *Repository) FindFavorite(ctx context.Context, id int) (models.Favorite,
 }
 
 func (r *Repository) UpdateFavoriteProgress(ctx context.Context, favoriteID int, progress models.StrFloatList) error {
-	favorite := &models.Favorite{ID: favoriteID, Progress: progress}
+	favorite := &models.MangaFavorite{ID: favoriteID, Progress: progress}
 	return r.db.
 		WithContext(ctx).
 		Updates(favorite).
 		Error
 }
 
-func (r *Repository) DelFavorite(ctx context.Context, favorite models.Favorite) error {
+func (r *Repository) DelFavorite(ctx context.Context, favorite models.MangaFavorite) error {
 	return r.db.
 		WithContext(ctx).
-		Delete(&models.Favorite{}, favorite.ID).
+		Delete(&models.MangaFavorite{}, favorite.ID).
 		Error
 }
