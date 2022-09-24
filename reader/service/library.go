@@ -39,3 +39,37 @@ func (s *Service) DelFavorite(ctx web.Context, id int) error {
 func (s *Service) GetFavorites(ctx web.Context) ([]models.Favorite, error) {
 	return s.db.GetFavorites(ctx)
 }
+
+func (s *Service) AddNovelFavorite(ctx web.Context, link string) (models.NovelFavorite, error) {
+	novel, err := s.db.GetNovel(ctx, link)
+	if err != nil {
+		conn, err := connector.NewNovelConnector(ctx, link)
+		if err != nil {
+			return models.NovelFavorite{}, err
+		}
+
+		novel, err = conn.GetNovelInfo(ctx, link)
+		if err != nil {
+			return models.NovelFavorite{}, err
+		}
+	}
+
+	favorite := models.NovelFavorite{
+		Novel: novel,
+	}
+
+	return favorite, s.db.CreateNovelFavorite(ctx, &favorite)
+}
+
+func (s *Service) DelNovelFavorite(ctx web.Context, id int) error {
+	favorite, err := s.db.FindNovelFavorite(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return s.db.DelNovelFavorite(ctx, favorite)
+}
+
+func (s *Service) GetNovelFavorites(ctx web.Context) ([]models.NovelFavorite, error) {
+	return s.db.GetNovelFavorites(ctx)
+}

@@ -22,3 +22,11 @@ func isMangaRequest(r web.Request) bool {
 
 	return false
 }
+
+func isNovelRequest(r web.Request) bool {
+	if r.GetRouteParam("type") == "novel" {
+		return true
+	}
+
+	return false
+}

@@ -12,7 +12,7 @@ func ScrapeNovelChapterText(ctx web.Context, c models.NovelConnector, opts *Scra
 	GetPageForScrapping(ctx, opts, func(h *colly.HTMLElement) {
 		data, err := GetAllTextForSelector(h.DOM, c.Chapter.Paragraph)
 		if err != nil {
-			ctx.Logger().With(zap.Error(err)).Debugf("error getting chapter images from %s", c.Source.Domain)
+			ctx.Logger().With(zap.Error(err)).Debugf("error getting chapter images from %s", c.Domain)
 			return
 		}
 

@@ -34,6 +34,17 @@ func setupConfig(db *gorm.DB) {
 		db.Logger.Error(nil, "could not update sources")
 		panic(err)
 	}
+
+	novelSources := []models.NovelSource{}
+	for _, conn := range connector.GetAllNovelConnectors() {
+		novelSources = append(novelSources, conn.GetSource())
+	}
+
+	err = r.CreateNovelSources(context.Background(), &novelSources)
+	if err != nil {
+		db.Logger.Error(nil, "could not update sources")
+		panic(err)
+	}
 }
 
 func New(db *gorm.DB) *Worker {

@@ -17,7 +17,7 @@ func _scrapNovelChapterList(ctx web.Context, c models.NovelConnector, h *colly.H
 	h.DOM.Find(c.NovelSelectors.Info.ChapterContainer).Each(func(i int, s *goquery.Selection) {
 		chapter, err := GetNovelChapterFromInfoSelectors(s, c.NovelSelectors.Info)
 		if err != nil {
-			ctx.Logger().With(zap.Error(err)).Debugf("error getting chapter info from %s", c.Source.Domain)
+			ctx.Logger().With(zap.Error(err)).Debugf("error getting chapter info from %s", c.Domain)
 			return
 		}
 
@@ -51,7 +51,7 @@ func ScrapeNovelInfo(ctx web.Context, c models.NovelConnector, opts *ScrapeOptio
 		var err error
 		novel, err = GetNovelFromInfoSelectors(h.DOM, c.NovelSelectors.Info)
 		if err != nil {
-			ctx.Logger().With(zap.Error(err)).Debugf("error getting novel info from %s", c.Source.Domain)
+			ctx.Logger().With(zap.Error(err)).Debugf("error getting novel info from %s", c.Domain)
 			return
 		}
 		novel.URL = opts.URL
@@ -75,7 +75,7 @@ func ScrapeNovelInfo(ctx web.Context, c models.NovelConnector, opts *ScrapeOptio
 			if err := GetPageForScrapping(ctx, opts, func(hh *colly.HTMLElement) {
 				chapters, nextPageURL = _scrapNovelChapterList(ctx, c, hh)
 			}); err != nil {
-				ctx.Logger().With(zap.Error(err)).Debugf("error getting chapters of novel from %s", c.Source.Domain)
+				ctx.Logger().With(zap.Error(err)).Debugf("error getting chapters of novel from %s", c.Domain)
 				return
 			}
 

@@ -62,3 +62,60 @@ func (s *Service) GetSourceMangaChapter(ctx web.Context, chapterURL string) (mod
 
 	return conn.GetChapterPages(ctx, chapterURL)
 }
+
+func (s *Service) GetNovelSourceList(ctx web.Context) ([]models.NovelSource, error) {
+	return s.db.GetNovelSources(ctx)
+}
+
+func (s *Service) GetSourceNovelList(ctx web.Context, domain string, force bool) ([]models.Novel, error) {
+	if !force {
+		return s.db.GetSourceNovels(ctx, domain)
+	}
+
+	conn, err := connector.NewNovelConnector(ctx, domain)
+	if err != nil {
+		return []models.Novel{}, err
+	}
+	mangas, err := conn.GetNovelList(ctx)
+
+	if err == nil {
+		s.w.UpdateSourceNovels(ctx, domain, mangas)
+	}
+
+	if len(mangas) > 200 {
+		return mangas[:200], err
+	}
+	return mangas, err
+}
+
+func (s *Service) SearchSourceNovel(ctx web.Context, query string) ([]models.Novel, error) {
+	mangas, err := s.db.SearchNovelsByTitle(ctx, query)
+
+	return mangas, err
+}
+
+func (s *Service) GetSourceNovel(ctx web.Context, mangaURL string, force bool) (models.Novel, error) {
+	if !force {
+		return s.db.GetNovel(ctx, mangaURL)
+	}
+
+	conn, err := connector.NewNovelConnector(ctx, mangaURL)
+	if err != nil {
+		return models.Novel{}, err
+	}
+	manga, err := conn.GetNovelInfo(ctx, mangaURL)
+
+	if err == nil {
+		s.w.UpdateSourceNovel(ctx, conn.GetSource().Domain, manga)
+	}
+	return manga, err
+}
+
+func (s *Service) GetSourceNovelChapter(ctx web.Context, chapterURL string) ([]string, error) {
+	conn, err := connector.NewNovelConnector(ctx, chapterURL)
+	if err != nil {
+		return []string{}, err
+	}
+
+	return conn.GetNovelChapter(ctx, chapterURL)
+}

@@ -10,11 +10,11 @@ func RegisterRoutes(router web.Router, service *service.Service) {
 	h := api.New(service)
 
 	router.GET("/api/:type/source", h.SourceListHandler)
-	router.POST("/api/:type/source", h.SourceMangaListHandler)
-	router.POST("/api/:type/source/manga", h.SourceMangaHandler)
-	router.POST("/api/:type/source/chapter", h.SourceMangaChapterHandler)
+	router.POST("/api/:type/source", h.SourceItemListHandler)
+	router.POST("/api/:type/source/item", h.SourceItemHandler)
+	router.POST("/api/:type/source/chapter", h.SourceItemChapterHandler)
 
-	router.POST("/api/:type/source/search", h.SourceMangaSearchHandler)
+	router.POST("/api/:type/source/search", h.SourceItemSearchHandler)
 
 	router.GET("/api/:type/library", h.GetFavoriteListHandler)
 	router.POST("/api/:type/library", h.AddFavoriteHandler)

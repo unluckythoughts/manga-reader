@@ -7,7 +7,7 @@ import (
 )
 
 type INovelConnector interface {
-	GetSource() Source
+	GetSource() NovelSource
 	GetNovelList(ctx web.Context) ([]Novel, error)
 	GetNovelInfo(ctx web.Context, novelURL string) (Novel, error)
 	GetNovelChapter(ctx web.Context, chapterURL string) ([]string, error)
@@ -55,6 +55,6 @@ type NovelConnector struct {
 	BaseURL       string
 	Transport     http.RoundTripper
 	NovelListPath string
-	Source
+	NovelSource
 	NovelSelectors
 }

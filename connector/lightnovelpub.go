@@ -2,6 +2,7 @@ package connector
 
 import (
 	"net/http"
+	"strings"
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/go-microservice/tools/web"
@@ -13,14 +14,14 @@ type lnp models.NovelConnector
 
 func GetLightNovelPubConnector() models.INovelConnector {
 	c := &lnp{
-		Source: models.Source{
+		NovelSource: models.NovelSource{
 			Name:    "Light Novel Pub",
 			Domain:  "lightnovelpub.com",
 			IconURL: "https://static.lightnovelpub.com/content/img/lightnovelpub/logo.png",
 		},
 		BaseURL:       "https://www.lightnovelpub.com/",
 		Transport:     cloudflarebp.AddCloudFlareByPass((&http.Client{}).Transport),
-		NovelListPath: "stories-17091737/genre-all/order-new/status-all/p-1",
+		NovelListPath: "stories-17091737/genre-all/order-new/status-all",
 		NovelSelectors: models.NovelSelectors{
 			List: models.NovelList{
 				NovelContainer: "ul.novel-list li",
@@ -28,6 +29,8 @@ func GetLightNovelPubConnector() models.INovelConnector {
 				NovelURL:       ".item-body h4.novel-title a[href]",
 				NovelImageURL:  ".cover-wrap img[data-src], .cover-wrap img[src]",
 				NextPage:       "ul.pagination li.PagedList-skipToNext a[href]",
+				LastPage:       "ul.pagination li.PagedList-pageCountAndLocation a",
+				PageParam:      "/p-" + scrapper.MANGA_LIST_PAGE_ID,
 			},
 			Info: models.NovelInfo{
 				Title:                   ".novel-info h1.novel-title",
@@ -51,15 +54,19 @@ func GetLightNovelPubConnector() models.INovelConnector {
 	return c
 }
 
-func (n *lnp) GetSource() models.Source {
-	return n.Source
+func (n *lnp) GetSource() models.NovelSource {
+	return n.NovelSource
 }
 
 func (n *lnp) GetNovelList(ctx web.Context) ([]models.Novel, error) {
 	c := models.NovelConnector(*n)
 	opts := &scrapper.ScrapeOptions{
-		URL:          c.BaseURL + c.NovelListPath,
+		URL:          c.BaseURL + c.NovelListPath + "/p-1",
 		RoundTripper: c.Transport,
+	}
+
+	if c.List.LastPage != "" && strings.Contains(c.List.PageParam, scrapper.MANGA_LIST_PAGE_ID) {
+		return scrapper.ScrapeNovelsParallel(ctx, c, opts, 2)
 	}
 
 	return scrapper.ScrapeNovels(ctx, c, opts)
