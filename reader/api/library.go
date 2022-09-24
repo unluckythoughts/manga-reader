@@ -9,17 +9,25 @@ import (
 )
 
 func (h *Handlers) AddFavoriteHandler(r web.Request) (interface{}, error) {
-	body := models.SourceMangaRequest{}
+	body := models.SourceRequest{}
 	err := r.GetValidatedBody(&body)
 	if err != nil {
-		return nil, err
+		return nil, web.BadRequest(err)
 	}
 
-	return h.s.AddFavorite(r.GetContext(), body.MangaURL)
+	if isMangaRequest(r) {
+		return h.s.AddFavorite(r.GetContext(), body.URL)
+	}
+
+	return nil, web.BadRequest()
 }
 
 func (h *Handlers) GetFavoriteListHandler(r web.Request) (interface{}, error) {
-	return h.s.GetFavorites(r.GetContext())
+	if isMangaRequest(r) {
+		return h.s.GetFavorites(r.GetContext())
+	}
+
+	return nil, web.BadRequest()
 }
 
 func (h *Handlers) DelFavoriteHandler(r web.Request) (interface{}, error) {
@@ -27,10 +35,14 @@ func (h *Handlers) DelFavoriteHandler(r web.Request) (interface{}, error) {
 
 	id, err := strconv.Atoi(favoriteID)
 	if err != nil {
-		return nil, err
+		return nil, web.BadRequest(err)
 	}
 
-	return nil, h.s.DelFavorite(r.GetContext(), id)
+	if isMangaRequest(r) {
+		return nil, h.s.DelFavorite(r.GetContext(), id)
+	}
+
+	return nil, web.BadRequest()
 }
 
 func (h *Handlers) UpdateFavoriteHandler(r web.Request) (interface{}, error) {
@@ -38,15 +50,24 @@ func (h *Handlers) UpdateFavoriteHandler(r web.Request) (interface{}, error) {
 
 	id, err := strconv.Atoi(favoriteID)
 	if err != nil {
-		return nil, err
+		return nil, web.BadRequest(err)
 	}
 
-	return h.s.UpdateFavorite(r.GetContext(), id)
+	if isMangaRequest(r) {
+		return h.s.UpdateFavorite(r.GetContext(), id)
+	}
+
+	return nil, web.BadRequest()
+
 }
 
 func (h *Handlers) UpdateAllFavoriteHandler(r web.Request) (interface{}, error) {
-	err := h.s.UpdateAllFavorite(r.GetContext())
-	return nil, err
+	if isMangaRequest(r) {
+		err := h.s.UpdateAllFavorite(r.GetContext())
+		return nil, err
+	}
+
+	return nil, web.BadRequest()
 }
 
 func (h *Handlers) UpdateFavoriteProgressHandler(r web.Request) (interface{}, error) {
@@ -56,12 +77,12 @@ func (h *Handlers) UpdateFavoriteProgressHandler(r web.Request) (interface{}, er
 
 	favoriteID, err := strconv.Atoi(strFavoriteID)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could get favoriteID route param")
+		return nil, web.BadRequest(errors.Wrapf(err, "could get favoriteID route param"))
 	}
 
 	chapterID, err := strconv.ParseFloat(strChapterID, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could get chapterID route param")
+		return nil, web.BadRequest(errors.Wrapf(err, "could get chapterID route param"))
 	}
 
 	pageID, err := strconv.ParseFloat(strPageID, 64)
@@ -70,5 +91,9 @@ func (h *Handlers) UpdateFavoriteProgressHandler(r web.Request) (interface{}, er
 	}
 
 	progress := models.StrFloatList{chapterID, pageID}
-	return nil, h.s.UpdateFavoriteProgress(r.GetContext(), favoriteID, progress)
+	if isMangaRequest(r) {
+		return nil, h.s.UpdateFavoriteProgress(r.GetContext(), favoriteID, progress)
+	}
+
+	return nil, web.BadRequest()
 }

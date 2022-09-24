@@ -9,33 +9,17 @@ import (
 func RegisterRoutes(router web.Router, service *service.Service) {
 	h := api.New(service)
 
-	router.GET("/proxy/:url", h.ProxyHandler)
+	router.GET("/api/:type/source", h.SourceListHandler)
+	router.POST("/api/:type/source", h.SourceMangaListHandler)
+	router.POST("/api/:type/source/manga", h.SourceMangaHandler)
+	router.POST("/api/:type/source/chapter", h.SourceMangaChapterHandler)
 
-	router.GET("/source", h.SourceListHandler)
-	router.POST("/source", h.SourceMangaListHandler)
-	router.POST("/source/manga", h.SourceMangaHandler)
-	router.POST("/source/chapter", h.SourceMangaChapterHandler)
+	router.POST("/api/:type/source/search", h.SourceMangaSearchHandler)
 
-	router.POST("/source/search", h.SourceMangaSearchHandler)
-
-	router.GET("/library", h.GetFavoriteListHandler)
-	router.POST("/library", h.AddFavoriteHandler)
-	router.PATCH("/library", h.UpdateAllFavoriteHandler)
-	router.GET("/library/:favoriteID/update", h.UpdateFavoriteHandler)
-	router.DELETE("/library/:favoriteID/remove", h.DelFavoriteHandler)
-	router.PUT("/library/:favoriteID/chapter/:chapterID/progress/:pageID", h.UpdateFavoriteProgressHandler)
-
-	router.GET("/novel/source", h.SourceListHandler)
-	router.POST("/novel/source", h.SourceMangaListHandler)
-	router.POST("/novel/source/manga", h.SourceMangaHandler)
-	router.POST("/novel/source/chapter", h.SourceMangaChapterHandler)
-
-	router.POST("/novel/source/search", h.SourceMangaSearchHandler)
-
-	router.GET("/novel/library", h.GetFavoriteListHandler)
-	router.POST("/novel/library", h.AddFavoriteHandler)
-	router.PATCH("/novel/library", h.UpdateAllFavoriteHandler)
-	router.GET("/novel/library/:favoriteID/update", h.UpdateFavoriteHandler)
-	router.DELETE("/novel/library/:favoriteID/remove", h.DelFavoriteHandler)
-	router.PUT("/library/:favoriteID/chapter/:chapterID/progress", h.UpdateFavoriteProgressHandler)
+	router.GET("/api/:type/library", h.GetFavoriteListHandler)
+	router.POST("/api/:type/library", h.AddFavoriteHandler)
+	router.PATCH("/api/:type/library", h.UpdateAllFavoriteHandler)
+	router.GET("/api/:type/library/:favoriteID/update", h.UpdateFavoriteHandler)
+	router.DELETE("/api/:type/library/:favoriteID/remove", h.DelFavoriteHandler)
+	router.PUT("/api/:type/library/:favoriteID/chapter/:chapterID/progress/:pageID", h.UpdateFavoriteProgressHandler)
 }
