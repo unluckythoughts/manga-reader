@@ -33,6 +33,47 @@ func getText(s *goquery.Selection, selector string) (string, error) {
 	return text, nil
 }
 
+func getAllText(s *goquery.Selection, selector string) ([]string, error) {
+	var texts []string
+	var selErr error
+	s.Each(func(i int, sel *goquery.Selection) {
+		text, err := getText(sel, selector)
+		if err != nil {
+			selErr = err
+		}
+
+		texts = append(texts, text)
+	})
+	return texts, selErr
+}
+
+func GetAllTextForSelector(selection *goquery.Selection, sel string) ([]string, error) {
+	if sel == "" {
+		return []string{}, nil
+	}
+
+	sels := getSelectors(sel)
+	var selectorErr error
+	for _, s := range sels {
+		selForText := selection
+		if !strings.HasPrefix(s, "[") {
+			selForText = selection.Find(s)
+		}
+
+		val, err := getAllText(selForText, s)
+		if err != nil {
+			selectorErr = err
+			continue
+		}
+
+		if len(val) > 0 {
+			return val, err
+		}
+	}
+
+	return []string{}, selectorErr
+}
+
 func GetTextForSelector(selection *goquery.Selection, sel string) (string, error) {
 	if sel == "" {
 		return "", nil

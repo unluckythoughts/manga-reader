@@ -166,7 +166,7 @@ func ParseDate(date string, format string) (string, error) {
 		return parseHumanReadableFormat(date)
 	}
 
-	if format == "" {
+	if format == "" || date == "" {
 		return date, nil
 	}
 
