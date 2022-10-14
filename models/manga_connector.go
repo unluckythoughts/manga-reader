@@ -36,6 +36,10 @@ type MangaInfo struct {
 	Synopsis                string
 	Slug                    string
 	OtherID                 string
+	ChapterListURL          string
+	ChapterListNextPage     string
+	ChapterListLastPage     string
+	ChapterListPageParam    string
 	ChapterContainer        string
 	ChapterNumber           string
 	ChapterTitle            string

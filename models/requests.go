@@ -12,6 +12,7 @@ type SourceChapterRequest struct {
 type SourceListRequest struct {
 	Domain string `json:"domain"`
 	Force  bool   `json:"force"`
+	Fix    bool   `json:"fix"`
 }
 
 type SearchSourceRequest struct {

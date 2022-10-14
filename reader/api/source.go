@@ -24,7 +24,7 @@ func (h *Handlers) SourceItemListHandler(r web.Request) (interface{}, error) {
 	}
 
 	if isMangaRequest(r) {
-		return h.s.GetSourceMangaList(r.GetContext(), body.Domain, body.Force)
+		return h.s.GetSourceMangaList(r.GetContext(), body.Domain, body.Force, body.Fix)
 	} else if isNovelRequest(r) {
 		return h.s.GetSourceNovelList(r.GetContext(), body.Domain, body.Force)
 	}

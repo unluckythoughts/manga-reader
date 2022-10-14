@@ -1,5 +1,11 @@
 {
   "files.exclude": {
     "**/manga-reader-ui": true
+  },
+  "search.exclude": {
+    "**/manga-reader-ui": true,
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true
   }
 }

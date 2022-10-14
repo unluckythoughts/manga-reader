@@ -10,7 +10,7 @@ func (s *Service) GetMangaSourceList(ctx web.Context) ([]models.Source, error) {
 	return s.db.GetSources(ctx)
 }
 
-func (s *Service) GetSourceMangaList(ctx web.Context, domain string, force bool) ([]models.Manga, error) {
+func (s *Service) GetSourceMangaList(ctx web.Context, domain string, force bool, fix bool) ([]models.Manga, error) {
 	if !force {
 		return s.db.GetSourceMangas(ctx, domain)
 	}
@@ -22,7 +22,7 @@ func (s *Service) GetSourceMangaList(ctx web.Context, domain string, force bool)
 	mangas, err := conn.GetMangaList(ctx)
 
 	if err == nil {
-		s.w.UpdateSourceMangas(ctx, domain, mangas)
+		s.w.UpdateSourceMangas(ctx, domain, mangas, fix)
 	}
 
 	if len(mangas) > 200 {

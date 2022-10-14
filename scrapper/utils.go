@@ -273,7 +273,7 @@ func GetImagesListForSelector(selection *goquery.Selection, selector string, inc
 }
 
 func getSelectors(selector string) []string {
-	pattern, err := regexp.Compile(`(?im)[^\n,(]*(?:\([^)]*\))?`)
+	pattern, err := regexp.Compile(`(?im)[^\n,(]*(?:\([^)]*\))?[^,]*`)
 	if err != nil {
 		return []string{selector}
 	}

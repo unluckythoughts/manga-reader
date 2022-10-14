@@ -8,7 +8,16 @@ import (
 	"go.uber.org/zap"
 )
 
-func (w *Worker) UpdateSourceMangas(ctx web.Context, domain string, mangas []models.Manga) {
+func (w *Worker) UpdateSourceMangaByName(ctx web.Context, mangas []models.Manga) {
+	for _, manga := range mangas {
+		err := w.db.UpdateMangaByName(ctx, &manga)
+		if err != nil {
+			ctx.Logger().With(zap.Error(err)).Errorf("could not update manga for %+s", manga.Title)
+		}
+	}
+}
+
+func (w *Worker) UpdateSourceMangas(ctx web.Context, domain string, mangas []models.Manga, fix bool) {
 	go func() {
 		if len(mangas) == 0 {
 			return
@@ -16,7 +25,7 @@ func (w *Worker) UpdateSourceMangas(ctx web.Context, domain string, mangas []mod
 
 		ctx = web.NewContext(ctx.Logger().Desugar())
 		source, err := w.db.FindSourceByDomain(ctx, domain)
-		if err != nil {
+		if err != nil || source.ID <= 0 {
 			ctx.Logger().With(zap.Error(err)).Errorf("could not find source for %+s", domain)
 			return
 		}
@@ -25,7 +34,13 @@ func (w *Worker) UpdateSourceMangas(ctx web.Context, domain string, mangas []mod
 			mangas[i].SourceID = source.ID
 		}
 
-		if len(mangas) > 1000 {
+		if fix {
+			err := w.db.DeleteChaptersBySource(ctx, source.ID)
+			if err != nil {
+				ctx.Logger().With(zap.Error(err)).Errorf("could not delete chapters for %+s", source.Domain)
+			}
+			w.UpdateSourceMangaByName(ctx, mangas)
+		} else if len(mangas) > 1000 {
 			batch := 500
 			for i := 0; i < len(mangas); i = i + batch {
 				batchMangas := []models.Manga{}

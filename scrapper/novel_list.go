@@ -93,7 +93,7 @@ func ScrapeNovelsParallel(ctx web.Context, c models.NovelConnector, opts *Scrape
 	count := utils.GetInt(lastPage)
 
 	workerFn := func(page int64, out chan<- []models.Novel) {
-		params := strings.Replace(c.List.PageParam, MANGA_LIST_PAGE_ID, strconv.Itoa(int(page)), 1)
+		params := strings.Replace(c.List.PageParam, PAGE_ID, strconv.Itoa(int(page)), 1)
 		url := c.BaseURL + c.NovelListPath + params
 		newOpts := opts.Clone()
 		newOpts.URL = url

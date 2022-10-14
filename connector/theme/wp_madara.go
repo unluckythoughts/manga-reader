@@ -79,7 +79,7 @@ func GetMadaraConnector() *madara {
 			List: models.MangaList{
 				MangaContainer: "div.page-item-detail.manga",
 				MangaTitle:     "h3 a",
-				MangaImageURL:  "img[src],img[data-src]",
+				MangaImageURL:  "img[data-src],img[src]",
 				MangaURL:       "h3 a[href]",
 				NextPage:       "",
 			},
@@ -88,11 +88,12 @@ func GetMadaraConnector() *madara {
 				ImageURL:                ".profile-manga .summary_image a img[data-src],.profile-manga .summary_image a img[src]",
 				OtherID:                 ".add-bookmark a[data-post]",
 				Synopsis:                ".summary__content p:last-of-type",
+				ChapterListURL:          "ajax/chapters",
 				ChapterContainer:        "ul.main li",
 				ChapterNumber:           "a",
 				ChapterTitle:            "a",
 				ChapterURL:              "a[href]",
-				ChapterUploadDate:       "a+span i",
+				ChapterUploadDate:       "a+span i, a+span a[titlef]",
 				ChapterUploadDateFormat: "January 2, 2006",
 			},
 			Chapter: models.PageSelectors{
@@ -139,7 +140,12 @@ func (m *madara) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, e
 	}
 
 	if len(manga.Chapters) == 0 {
-		opts = GetMadaraScrapeOptsForChapterList(c, manga.OtherID, mangaURL+"ajax/chapters")
+		chaptersURL := ""
+		if c.Info.ChapterListURL != "" {
+			chaptersURL = mangaURL + c.Info.ChapterListURL
+		}
+
+		opts = GetMadaraScrapeOptsForChapterList(c, manga.OtherID, chaptersURL)
 		chaptersManga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
 		if err != nil {
 			return manga, err

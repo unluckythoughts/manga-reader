@@ -11,10 +11,10 @@ func GetAsuraScansConnector() models.IMangaConnector {
 
 	c.Source = models.Source{
 		Name:    "Asura Scans",
-		Domain:  "asurascans.com",
+		Domain:  "asura.gg",
 		IconURL: "https://www.asurascans.com/wp-content/uploads/2021/03/Group_1.png",
 	}
-	c.BaseURL = "http://asurascans.com/"
+	c.BaseURL = "http://asura.gg/"
 
 	return c
 }

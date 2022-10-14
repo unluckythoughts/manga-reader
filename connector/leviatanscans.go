@@ -18,7 +18,7 @@ func GetLeviatanScansConnector() models.IMangaConnector {
 	c.Source = models.Source{
 		Name:    "Leviatan Scans",
 		Domain:  "leviatanscans.com",
-		IconURL: "https://leviatanscans.com/wp-content/uploads/2021/03/cropped-isotiponegro.png",
+		IconURL: "https://en.leviatanscans.com/wp-content/uploads/2022/08/cropped-isotiponegro-32x32.png",
 	}
 
 	c.BaseURL = "https://en.leviatanscans.com/"
@@ -28,7 +28,7 @@ func GetLeviatanScansConnector() models.IMangaConnector {
 	c.MangaSelectors.List.MangaURL = ".item-summary h3 a[href],.item-summary h5 a[href]"
 	c.MangaSelectors.List.MangaImageURL = ".item-thumb a img[data-src],.item-thumb a img[src]"
 	c.MangaSelectors.List.LastPage = ".wp-pagenavi a.last"
-	c.MangaSelectors.List.PageParam = "/page/" + scrapper.MANGA_LIST_PAGE_ID
+	c.MangaSelectors.List.PageParam = "/page/" + scrapper.PAGE_ID
 
 	c.MangaSelectors.Info.Title = "#manga-title h1"
 	c.MangaSelectors.Info.ImageURL = ".profile-manga .summary_image img[data-src], .profile-manga .summary_image img[src]"

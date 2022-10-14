@@ -142,6 +142,8 @@ func parseHumanReadableFormat(date string) (string, error) {
 		timeSpan = int64(time.Second)
 	case strings.HasPrefix(t[1], "minute"):
 		timeSpan = int64(time.Minute)
+	case strings.HasPrefix(t[1], "mins"):
+		timeSpan = int64(time.Minute)
 	case strings.HasPrefix(t[1], "hour"):
 		timeSpan = int64(time.Hour)
 	case strings.HasPrefix(t[1], "day"):

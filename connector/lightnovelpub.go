@@ -30,7 +30,7 @@ func GetLightNovelPubConnector() models.INovelConnector {
 				NovelImageURL:  ".cover-wrap img[data-src], .cover-wrap img[src]",
 				NextPage:       "ul.pagination li.PagedList-skipToNext a[href]",
 				LastPage:       "ul.pagination li.PagedList-pageCountAndLocation a",
-				PageParam:      "/p-" + scrapper.MANGA_LIST_PAGE_ID,
+				PageParam:      "/p-" + scrapper.PAGE_ID,
 			},
 			Info: models.NovelInfo{
 				Title:                   ".novel-info h1.novel-title",
@@ -65,7 +65,7 @@ func (n *lnp) GetNovelList(ctx web.Context) ([]models.Novel, error) {
 		RoundTripper: c.Transport,
 	}
 
-	if c.List.LastPage != "" && strings.Contains(c.List.PageParam, scrapper.MANGA_LIST_PAGE_ID) {
+	if c.List.LastPage != "" && strings.Contains(c.List.PageParam, scrapper.PAGE_ID) {
 		return scrapper.ScrapeNovelsParallel(ctx, c, opts, 2)
 	}
 

@@ -24,6 +24,10 @@ func GetAllMangaConnectors() []models.IMangaConnector {
 		GetLuminousScansConnector(),
 		GetFlameScansConnector(),
 		GetAstraScansConnector(),
+		GetMangaClashConnector(),
+		GetNitroScansConnector(),
+		GetAlphaScansConnector(),
+		GetToonilyNetConnector(),
 	)
 }
 

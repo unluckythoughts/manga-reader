@@ -25,9 +25,9 @@ func GetBasicWordPressConnector() *basic {
 				NextPage:       ".hpage a.r[href]",
 			},
 			Info: models.MangaInfo{
-				Title:                   ".infox > h1",
+				Title:                   "h1.entry-title, h1",
 				ImageURL:                ".thumb img[src]",
-				Synopsis:                ".infox > .wd-full .entry-content",
+				Synopsis:                ".wd-full .entry-content",
 				ChapterContainer:        "#chapterlist ul li",
 				ChapterNumber:           "[data-num]",
 				ChapterTitle:            "a span.chapternum",
@@ -53,7 +53,7 @@ func (b *basic) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 		RoundTripper: c.Transport,
 	}
 
-	if c.List.LastPage != "" && strings.Contains(c.List.PageParam, scrapper.MANGA_LIST_PAGE_ID) {
+	if c.List.LastPage != "" && strings.Contains(c.List.PageParam, scrapper.PAGE_ID) {
 		return scrapper.ScrapeMangasParallel(ctx, c, opts)
 	}
 
