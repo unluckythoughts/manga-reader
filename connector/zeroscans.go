@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/manga-reader/connector/theme"
 	"github.com/unluckythoughts/manga-reader/models"
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
@@ -56,7 +57,7 @@ func GetZeroScansConnector() models.IMangaConnector {
 		Source: models.Source{
 			Name:    "Zero Scans",
 			Domain:  "zeroscans.com",
-			IconURL: "https://zeroscans.com/favicon.ico",
+			IconURL: "/assets/images/zeroscans.png",
 		},
 		BaseURL:       "https://zeroscans.com/swordflake/",
 		MangaListPath: "comics/",
@@ -85,13 +86,19 @@ func (z *zero) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	}
 
 	for i, m := range mangas {
-		mangas[i].URL = z.BaseURL + "comic/" + m.Slug
+		mangas[i].URL = theme.GetTrucattedURL(z.BaseURL + "comic/" + m.Slug)
 	}
 
 	return mangas, nil
 }
 
+func (z *zero) GetLatestMangaList(ctx web.Context, latestTitle string) ([]models.Manga, error) {
+	return z.GetMangaList(ctx)
+}
+
 func (z *zero) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
+	mangaURL = theme.GetCompleteURL(mangaURL, z.Source.Domain)
+
 	apiResp := zeroAPIResponseBody{}
 	q := scrapper.APIQueryData{
 		URL:      mangaURL,
@@ -107,7 +114,7 @@ func (z *zero) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, err
 	if err != nil {
 		return manga, err
 	}
-	manga.URL = z.BaseURL + "comic/" + url.PathEscape(manga.Slug)
+	manga.URL = theme.GetTrucattedURL(z.BaseURL + "comic/" + url.PathEscape(manga.Slug))
 
 	chaptersURL := z.BaseURL + "comic/" + manga.OtherID + "/chapters"
 	params := map[string]string{
@@ -141,8 +148,9 @@ func (z *zero) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, err
 		q.QueryParams["page"] = strconv.Itoa(currentPage + 1)
 	}
 
+	chapterBasePath := theme.GetTrucattedURL(z.BaseURL + "comic/" + manga.Slug + "/chapters/")
 	for i, c := range manga.Chapters {
-		manga.Chapters[i].URL = z.BaseURL + "comic/" + manga.Slug + "/chapters/" + c.OtherID
+		manga.Chapters[i].URL = chapterBasePath + c.OtherID
 		manga.Chapters[i].Title = "Chapter " + string(c.Title)
 		manga.Chapters[i].Number = c.Title
 	}
@@ -154,6 +162,7 @@ func (z *zero) GetChapterPages(ctx web.Context, pageListURL string) (models.Page
 	headers := http.Header{}
 	headers.Add("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
 
+	pageListURL = theme.GetCompleteURL(pageListURL, z.Source.Domain)
 	apiResp := zeroAPIResponseBody{}
 	q := scrapper.APIQueryData{
 		URL:      pageListURL,

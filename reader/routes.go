@@ -10,6 +10,7 @@ func RegisterRoutes(router web.Router, service *service.Service) {
 	h := api.New(service)
 
 	router.GET("/api/:type/source", h.SourceListHandler)
+	router.PATCH("/api/:type/source", h.UpdateAllSourceMangasHandler)
 	router.POST("/api/:type/source", h.SourceItemListHandler)
 	router.POST("/api/:type/source/item", h.SourceItemHandler)
 	router.POST("/api/:type/source/chapter", h.SourceItemChapterHandler)

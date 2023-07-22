@@ -77,6 +77,9 @@ func _scrapeChaptersParallel(ctx web.Context, c models.MangaConnector, opts *Scr
 	} else {
 		lastPage := _scrapLastPage(ctx, c.Info.ChapterListLastPage, opts)
 		count = utils.GetInt(lastPage)
+		if count == 0 {
+			count = 1
+		}
 	}
 
 	workerFn := func(page int64, out chan<- []models.MangaChapter) {

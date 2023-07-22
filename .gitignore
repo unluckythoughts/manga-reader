@@ -4,6 +4,8 @@
 *.dll
 *.dylib
 
+__debug_bin
+db.sqlite.copy
 db.sqlite
 *.db
 tmp/

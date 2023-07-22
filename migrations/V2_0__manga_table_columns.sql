@@ -1,5 +1,0 @@
-ALTER TABLE manga
-  ADD COLUMN slug TEXT;
-
-ALTER TABLE manga
-  ADD COLUMN other_id TEXT;

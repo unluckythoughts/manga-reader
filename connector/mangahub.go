@@ -9,6 +9,7 @@ import (
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/manga-reader/connector/theme"
 	"github.com/unluckythoughts/manga-reader/models"
 	"github.com/unluckythoughts/manga-reader/scrapper"
 )
@@ -161,14 +162,19 @@ func (m *mangahub) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 
 	for i, m := range mangas {
 		mangas[i].ImageURL = "https://thumb.mghubcdn.com/" + m.ImageURL
-		mangas[i].URL = "https://mangahub.io/manga/" + m.URL
+		mangas[i].URL = theme.GetTrucattedURL("https://mangahub.io/manga/" + m.URL)
 	}
 
 	return mangas, nil
 }
 
+func (m *mangahub) GetLatestMangaList(ctx web.Context, latestTitle string) ([]models.Manga, error) {
+	return m.GetMangaList(ctx)
+}
+
 func (m *mangahub) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
-	slug := strings.Replace(mangaURL, "https://mangahub.io/manga/", "", -1)
+	mangaURL = theme.GetCompleteURL(mangaURL, m.Source.Domain)
+	slug := strings.ReplaceAll(mangaURL, "https://mangahub.io/manga/", "")
 
 	apiResp := mangahubAPIResponseBody{}
 	q := scrapper.APIQueryData{
@@ -190,19 +196,20 @@ func (m *mangahub) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga,
 		return manga, err
 	}
 
-	manga.URL = "https://mangahub.io/manga/" + manga.Slug
+	manga.URL = theme.GetTrucattedURL("https://mangahub.io/manga/" + manga.Slug)
 	manga.ImageURL = "https://thumb.mghubcdn.com/" + manga.ImageURL
 
 	for i, c := range manga.Chapters {
-		manga.Chapters[i].URL = "https://mangahub.io/chapter/" + manga.Slug + "/chapter-" + c.Number
+		manga.Chapters[i].URL = theme.GetTrucattedURL("https://mangahub.io/chapter/" + manga.Slug + "/chapter-" + c.Number)
 	}
 
 	return manga, nil
 }
 
 func (m *mangahub) GetChapterPages(ctx web.Context, chapterURL string) (models.Pages, error) {
-	chapterURL = strings.Replace(chapterURL, "https://mangahub.io/chapter/", "", -1)
-	slugs := strings.Split(strings.Replace(chapterURL, "/chapter-", ":", -1), ":")
+	chapterURL = theme.GetCompleteURL(chapterURL, m.Source.Domain)
+	chapterURL = strings.ReplaceAll(chapterURL, "https://mangahub.io/chapter/", "")
+	slugs := strings.Split(strings.ReplaceAll(chapterURL, "/chapter-", ":"), ":")
 
 	apiResp := mangahubAPIResponseBody{}
 	q := scrapper.APIQueryData{

@@ -11,9 +11,10 @@ func GetInfernalVoidScansConnector() models.IMangaConnector {
 	c.Source = models.Source{
 		Name:    "Infernal Void Scans",
 		Domain:  "void-scans.com",
-		IconURL: "https://void-scans.com/wp-content/uploads/cropped-weblogo-1.png",
+		IconURL: "/assets/images/voidscans.png",
 	}
 	c.BaseURL = "https://void-scans.com/"
+	c.Chapter.ImageUrl = "#readerarea p img[data-lazy-src],#readerarea p img[src]"
 
 	return c
 }

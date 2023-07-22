@@ -22,9 +22,10 @@ type Number interface {
 
 func GetInt(val string) int {
 	pattern := regexp.MustCompile("[^0-9]")
-	strNum := pattern.ReplaceAllString(val, "")
+	strNum := pattern.ReplaceAllString(val, " ")
+	numList := strings.Split(strNum, " ")
 
-	return MustParse[int](strNum)
+	return MustParse[int](numList[len(numList)-1])
 }
 
 func MustParse[T Number](s string) T {
@@ -112,6 +113,10 @@ func GetString(val interface{}) string {
 }
 
 func parseHumanReadableFormat(date string) (string, error) {
+	for _, skipWord := range []string{"released"} {
+		date = strings.ReplaceAll(strings.ToLower(date), skipWord, "")
+	}
+
 	t := strings.Split(strings.TrimSpace(date), " ")
 
 	if len(t) < 3 {

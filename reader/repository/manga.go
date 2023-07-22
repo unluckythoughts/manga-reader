@@ -9,11 +9,11 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (r *Repository) GetSourceMangas(ctx context.Context, domain string) ([]models.Manga, error) {
+func (r *Repository) GetSourceMangas(ctx context.Context, id uint) ([]models.Manga, error) {
 	var mangas []models.Manga
 	err := r.db.WithContext(ctx).
 		Joins("Source").
-		Where("Source.domain = ?", domain).
+		Where("source_id = ?", id).
 		Preload("Source").
 		Limit(200).
 		Find(&mangas).
@@ -22,6 +22,7 @@ func (r *Repository) GetSourceMangas(ctx context.Context, domain string) ([]mode
 	return mangas, err
 }
 
+// function to search the name by title
 func (r *Repository) SearchMangasByTitle(ctx context.Context, query string) ([]models.Manga, error) {
 	var mangas []models.Manga
 	err := r.db.WithContext(ctx).
@@ -34,11 +35,24 @@ func (r *Repository) SearchMangasByTitle(ctx context.Context, query string) ([]m
 	return mangas, err
 }
 
+// function to search the name by title
+func (r *Repository) SearchSourceMangasByTitle(ctx context.Context, source models.Source, query string) ([]models.Manga, error) {
+	var mangas []models.Manga
+	err := r.db.WithContext(ctx).
+		Where("source_id = ? and LOWER(title) REGEXP ?", source.ID, strings.ToLower(query)).
+		Preload("Source").
+		Find(&mangas).
+		Limit(100).
+		Error
+
+	return mangas, err
+}
+
 func (r *Repository) UpdateMangas(ctx context.Context, mangas *[]models.Manga) error {
 	err := r.db.WithContext(ctx).
 		Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "url"}},
-			DoUpdates: clause.AssignmentColumns([]string{"synopsis", "image_url", "slug", "other_id"}),
+			Columns:   []clause.Column{{Name: "title"}, {Name: "source_id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"url", "synopsis", "image_url", "slug", "other_id"}),
 		}, clause.Returning{}).
 		Save(mangas).
 		Error
@@ -46,25 +60,10 @@ func (r *Repository) UpdateMangas(ctx context.Context, mangas *[]models.Manga) e
 	return err
 }
 
-func (r *Repository) UpdateMangaByName(ctx context.Context, manga *models.Manga) error {
-	dbManga := models.Manga{}
-	err := r.db.WithContext(ctx).
-		First(&dbManga, "source_id=? and title=?", manga.SourceID, manga.Title).
-		Error
-	if err != nil {
-		return err
-	} else if dbManga.ID <= 0 {
-		return errors.New("could find manga to update")
-	}
-
-	manga.ID = dbManga.ID
-	return r.db.WithContext(ctx).Save(manga).Error
-}
-
-func (r *Repository) GetManga(ctx context.Context, url string) (models.Manga, error) {
+func (r *Repository) GetManga(ctx context.Context, id uint) (models.Manga, error) {
 	var manga models.Manga
 	err := r.db.
-		Where(&models.Manga{URL: url}).
+		Where(id).
 		Preload("Source").
 		Preload("Chapters").
 		Find(&manga).
@@ -73,12 +72,49 @@ func (r *Repository) GetManga(ctx context.Context, url string) (models.Manga, er
 	return manga, err
 }
 
+func (r *Repository) GetLatestMangaForSource(ctx context.Context, sourceID uint) (models.Manga, error) {
+	var manga models.Manga
+	err := r.db.
+		Where("source_id  = ?", sourceID).
+		Order("id DESC").
+		Preload("Source").
+		Preload("Chapters").
+		First(&manga).
+		Error
+
+	return manga, err
+}
+
+func (r *Repository) GetSourceDomain(ctx context.Context, mangaID uint) (string, error) {
+	var manga models.Manga
+	err := r.db.
+		Where(mangaID).
+		Preload("Source").
+		Find(&manga).
+		Error
+
+	if manga.Source.Domain != "" {
+		return manga.Source.Domain, err
+	}
+	return "", errors.New("could not find domain")
+}
+
+func (r *Repository) GetChapter(ctx context.Context, id uint) (models.MangaChapter, error) {
+	var chapter models.MangaChapter
+	err := r.db.
+		Where(id).
+		Find(&chapter).
+		Error
+
+	return chapter, err
+}
+
 func (r *Repository) UpdateChapters(ctx context.Context, chapters *[]models.MangaChapter) error {
 	err := r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "url"}},
-			DoUpdates: clause.AssignmentColumns([]string{"number", "title", "other_id"}),
+			Columns:   []clause.Column{{Name: "number"}, {Name: "manga_id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"url", "title", "other_id"}),
 		}, clause.Returning{}).
 		Save(chapters).
 		Error
@@ -86,7 +122,18 @@ func (r *Repository) UpdateChapters(ctx context.Context, chapters *[]models.Mang
 	return err
 }
 
-func (r *Repository) DeleteChaptersBySource(ctx context.Context, sourceID int) error {
+func (r *Repository) UpdateChapterPages(ctx context.Context, id uint, pages []string) error {
+	err := r.db.
+		WithContext(ctx).
+		Model(&models.MangaChapter{}).
+		Where(id).
+		UpdateColumn("image_urls", models.StrList(pages)).
+		Error
+
+	return err
+}
+
+func (r *Repository) DeleteChaptersBySource(ctx context.Context, sourceID uint) error {
 	err := r.db.WithContext(ctx).
 		Delete(&models.MangaChapter{}, "manga_id in (select id from manga where source_id=?)", sourceID).
 		Error

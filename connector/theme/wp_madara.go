@@ -19,19 +19,27 @@ func GetMadaraScrapeOptsForMangaList(c models.MangaConnector, page string) scrap
 
 	params := url.Values{}
 	params.Add("action", "madara_load_more")
-	params.Add("template", "madara-core/content/content-archive")
 	params.Add("page", page)
+	params.Add("template", "madara-core/content/content-archive")
 	params.Add("vars[paged]", "1")
-	params.Add("vars[orderby]", "post_title")
+	params.Add("vars[orderby]", "date")
+	params.Add("vars[sidebar]", "right")
 	params.Add("vars[template]", "archive")
-	params.Add("vars[sidebar]", "full")
-	params.Add("vars[meta_query][0][0][key]", "_wp_manga_chapter_type")
-	params.Add("vars[meta_query][0][0][value]", "manga")
-	params.Add("vars[meta_query][0][relation]", "AND")
-	params.Add("vars[meta_query][relation]", "OR")
 	params.Add("vars[post_type]", "wp-manga")
-	params.Add("vars[order]", "ASC")
+	params.Add("vars[post_status]", "publish")
 	params.Add("vars[posts_per_page]", "500")
+	params.Add("vars[manga_archives_item_layout]", "default")
+	params.Add("vars[meta_query][0][paged]", "1")
+	params.Add("vars[meta_query][0][orderby]", "date")
+	params.Add("vars[meta_query][0][sidebar]", "right")
+	params.Add("vars[meta_query][0][template]", "archive")
+	params.Add("vars[meta_query][0][post_type]", "wp-manga")
+	params.Add("vars[meta_query][0][post_status]", "publish")
+	params.Add("vars[meta_query][relation]", "AND")
+
+	// params.Add("vars[meta_query][0][0][key]", "_wp_manga_chapter_type")
+	// params.Add("vars[meta_query][0][0][value]", "manga")
+	// params.Add("vars[meta_query][0][relation]", "AND")
 
 	opts := scrapper.ScrapeOptions{
 		URL:            c.BaseURL + c.MangaListPath,
@@ -118,9 +126,40 @@ func (m *madara) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 			return mangas, err
 		}
 
-		mangas = append(mangas, pageMangas...)
+		for _, m := range pageMangas {
+			m.URL = GetTrucattedURL(m.URL)
+			mangas = append(mangas, m)
+		}
 
 		if len(pageMangas) <= 0 {
+			break
+		}
+	}
+
+	return mangas, nil
+}
+
+func (m *madara) GetLatestMangaList(ctx web.Context, latestTitle string) ([]models.Manga, error) {
+	c := models.MangaConnector(*m)
+
+	var mangas []models.Manga
+	for i := 0; true; i++ {
+		opts := GetMadaraScrapeOptsForMangaList(c, strconv.Itoa(i))
+		pageMangas, err := scrapper.ScrapeMangas(ctx, c, &opts)
+		if err != nil {
+			return mangas, err
+		}
+
+		foundLast := false
+		for _, m := range pageMangas {
+			m.URL = GetTrucattedURL(m.URL)
+			mangas = append(mangas, m)
+			if m.Title == latestTitle {
+				foundLast = true
+			}
+		}
+
+		if foundLast || len(pageMangas) <= 0 {
 			break
 		}
 	}
@@ -131,7 +170,7 @@ func (m *madara) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 func (m *madara) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
 	c := models.MangaConnector(*m)
 	opts := scrapper.ScrapeOptions{
-		URL:          mangaURL,
+		URL:          GetCompleteURL(mangaURL, m.Source.Domain),
 		RoundTripper: c.Transport,
 	}
 	manga, err := scrapper.ScrapeMangaInfo(ctx, c, &opts)
@@ -139,6 +178,7 @@ func (m *madara) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, e
 		return manga, err
 	}
 
+	manga.URL = GetTrucattedURL(manga.URL)
 	if len(manga.Chapters) == 0 {
 		chaptersURL := ""
 		if c.Info.ChapterListURL != "" {
@@ -154,13 +194,17 @@ func (m *madara) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, e
 		manga.Chapters = chaptersManga.Chapters
 	}
 
+	for i := range manga.Chapters {
+		manga.Chapters[i].URL = GetTrucattedURL(manga.Chapters[i].URL)
+	}
+
 	return manga, err
 }
 
 func (m *madara) GetChapterPages(ctx web.Context, chapterUrl string) (models.Pages, error) {
 	c := models.MangaConnector(*m)
 	opts := scrapper.ScrapeOptions{
-		URL:          chapterUrl,
+		URL:          GetCompleteURL(chapterUrl, m.Source.Domain),
 		RoundTripper: c.Transport,
 	}
 	return scrapper.ScrapeChapterPages(ctx, c, &opts)

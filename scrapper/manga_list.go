@@ -73,7 +73,6 @@ func _scrapMangasInPage(ctx web.Context, c models.MangaConnector, opts *ScrapeOp
 
 func ScrapeMangas(ctx web.Context, c models.MangaConnector, opts *ScrapeOptions) ([]models.Manga, error) {
 	mangas := []models.Manga{}
-	// url := c.BaseURL + c.MangaListPath
 	for opts.URL != "" {
 		pageMangas, nextPage, err := _scrapMangasInPage(ctx, c, opts)
 		if err != nil {
@@ -81,6 +80,27 @@ func ScrapeMangas(ctx web.Context, c models.MangaConnector, opts *ScrapeOptions)
 		}
 
 		mangas = append(mangas, pageMangas...)
+		opts.URL = nextPage
+	}
+
+	return mangas, nil
+}
+
+func ScrapeLatestMangas(ctx web.Context, c models.MangaConnector, latestTitle string, opts *ScrapeOptions) ([]models.Manga, error) {
+	mangas := []models.Manga{}
+	for opts.URL != "" {
+		pageMangas, nextPage, err := _scrapMangasInPage(ctx, c, opts)
+		if err != nil {
+			return mangas, err
+		}
+
+		mangas = append(mangas, pageMangas...)
+
+		for _, m := range pageMangas {
+			if m.Title == latestTitle {
+				break
+			}
+		}
 		opts.URL = nextPage
 	}
 

@@ -24,7 +24,7 @@ func main() {
 	s := microservice.New(opts)
 	readerService := service.New(s.GetDB())
 
-	s.HttpRouter().ServeFiles("/static/*filepath", http.Dir("./manga-reader-ui/dist"))
+	s.HttpRouter().ServeFiles("/assets/*filepath", http.Dir("./public"))
 	reader.RegisterRoutes(s.HttpRouter(), readerService)
 	s.Start()
 }

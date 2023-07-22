@@ -11,9 +11,10 @@ func GetElarcPageConnector() models.IMangaConnector {
 	c.Source = models.Source{
 		Name:    "Elarc Page",
 		Domain:  "elarcpage.com",
-		IconURL: "https://elarcpage.com/favicon.ico",
+		IconURL: "/assets/images/elarcpage.png",
 	}
-	c.BaseURL = "http://asurascans.com/"
+	c.BaseURL = "http://elarcpage.com/"
+	c.MangaListPath = "series/"
 
 	c.MangaSelectors.Info.Title = ".info-right h1.entry-title"
 	c.MangaSelectors.Info.ImageURL = ".info-left .thumb img[src]"

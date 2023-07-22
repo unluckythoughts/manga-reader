@@ -34,6 +34,9 @@ run:
 	DB_DEBUG=true \
 	go run main.go
 
+run-cli:
+	go run cli/main.go
+
 .SILENT: test-start test-stop test-db-init
 test-start:
 	@docker-compose --profile test up --build --detach

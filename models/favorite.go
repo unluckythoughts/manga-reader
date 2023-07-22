@@ -1,13 +1,14 @@
 package models
 
 type MangaFavorite struct {
-	ID         int          `json:"id" gorm:"column:id;primarykey"`
+	ID         uint         `json:"id" gorm:"column:id;primarykey"`
 	UserID     int          `json:"-" gorm:"column:user_id"`
 	User       User         `json:"user" gorm:"foreignkey:UserID"`
-	MangaID    int          `json:"-" gorm:"column:manga_id"`
+	MangaID    uint         `json:"-" gorm:"column:manga_id"`
 	Manga      Manga        `json:"manga" gorm:"foreignkey:MangaID"`
 	Progress   StrFloatList `json:"progress" gorm:"column:progress"`
 	Categories StrList      `json:"categories" gorm:"column:categories"`
+	UpdatedAt  StrTimeStamp `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (f MangaFavorite) TableName() string {
@@ -15,13 +16,14 @@ func (f MangaFavorite) TableName() string {
 }
 
 type NovelFavorite struct {
-	ID         int          `json:"id" gorm:"column:id;primarykey"`
+	ID         uint         `json:"id" gorm:"column:id;primarykey"`
 	UserID     int          `json:"-" gorm:"column:user_id"`
 	User       User         `json:"user" gorm:"foreignkey:UserID"`
-	NovelID    int          `json:"-" gorm:"column:novel_id"`
+	NovelID    uint         `json:"-" gorm:"column:novel_id"`
 	Novel      Novel        `json:"novel" gorm:"foreignkey:NovelID"`
 	Progress   StrFloatList `json:"progress" gorm:"column:progress"`
 	Categories StrList      `json:"categories" gorm:"column:categories"`
+	UpdatedAt  StrTimeStamp `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (f NovelFavorite) TableName() string {
@@ -29,8 +31,9 @@ func (f NovelFavorite) TableName() string {
 }
 
 type Category struct {
-	ID   int    `json:"-" gorm:"column:id;primarykey"`
-	Name string `json:"name" gorm:"column:name"`
+	ID        int          `json:"-" gorm:"column:id;primarykey"`
+	Name      string       `json:"name" gorm:"column:name"`
+	UpdatedAt StrTimeStamp `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (c Category) TableName() string {
@@ -38,8 +41,9 @@ func (c Category) TableName() string {
 }
 
 type User struct {
-	ID   int    `json:"-" gorm:"column:id;primarykey"`
-	Name string `json:"name" gorm:"column:name"`
+	ID        int          `json:"-" gorm:"column:id;primarykey"`
+	Name      string       `json:"name" gorm:"column:name"`
+	UpdatedAt StrTimeStamp `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (u User) TableName() string {

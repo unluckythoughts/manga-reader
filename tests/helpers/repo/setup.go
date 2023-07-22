@@ -20,7 +20,7 @@ func Setup() {
 	db = sqlite.New(opts)
 	err := db.Exec("SELECT '' REGEXP '';").Error
 	if err != nil {
-		db.Logger.Error(nil, "could not update sources")
+		db.Logger.Error(db.Statement.Context, "could not run REGEXP")
 		panic(err)
 	}
 }

@@ -2,11 +2,50 @@ package models
 
 import (
 	"database/sql/driver"
+	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/unluckythoughts/manga-reader/utils"
 )
+
+type StrTimeStamp time.Time
+
+func (sts StrTimeStamp) MarshalJSON() ([]byte, error) {
+	ts := "\"" + time.Time(sts).Format(time.DateTime) + "\""
+	return []byte(ts), nil
+}
+
+func (sts *StrTimeStamp) Scan(value interface{}) error {
+	switch value := value.(type) {
+	case time.Time:
+		*sts = StrTimeStamp(value)
+		return nil
+	case string:
+		numPattern := regexp.MustCompile(`^[0-9]+$`)
+		if numPattern.MatchString(value) {
+			i, err := strconv.ParseInt(value, 10, 64)
+			if err != nil {
+				return err
+			}
+			*sts = StrTimeStamp(time.Unix(i, 0))
+			return nil
+		}
+		ts, err := time.Parse(time.RFC3339, value)
+		*sts = StrTimeStamp(ts)
+		return err
+	}
+
+	return fmt.Errorf("could not parse StrTimeStamp value from timestamp: %v of type: %T", value, value)
+}
+
+func (sts StrTimeStamp) Value() (driver.Value, error) {
+	ts := time.Time(sts)
+
+	return ts.Format(time.RFC3339), nil
+}
 
 type StrFloat string
 

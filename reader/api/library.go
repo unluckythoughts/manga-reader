@@ -16,9 +16,9 @@ func (h *Handlers) AddFavoriteHandler(r web.Request) (interface{}, error) {
 	}
 
 	if isMangaRequest(r) {
-		return h.s.AddMangaFavorite(r.GetContext(), body.URL)
+		return h.s.AddMangaFavorite(r.GetContext(), body.ID)
 	} else if isNovelRequest(r) {
-		return h.s.AddNovelFavorite(r.GetContext(), body.URL)
+		return h.s.AddNovelFavorite(r.GetContext(), body.ID)
 	}
 
 	return nil, web.BadRequest()
@@ -43,9 +43,9 @@ func (h *Handlers) DelFavoriteHandler(r web.Request) (interface{}, error) {
 	}
 
 	if isMangaRequest(r) {
-		return nil, h.s.DelMangaFavorite(r.GetContext(), id)
+		return nil, h.s.DelMangaFavorite(r.GetContext(), uint(id))
 	} else if isNovelRequest(r) {
-		return nil, h.s.DelNovelFavorite(r.GetContext(), id)
+		return nil, h.s.DelNovelFavorite(r.GetContext(), uint(id))
 	}
 
 	return nil, web.BadRequest()
@@ -60,9 +60,9 @@ func (h *Handlers) UpdateFavoriteHandler(r web.Request) (interface{}, error) {
 	}
 
 	if isMangaRequest(r) {
-		return h.s.UpdateMangaFavorite(r.GetContext(), id)
+		return h.s.UpdateMangaFavorite(r.GetContext(), uint(id))
 	} else if isNovelRequest(r) {
-		return h.s.UpdateNovelFavorite(r.GetContext(), id)
+		return h.s.UpdateNovelFavorite(r.GetContext(), uint(id))
 	}
 
 	return nil, web.BadRequest()
@@ -101,9 +101,9 @@ func (h *Handlers) UpdateFavoriteProgressHandler(r web.Request) (interface{}, er
 
 	progress := models.StrFloatList{chapterID, pageID}
 	if isMangaRequest(r) {
-		return nil, h.s.UpdateMangaFavoriteProgress(r.GetContext(), favoriteID, progress)
+		return nil, h.s.UpdateMangaFavoriteProgress(r.GetContext(), uint(favoriteID), progress)
 	} else if isNovelRequest(r) {
-		return nil, h.s.UpdateNovelFavoriteProgress(r.GetContext(), favoriteID, progress)
+		return nil, h.s.UpdateNovelFavoriteProgress(r.GetContext(), uint(favoriteID), progress)
 	}
 
 	return nil, web.BadRequest()

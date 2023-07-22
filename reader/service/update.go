@@ -8,13 +8,13 @@ import (
 	"github.com/unluckythoughts/manga-reader/models"
 )
 
-func (s *Service) UpdateMangaFavorite(ctx web.Context, favoriteID int) (models.MangaFavorite, error) {
+func (s *Service) UpdateMangaFavorite(ctx web.Context, favoriteID uint) (models.MangaFavorite, error) {
 	favorite, err := s.db.FindFavorite(ctx, favoriteID)
 	if err != nil {
 		return models.MangaFavorite{}, err
 	}
 
-	conn, err := connector.NewMangaConnector(ctx, favorite.Manga.URL)
+	conn, err := connector.GetMangaConnector(ctx, favorite.Manga.Source.Domain)
 	if err != nil {
 		return models.MangaFavorite{}, err
 	}
@@ -50,7 +50,7 @@ func (s *Service) UpdateMangaFavorite(ctx web.Context, favoriteID int) (models.M
 	return favorite, nil
 }
 
-func (s *Service) UpdateMangaFavoriteProgress(ctx web.Context, favoriteID int, progress models.StrFloatList) error {
+func (s *Service) UpdateMangaFavoriteProgress(ctx web.Context, favoriteID uint, progress models.StrFloatList) error {
 	return s.db.UpdateFavoriteProgress(ctx, favoriteID, progress)
 }
 
@@ -58,7 +58,7 @@ func (s *Service) UpdateAllMangaFavorite(ctx web.Context) error {
 	return s.w.UpdateFavorites(ctx)
 }
 
-func (s *Service) UpdateNovelFavorite(ctx web.Context, favoriteID int) (models.NovelFavorite, error) {
+func (s *Service) UpdateNovelFavorite(ctx web.Context, favoriteID uint) (models.NovelFavorite, error) {
 	favorite, err := s.db.FindNovelFavorite(ctx, favoriteID)
 	if err != nil {
 		return models.NovelFavorite{}, err
@@ -100,7 +100,7 @@ func (s *Service) UpdateNovelFavorite(ctx web.Context, favoriteID int) (models.N
 	return favorite, nil
 }
 
-func (s *Service) UpdateNovelFavoriteProgress(ctx web.Context, favoriteID int, progress models.StrFloatList) error {
+func (s *Service) UpdateNovelFavoriteProgress(ctx web.Context, favoriteID uint, progress models.StrFloatList) error {
 	return s.db.UpdateNovelFavoriteProgress(ctx, favoriteID, progress)
 }
 

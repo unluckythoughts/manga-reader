@@ -26,7 +26,7 @@ func (r *Repository) GetFavorites(ctx context.Context) ([]models.MangaFavorite, 
 	return favorites, err
 }
 
-func (r *Repository) FindFavorite(ctx context.Context, id int) (models.MangaFavorite, error) {
+func (r *Repository) FindFavorite(ctx context.Context, id uint) (models.MangaFavorite, error) {
 	var favorite models.MangaFavorite
 	err := r.db.WithContext(ctx).
 		Preload("Manga.Chapters").
@@ -35,7 +35,7 @@ func (r *Repository) FindFavorite(ctx context.Context, id int) (models.MangaFavo
 	return favorite, err
 }
 
-func (r *Repository) UpdateFavoriteProgress(ctx context.Context, favoriteID int, progress models.StrFloatList) error {
+func (r *Repository) UpdateFavoriteProgress(ctx context.Context, favoriteID uint, progress models.StrFloatList) error {
 	favorite := &models.MangaFavorite{ID: favoriteID, Progress: progress}
 	return r.db.
 		WithContext(ctx).

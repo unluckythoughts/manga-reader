@@ -52,6 +52,10 @@ func (l *astra) GetMangaList(ctx web.Context) ([]models.Manga, error) {
 	return l.c.GetMangaList(ctx)
 }
 
+func (l *astra) GetLatestMangaList(ctx web.Context, latestTitle string) ([]models.Manga, error) {
+	return l.c.GetLatestMangaList(ctx, latestTitle)
+}
+
 func (l *astra) GetMangaInfo(ctx web.Context, mangaURL string) (models.Manga, error) {
 	manga, err := l.c.GetMangaInfo(ctx, mangaURL)
 	if err != nil {

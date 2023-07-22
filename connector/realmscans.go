@@ -10,10 +10,10 @@ func GetRealmScansConnector() models.IMangaConnector {
 
 	c.Source = models.Source{
 		Name:    "Realm Scans",
-		Domain:  "realmscans.com",
-		IconURL: "https://realmscans.com/wp-content/uploads/2022/08/realm-scans-fav.png",
+		Domain:  "realmscans.xyz",
+		IconURL: "/assets/images/realmscans.svg",
 	}
-	c.BaseURL = "http://realmscans.com/"
+	c.BaseURL = "https://realmscans.xyz/"
 	c.MangaListPath = "series/"
 
 	c.MangaSelectors.Info.Title = ".info-right h1"
@@ -21,6 +21,7 @@ func GetRealmScansConnector() models.IMangaConnector {
 	c.MangaSelectors.Info.Synopsis = ".info-right .wd-full .entry-content p"
 
 	c.MangaSelectors.Chapter.ImageUrl = "#readerarea img:is([data-src],[src])"
+	c.Info.ChapterUploadDateFormat = "02 Jan 2006"
 
 	return c
 }

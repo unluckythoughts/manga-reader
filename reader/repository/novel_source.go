@@ -11,7 +11,7 @@ func (r *Repository) CreateNovelSources(ctx context.Context, sources *[]models.N
 	return r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "domain"}},
+			Columns:   []clause.Column{{Name: "name"}},
 			DoNothing: false, UpdateAll: true,
 		}).
 		Clauses(clause.Returning{}).

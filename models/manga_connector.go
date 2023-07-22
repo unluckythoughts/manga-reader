@@ -2,6 +2,7 @@ package models
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/unluckythoughts/go-microservice/tools/web"
 )
@@ -9,13 +10,13 @@ import (
 type IMangaConnector interface {
 	GetSource() Source
 	GetMangaList(ctx web.Context) ([]Manga, error)
+	GetLatestMangaList(ctx web.Context, latestMangaTitle string) ([]Manga, error)
 	GetMangaInfo(ctx web.Context, mangaURL string) (Manga, error)
 	GetChapterPages(ctx web.Context, pageListURL string) (Pages, error)
 }
 
 type Pages struct {
-	Config map[string]interface{} `json:"config"`
-	URLs   []string               `json:"urls"`
+	URLs []string `json:"urls"`
 }
 
 type MangaList struct {
@@ -59,9 +60,10 @@ type MangaSelectors struct {
 }
 
 type MangaConnector struct {
-	BaseURL       string
-	Transport     http.RoundTripper
-	MangaListPath string
+	BaseURL            string
+	Transport          http.RoundTripper
+	MangaListPath      string
+	MangaListURLParams url.Values
 	Source
 	MangaSelectors
 }

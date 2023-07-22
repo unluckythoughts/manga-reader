@@ -48,7 +48,6 @@ func (w *Worker) UpdateSourceNovels(ctx web.Context, domain string, novels []mod
 				return
 			}
 		}
-		source.UpdatedAt = time.Now().Format("2006-01-02")
 
 		err = w.db.SaveNovelSource(ctx, &source)
 		if err != nil {

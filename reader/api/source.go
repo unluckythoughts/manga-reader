@@ -16,6 +16,16 @@ func (h *Handlers) SourceListHandler(r web.Request) (interface{}, error) {
 	return nil, web.BadRequest()
 }
 
+func (h *Handlers) UpdateAllSourceMangasHandler(r web.Request) (interface{}, error) {
+	if isMangaRequest(r) {
+		return nil, h.s.UpdateAllSourceMangas(r.GetContext())
+	} else if isNovelRequest(r) {
+		return h.s.GetNovelSourceList(r.GetContext())
+	}
+
+	return nil, web.BadRequest()
+}
+
 func (h *Handlers) SourceItemListHandler(r web.Request) (interface{}, error) {
 	body := models.SourceListRequest{}
 	err := r.GetValidatedBody(&body)
@@ -24,9 +34,9 @@ func (h *Handlers) SourceItemListHandler(r web.Request) (interface{}, error) {
 	}
 
 	if isMangaRequest(r) {
-		return h.s.GetSourceMangaList(r.GetContext(), body.Domain, body.Force, body.Fix)
+		return h.s.GetSourceMangaList(r.GetContext(), body.ID, body.Force, body.Fix)
 	} else if isNovelRequest(r) {
-		return h.s.GetSourceNovelList(r.GetContext(), body.Domain, body.Force)
+		return h.s.GetSourceNovelList(r.GetContext(), body.ID, body.Force)
 	}
 
 	return nil, web.BadRequest()
@@ -56,9 +66,9 @@ func (h *Handlers) SourceItemHandler(r web.Request) (interface{}, error) {
 	}
 
 	if isMangaRequest(r) {
-		return h.s.GetSourceManga(r.GetContext(), body.URL, body.Force)
+		return h.s.GetSourceManga(r.GetContext(), body.ID, body.Force)
 	} else if isNovelRequest(r) {
-		return h.s.GetSourceNovel(r.GetContext(), body.URL, body.Force)
+		return h.s.GetSourceNovel(r.GetContext(), body.ID, body.Force)
 	}
 
 	return nil, web.BadRequest()
@@ -72,14 +82,14 @@ func (h *Handlers) SourceItemChapterHandler(r web.Request) (interface{}, error) 
 	}
 
 	if isMangaRequest(r) {
-		pages, err := h.s.GetSourceMangaChapter(r.GetContext(), body.ChapterURL)
+		chapter, err := h.s.GetSourceMangaChapter(r.GetContext(), body.ID, body.Force)
 		if err != nil {
 			r.GetContext().Logger().With(zap.Error(err)).Error("error getting manga chapter")
-			return pages, web.BadRequest(err)
+			return chapter, web.BadRequest(err)
 		}
-		return pages, nil
+		return chapter, nil
 	} else if isNovelRequest(r) {
-		text, err := h.s.GetSourceNovelChapter(r.GetContext(), body.ChapterURL)
+		text, err := h.s.GetSourceNovelChapter(r.GetContext(), body.ID)
 		if err != nil {
 			r.GetContext().Logger().With(zap.Error(err)).Error("error getting manga chapter")
 			return text, web.BadRequest(err)
