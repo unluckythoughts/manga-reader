@@ -60,7 +60,9 @@ func (b *basic) GetMangaList(ctx web.Context) (mangas []models.Manga, err error)
 	if c.List.LastPage != "" && strings.Contains(c.List.PageParam, scrapper.PAGE_ID) {
 		mangas, err = scrapper.ScrapeMangasParallel(ctx, c, opts)
 	} else {
-		opts.URL = opts.URL + c.MangaListURLParams.Encode()
+		if len(c.MangaListURLParams) > 0 {
+			opts.URL = opts.URL + "?" + c.MangaListURLParams.Encode()
+		}
 		mangas, err = scrapper.ScrapeMangas(ctx, c, opts)
 	}
 
@@ -74,10 +76,12 @@ func (b *basic) GetMangaList(ctx web.Context) (mangas []models.Manga, err error)
 func (b *basic) GetLatestMangaList(ctx web.Context, latestTitle string) (mangas []models.Manga, err error) {
 	c := models.MangaConnector(*b)
 	opts := &scrapper.ScrapeOptions{
-		URL:          c.BaseURL + c.MangaListPath + c.MangaListURLParams.Encode(),
+		URL:          c.BaseURL + c.MangaListPath,
 		RoundTripper: c.Transport,
 	}
-
+	if len(c.MangaListURLParams) > 0 {
+		opts.URL = opts.URL + "?" + c.MangaListURLParams.Encode()
+	}
 	mangas, err = scrapper.ScrapeLatestMangas(ctx, c, latestTitle, opts)
 
 	for i := range mangas {

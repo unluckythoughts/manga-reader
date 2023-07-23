@@ -15,7 +15,7 @@ func GetReaperScansConnector() models.IMangaConnector {
 	c.Source = models.Source{
 		Name:    "Reaper Scans",
 		Domain:  "reaperscans.com",
-		IconURL: "/assets/images/reaperscans.png",
+		IconURL: "/static/assets/images/reaperscans.png",
 	}
 	c.BaseURL = "https://reaperscans.com/"
 	c.MangaListPath = "comics/"

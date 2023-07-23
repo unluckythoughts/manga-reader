@@ -156,6 +156,7 @@ func (m *madara) GetLatestMangaList(ctx web.Context, latestTitle string) ([]mode
 			mangas = append(mangas, m)
 			if m.Title == latestTitle {
 				foundLast = true
+				break
 			}
 		}
 

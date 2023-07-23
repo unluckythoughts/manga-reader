@@ -98,7 +98,7 @@ func ScrapeLatestMangas(ctx web.Context, c models.MangaConnector, latestTitle st
 
 		for _, m := range pageMangas {
 			if m.Title == latestTitle {
-				break
+				return mangas, nil
 			}
 		}
 		opts.URL = nextPage
@@ -108,8 +108,6 @@ func ScrapeLatestMangas(ctx web.Context, c models.MangaConnector, latestTitle st
 }
 
 func ScrapeMangasParallel(ctx web.Context, c models.MangaConnector, opts *ScrapeOptions) ([]models.Manga, error) {
-	mangas := []models.Manga{}
-
 	var count = 0
 	if strings.HasPrefix(c.List.LastPage, "DEFAULT::") {
 		count = utils.GetInt(strings.Split(c.List.LastPage, "DEFAULT::")[1])
@@ -135,7 +133,7 @@ func ScrapeMangasParallel(ctx web.Context, c models.MangaConnector, opts *Scrape
 	workerCount := 10
 	payloadChan, mangasChan := utils.StartWorkers[int64, []models.Manga](workerCount, workerFn)
 	utils.SendPayloads[int64](utils.MakeRange[int64](1, int64(count), 1), payloadChan)
-	mangas = utils.GetSlicedResults[models.Manga](mangasChan)
+	mangas := utils.GetSlicedResults[models.Manga](mangasChan)
 
 	return mangas, nil
 }

@@ -23,8 +23,9 @@ db-migrate: FLYWAY_CMD=migrate
 db-migrate: flyway-run
 
 ui-build:
-	@cd $(UI_DIR)
-	npm run build
+	cd $(UI_DIR)
+	npm i
+	UI_OUT_DIR=$(PWD)/public npm run build
 
 run:
 	@DB_FILE_PATH=db.sqlite \

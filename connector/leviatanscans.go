@@ -20,7 +20,7 @@ func GetLeviatanScansConnector() models.IMangaConnector {
 	c.Source = models.Source{
 		Name:    "Leviatan Scans",
 		Domain:  "leviatanscans.com",
-		IconURL: "/assets/images/leviatanscans.png",
+		IconURL: "/static/assets/images/leviatanscans.png",
 	}
 
 	c.BaseURL = "https://en.leviatanscans.com/"

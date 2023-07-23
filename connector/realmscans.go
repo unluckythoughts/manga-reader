@@ -11,7 +11,7 @@ func GetRealmScansConnector() models.IMangaConnector {
 	c.Source = models.Source{
 		Name:    "Realm Scans",
 		Domain:  "realmscans.xyz",
-		IconURL: "/assets/images/realmscans.svg",
+		IconURL: "/static/assets/images/realmscans.svg",
 	}
 	c.BaseURL = "https://realmscans.xyz/"
 	c.MangaListPath = "series/"

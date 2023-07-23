@@ -24,7 +24,7 @@ func main() {
 	s := microservice.New(opts)
 	readerService := service.New(s.GetDB())
 
-	s.HttpRouter().ServeFiles("/assets/*filepath", http.Dir("./public"))
 	reader.RegisterRoutes(s.HttpRouter(), readerService)
+	s.HttpRouter().ServeFiles("/static/*filepath", http.Dir("./public"))
 	s.Start()
 }

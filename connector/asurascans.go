@@ -18,7 +18,7 @@ func GetAsuraScansConnector() models.IMangaConnector {
 	c.Source = models.Source{
 		Name:    "Asura Scans",
 		Domain:  "asura.gg",
-		IconURL: "/assets/images/asurascans.png",
+		IconURL: "/static/assets/images/asurascans.png",
 	}
 	c.BaseURL = "http://asura.gg/"
 	c.Chapter.ImageUrl = "#readerarea img[src]"

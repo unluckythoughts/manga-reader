@@ -15,7 +15,6 @@ func GetAllMangaConnectors() map[string]models.IMangaConnector {
 		GetLeviatanScansConnector(),
 		GetZeroScansConnector(),
 		GetRealmScansConnector(),
-		GetReaperScansConnector(),
 		GetElarcPageConnector(),
 		GetInfernalVoidScansConnector(),
 		GetLuminousScansConnector(),

@@ -11,7 +11,7 @@ func GetMangaReadConnector() models.IMangaConnector {
 	c.Source = models.Source{
 		Name:    "MangaRead",
 		Domain:  "mangaread.org",
-		IconURL: "/assets/images/mangaread.svg",
+		IconURL: "/static/assets/images/mangaread.svg",
 	}
 	c.BaseURL = "https://www.mangaread.org/"
 	c.Info.ChapterUploadDateFormat = "02.01.2006"

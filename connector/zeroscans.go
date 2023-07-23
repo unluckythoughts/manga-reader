@@ -57,7 +57,7 @@ func GetZeroScansConnector() models.IMangaConnector {
 		Source: models.Source{
 			Name:    "Zero Scans",
 			Domain:  "zeroscans.com",
-			IconURL: "/assets/images/zeroscans.png",
+			IconURL: "/static/assets/images/zeroscans.png",
 		},
 		BaseURL:       "https://zeroscans.com/swordflake/",
 		MangaListPath: "comics/",
