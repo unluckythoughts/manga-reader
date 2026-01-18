@@ -152,7 +152,7 @@ func (d *DB) HardDeleteChapter(id int) error {
 }
 
 // ListChapters retrieves all chapters with optional filters
-func (d *DB) ListChapters(offset, limit int, bookID int, completed *bool, downloaded *bool) ([]models.Chapter, error) {
+func (d *DB) ListChapters(offset, limit int, bookID int) ([]models.Chapter, error) {
 	var chapters []models.Chapter
 	query := d.db.Offset(offset)
 
@@ -164,14 +164,6 @@ func (d *DB) ListChapters(offset, limit int, bookID int, completed *bool, downlo
 		query = query.Where("book_id = ?", bookID)
 	}
 
-	if completed != nil {
-		query = query.Where("completed = ?", *completed)
-	}
-
-	if downloaded != nil {
-		query = query.Where("downloaded = ?", *downloaded)
-	}
-
 	if err := query.Order("number ASC").Find(&chapters).Error; err != nil {
 		return nil, err
 	}
@@ -179,20 +171,12 @@ func (d *DB) ListChapters(offset, limit int, bookID int, completed *bool, downlo
 }
 
 // CountChapters returns the total number of chapters
-func (d *DB) CountChapters(bookID int, completed *bool, downloaded *bool) (int64, error) {
+func (d *DB) CountChapters(bookID int) (int64, error) {
 	var count int64
 	query := d.db.Model(&models.Chapter{})
 
 	if bookID > 0 {
 		query = query.Where("book_id = ?", bookID)
-	}
-
-	if completed != nil {
-		query = query.Where("completed = ?", *completed)
-	}
-
-	if downloaded != nil {
-		query = query.Where("downloaded = ?", *downloaded)
 	}
 
 	if err := query.Count(&count).Error; err != nil {

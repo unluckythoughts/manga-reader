@@ -48,3 +48,8 @@ type FavoritesPaginatedResponse struct {
 	Items      []Favorite `json:"items"`
 	Pagination Pagination `json:"pagination"`
 }
+
+type ChaptersPaginatedResponse struct {
+	Items      []Chapter  `json:"items"`
+	Pagination Pagination `json:"pagination"`
+}

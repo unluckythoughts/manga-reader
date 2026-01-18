@@ -17,6 +17,10 @@ func (a *api) registerRoutes(router web.Router) {
 	router.GET("/api/v1/books", a.ListBooks)
 	router.GET("/api/v1/books/:id", a.GetBook)
 
+	// Chapters API
+	router.GET("/api/v1/chapters", a.ListChapters)
+	router.GET("/api/v1/chapters/:id", a.GetChapter)
+
 	// Sources API
 	router.GET("/api/v1/sources", a.ListSources)
 	router.GET("/api/v1/sources/:id", a.GetSource)
