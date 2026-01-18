@@ -1,16 +1,16 @@
 .ONESHELL:
-SHELL = /bin/bash
+SHELL = powershell.exe
+.SHELLFLAGS = -NoProfile -Command
 MIGRATIONS_FOLDER=$(PWD)/migrations
 DB_FILE=$(PWD)/db.sqlite
 MAKEFLAGS += --no-print-directory
-UI_DIR = "manga-reader-ui"
+UI_DIR = manga-reader-ui
 
+# 	if (Test-Path "$(UI_DIR)") { Set-Location "$(UI_DIR)"; npm i }
 init:
-	@rm -rf vendor
+	go clean -modcache
 	go mod tidy
-	go mod vendor -v
-	cd $(UI_DIR)
-	npm i
+	go mod download
 
 flyway-run:
 	@docker run \
@@ -21,37 +21,3 @@ flyway-run:
 
 db-migrate: FLYWAY_CMD=migrate
 db-migrate: flyway-run
-
-ui-build:
-	cd $(UI_DIR)
-	npm i
-	UI_OUT_DIR=$(PWD)/public npm run build
-
-run:
-	@DB_FILE_PATH=db.sqlite \
-	WEB_PORT=5678 \
-	WEB_CORS=true \
-	WEB_PROXY=true \
-	DB_DEBUG=true \
-	go run main.go
-
-run-cli:
-	go run cli/main.go
-
-.SILENT: test-start test-stop test-db-init
-test-start:
-	@docker-compose --profile test up --build --detach
-
-test-stop:
-	@docker-compose --profile test down
-	@docker-compose --profile test rm -f
-
-test-db-init: DB_FILE := "$(PWD)/tests/helpers/repo/test.db"
-test-db-init:
-	make flyway-run DB_FILE=$(DB_FILE) FLYWAY_OPTS=-cleanDisabled="false" FLYWAY_CMD=clean >/dev/null 2>&1
-	make flyway-run DB_FILE=$(DB_FILE) FLYWAY_CMD=migrate >/dev/null 2>&1
-
-test: test-stop test-db-init test-start
-	go test -v ./tests...
-
-stop: test-stop
