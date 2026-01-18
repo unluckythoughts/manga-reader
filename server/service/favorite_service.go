@@ -3,7 +3,7 @@ package service
 import (
 	"time"
 
-	"github.com/unluckythoughts/manga-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/models"
 )
 
 // GetFavorites retrieves a paginated list of favorites with optional filters

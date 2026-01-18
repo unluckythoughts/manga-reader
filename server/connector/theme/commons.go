@@ -1,9 +1,9 @@
 package theme
 
 import (
+	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/utils"
 	"github.com/unluckythoughts/go-scraper"
-	"github.com/unluckythoughts/manga-reader/server/models"
-	"github.com/unluckythoughts/manga-reader/server/utils"
 )
 
 func getBook(data string, conn models.Connector) (models.Book, error) {

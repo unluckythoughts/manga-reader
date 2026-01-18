@@ -22,3 +22,8 @@ func NewClient(baseURL string) *Client {
 func (c *Client) SetAuthToken(token string) {
 	c.client.SetBearerToken(token)
 }
+
+// SetAuthToken sets the authentication token for the client
+func (c *Client) Log(msg string) {
+	c.client.Log(msg)
+}

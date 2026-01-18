@@ -5,7 +5,7 @@ info:
   version: 1.0.0
   contact:
     name: API Support
-    url: https://github.com/unluckythoughts/manga-reader
+    url: https://github.com/unluckythoughts/book-reader
 
 servers:
   - url: http://localhost:8080/api/v1

@@ -1,8 +1,8 @@
 package connector
 
 import (
-	"github.com/unluckythoughts/manga-reader/server/connector/theme"
-	"github.com/unluckythoughts/manga-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/connector/theme"
+	"github.com/unluckythoughts/book-reader/server/models"
 )
 
 type fwb struct {

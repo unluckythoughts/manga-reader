@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/unluckythoughts/manga-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/models"
 )
 
 // GetBooks retrieves a paginated list of books with optional filters

@@ -1,9 +1,9 @@
 {
   "files.exclude": {
-    "**/manga-reader-ui": true
+    "**/book-reader-ui": true
   },
   "search.exclude": {
-    "**/manga-reader-ui": true,
+    "**/book-reader-ui": true,
     "**/*.code-search": true
   }
 }

@@ -3,7 +3,7 @@ package service
 import (
 	"time"
 
-	"github.com/unluckythoughts/manga-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/models"
 )
 
 // GetCategories retrieves a paginated list of categories

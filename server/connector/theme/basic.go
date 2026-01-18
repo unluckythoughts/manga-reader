@@ -3,9 +3,9 @@ package theme
 import (
 	"fmt"
 
+	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/utils"
 	"github.com/unluckythoughts/go-scraper"
-	"github.com/unluckythoughts/manga-reader/server/models"
-	"github.com/unluckythoughts/manga-reader/server/utils"
 )
 
 type BasicConnector struct {

@@ -4,7 +4,7 @@ SHELL = powershell.exe
 MIGRATIONS_FOLDER=$(PWD)/migrations
 DB_FILE=$(PWD)/db.sqlite
 MAKEFLAGS += --no-print-directory
-UI_DIR = manga-reader-ui
+UI_DIR = book-reader-ui
 
 # 	if (Test-Path "$(UI_DIR)") { Set-Location "$(UI_DIR)"; npm i }
 init:

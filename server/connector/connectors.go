@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/unluckythoughts/manga-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/models"
 )
 
 var (

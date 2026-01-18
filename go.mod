@@ -1,4 +1,4 @@
-module github.com/unluckythoughts/manga-reader
+module github.com/unluckythoughts/book-reader
 
 go 1.24.0
 
@@ -6,6 +6,7 @@ toolchain go1.24.3
 
 require (
 	github.com/DaRealFreak/cloudflare-bp-go v1.0.4
+	github.com/stretchr/testify v1.8.1
 	github.com/unluckythoughts/go-microservice v1.4.4
 	github.com/unluckythoughts/go-scraper v0.1.7
 	go.uber.org/zap v1.27.1
@@ -24,6 +25,7 @@ require (
 	github.com/bits-and-blooms/bitset v1.24.4 // indirect
 	github.com/caarlos0/env v3.5.0+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
@@ -49,6 +51,8 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.28 // indirect
 	github.com/nlnwa/whatwg-url v0.6.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/temoto/robotstxt v1.1.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
@@ -59,6 +63,7 @@ require (
 	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/postgres v1.6.0 // indirect
 	gorm.io/driver/sqlite v1.5.7 // indirect
 )

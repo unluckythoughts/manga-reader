@@ -1,6 +1,6 @@
 package service
 
-import "github.com/unluckythoughts/manga-reader/server/db"
+import "github.com/unluckythoughts/book-reader/server/db"
 
 type ReaderService struct {
 	db *db.DB

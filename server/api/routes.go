@@ -1,9 +1,9 @@
 package api
 
 import (
+	"github.com/unluckythoughts/book-reader/server/db"
+	"github.com/unluckythoughts/book-reader/server/service"
 	"github.com/unluckythoughts/go-microservice/tools/web"
-	"github.com/unluckythoughts/manga-reader/server/db"
-	"github.com/unluckythoughts/manga-reader/server/service"
 	"gorm.io/gorm"
 )
 

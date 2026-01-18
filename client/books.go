@@ -3,7 +3,7 @@ package client
 import (
 	"fmt"
 
-	"github.com/unluckythoughts/manga-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/models"
 )
 
 // ListBooks retrieves a paginated list of books

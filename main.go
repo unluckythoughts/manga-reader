@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
+	"github.com/unluckythoughts/book-reader/server/api"
 	"github.com/unluckythoughts/go-microservice"
-	"github.com/unluckythoughts/manga-reader/server/api"
 	"go.uber.org/zap"
 )
 
@@ -15,7 +15,7 @@ func proxyTransport(l *zap.Logger) http.RoundTripper {
 
 func main() {
 	opts := microservice.Options{
-		Name:           "manga-reader",
+		Name:           "book-reader",
 		EnableDB:       true,
 		DBType:         microservice.DBTypeSqlite,
 		ProxyTransport: proxyTransport,

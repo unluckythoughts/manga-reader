@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/unluckythoughts/manga-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/models"
 	"gorm.io/gorm"
 )
 

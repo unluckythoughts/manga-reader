@@ -1,6 +1,6 @@
 package service
 
-import "github.com/unluckythoughts/manga-reader/server/models"
+import "github.com/unluckythoughts/book-reader/server/models"
 
 // GetSources retrieves a paginated list of sources
 func (s *ReaderService) GetSources(page, limit int) ([]models.Source, int64, error) {

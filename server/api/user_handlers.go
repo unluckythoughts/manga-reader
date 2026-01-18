@@ -3,8 +3,8 @@ package api
 import (
 	"strconv"
 
+	"github.com/unluckythoughts/book-reader/server/models"
 	"github.com/unluckythoughts/go-microservice/tools/web"
-	"github.com/unluckythoughts/manga-reader/server/models"
 )
 
 func (api *api) ListUsers(r web.Request) models.UsersPaginatedResponse {
