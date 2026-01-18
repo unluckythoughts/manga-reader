@@ -20,6 +20,20 @@ func (a *api) registerRoutes(router web.Router) {
 	// Sources API
 	router.GET("/api/v1/sources", a.ListSources)
 	router.GET("/api/v1/sources/:id", a.GetSource)
+
+	// Users API
+	router.GET("/api/v1/users", a.ListUsers)
+	router.GET("/api/v1/users/:id", a.GetUser)
+	router.POST("/api/v1/users", a.CreateUser)
+	router.PUT("/api/v1/users/:id", a.UpdateUser)
+	router.DELETE("/api/v1/users/:id", a.DeleteUser)
+
+	// Categories API
+	router.GET("/api/v1/categories", a.ListCategories)
+	router.GET("/api/v1/categories/:id", a.GetCategory)
+	router.POST("/api/v1/categories", a.CreateCategory)
+	router.PUT("/api/v1/categories/:id", a.UpdateCategory)
+	router.DELETE("/api/v1/categories/:id", a.DeleteCategory)
 }
 
 func Register(router web.Router, gormDB *gorm.DB) {

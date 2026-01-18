@@ -32,3 +32,14 @@ type SourcesPaginatedResponse struct {
 	Items      []Source   `json:"items"`
 	Pagination Pagination `json:"pagination"`
 }
+
+// UsersPaginatedResponse represents a paginated response for users
+type UsersPaginatedResponse struct {
+	Items      []User     `json:"items"`
+	Pagination Pagination `json:"pagination"`
+}
+
+type CategoriesPaginatedResponse struct {
+	Items      []Category `json:"items"`
+	Pagination Pagination `json:"pagination"`
+}
