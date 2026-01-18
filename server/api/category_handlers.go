@@ -7,7 +7,7 @@ import (
 	"github.com/unluckythoughts/go-microservice/tools/web"
 )
 
-func (api *api) ListCategories(r web.Request) models.CategoriesPaginatedResponse {
+func (api *api) ListCategories(r web.Request) (any, error) {
 	pageSize := r.GetURLParam("limit")
 	pageNumber := r.GetURLParam("page")
 
@@ -22,14 +22,7 @@ func (api *api) ListCategories(r web.Request) models.CategoriesPaginatedResponse
 
 	categories, total, err := api.s.GetCategories(page, limit)
 	if err != nil {
-		return models.CategoriesPaginatedResponse{
-			Items: []models.Category{},
-			Pagination: models.Pagination{
-				Page:  page,
-				Limit: limit,
-				Total: 0,
-			},
-		}
+		return models.CategoriesPaginatedResponse{}, err
 	}
 
 	pagination := models.Pagination{
@@ -42,10 +35,10 @@ func (api *api) ListCategories(r web.Request) models.CategoriesPaginatedResponse
 	return models.CategoriesPaginatedResponse{
 		Items:      categories,
 		Pagination: pagination,
-	}
+	}, nil
 }
 
-func (api *api) GetCategory(r web.Request) (*models.Category, error) {
+func (api *api) GetCategory(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
@@ -55,7 +48,7 @@ func (api *api) GetCategory(r web.Request) (*models.Category, error) {
 	return api.s.GetCategoryByID(id)
 }
 
-func (api *api) CreateCategory(r web.Request) (*models.Category, error) {
+func (api *api) CreateCategory(r web.Request) (any, error) {
 	body := models.CreateCategoryRequest{}
 	if err := r.GetValidatedBody(&body); err != nil {
 		return nil, err
@@ -64,7 +57,7 @@ func (api *api) CreateCategory(r web.Request) (*models.Category, error) {
 	return api.s.CreateCategory(&body)
 }
 
-func (api *api) UpdateCategory(r web.Request) (*models.Category, error) {
+func (api *api) UpdateCategory(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
@@ -79,12 +72,12 @@ func (api *api) UpdateCategory(r web.Request) (*models.Category, error) {
 	return api.s.UpdateCategory(id, &body)
 }
 
-func (api *api) DeleteCategory(r web.Request) error {
+func (api *api) DeleteCategory(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return api.s.DeleteCategory(id)
+	return nil, api.s.DeleteCategory(id)
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/unluckythoughts/go-microservice/tools/web"
 )
 
-func (api *api) ListFavorites(r web.Request) models.FavoritesPaginatedResponse {
+func (api *api) ListFavorites(r web.Request) (any, error) {
 	pageSize := r.GetURLParam("limit")
 	pageNumber := r.GetURLParam("page")
 	userIDStr := r.GetURLParam("user_id")
@@ -30,14 +30,7 @@ func (api *api) ListFavorites(r web.Request) models.FavoritesPaginatedResponse {
 
 	favorites, total, err := api.s.GetFavorites(page, limit, userID)
 	if err != nil {
-		return models.FavoritesPaginatedResponse{
-			Items: []models.Favorite{},
-			Pagination: models.Pagination{
-				Page:  page,
-				Limit: limit,
-				Total: 0,
-			},
-		}
+		return models.FavoritesPaginatedResponse{}, err
 	}
 
 	pagination := models.Pagination{
@@ -50,10 +43,10 @@ func (api *api) ListFavorites(r web.Request) models.FavoritesPaginatedResponse {
 	return models.FavoritesPaginatedResponse{
 		Items:      favorites,
 		Pagination: pagination,
-	}
+	}, nil
 }
 
-func (api *api) GetFavorite(r web.Request) (*models.Favorite, error) {
+func (api *api) GetFavorite(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
@@ -63,7 +56,7 @@ func (api *api) GetFavorite(r web.Request) (*models.Favorite, error) {
 	return api.s.GetFavoriteByID(id)
 }
 
-func (api *api) CreateFavorite(r web.Request) (*models.Favorite, error) {
+func (api *api) CreateFavorite(r web.Request) (any, error) {
 	body := models.CreateFavoriteRequest{}
 	if err := r.GetValidatedBody(&body); err != nil {
 		return nil, err
@@ -72,7 +65,7 @@ func (api *api) CreateFavorite(r web.Request) (*models.Favorite, error) {
 	return api.s.CreateFavorite(&body)
 }
 
-func (api *api) UpdateFavorite(r web.Request) (*models.Favorite, error) {
+func (api *api) UpdateFavorite(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
@@ -87,7 +80,7 @@ func (api *api) UpdateFavorite(r web.Request) (*models.Favorite, error) {
 	return api.s.UpdateFavorite(id, &body)
 }
 
-func (api *api) UpdateFavoriteProgress(r web.Request) (*models.Favorite, error) {
+func (api *api) UpdateFavoriteProgress(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
@@ -110,12 +103,12 @@ func (api *api) UpdateFavoriteProgress(r web.Request) (*models.Favorite, error) 
 	return api.s.UpdateFavorite(id, &updatedBody)
 }
 
-func (api *api) DeleteFavorite(r web.Request) error {
+func (api *api) DeleteFavorite(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return api.s.DeleteFavorite(id)
+	return nil, api.s.DeleteFavorite(id)
 }

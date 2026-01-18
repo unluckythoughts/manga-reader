@@ -7,7 +7,7 @@ import (
 	"github.com/unluckythoughts/go-microservice/tools/web"
 )
 
-func (api *api) ListSources(r web.Request) models.SourcesPaginatedResponse {
+func (api *api) ListSources(r web.Request) (any, error) {
 	pageSize := r.GetURLParam("limit")
 	pageNumber := r.GetURLParam("page")
 
@@ -22,14 +22,7 @@ func (api *api) ListSources(r web.Request) models.SourcesPaginatedResponse {
 
 	sources, total, err := api.s.GetSources(page, limit)
 	if err != nil {
-		return models.SourcesPaginatedResponse{
-			Items: []models.Source{},
-			Pagination: models.Pagination{
-				Page:  page,
-				Limit: limit,
-				Total: 0,
-			},
-		}
+		return models.SourcesPaginatedResponse{}, err
 	}
 
 	pagination := models.Pagination{
@@ -42,10 +35,10 @@ func (api *api) ListSources(r web.Request) models.SourcesPaginatedResponse {
 	return models.SourcesPaginatedResponse{
 		Items:      sources,
 		Pagination: pagination,
-	}
+	}, nil
 }
 
-func (api *api) GetSource(r web.Request) (*models.Source, error) {
+func (api *api) GetSource(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {

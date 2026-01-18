@@ -7,7 +7,7 @@ import (
 	"github.com/unluckythoughts/go-microservice/tools/web"
 )
 
-func (api *api) ListBooks(r web.Request) models.BooksPaginatedResponse {
+func (api *api) ListBooks(r web.Request) (any, error) {
 	pageSize := r.GetURLParam("limit")
 	pageNumber := r.GetURLParam("page")
 	sourceIDText := r.GetURLParam("source_id")
@@ -26,6 +26,9 @@ func (api *api) ListBooks(r web.Request) models.BooksPaginatedResponse {
 	}
 
 	books, total, err := api.s.GetBooks(page, limit, sourceID)
+	if err != nil {
+		return models.BooksPaginatedResponse{}, err
+	}
 
 	return models.BooksPaginatedResponse{
 		Items: books,
@@ -34,10 +37,10 @@ func (api *api) ListBooks(r web.Request) models.BooksPaginatedResponse {
 			Limit: limit,
 			Total: total,
 		},
-	}
+	}, nil
 }
 
-func (api *api) GetBook(r web.Request) (*models.Book, error) {
+func (api *api) GetBook(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {

@@ -7,7 +7,7 @@ import (
 	"github.com/unluckythoughts/go-microservice/tools/web"
 )
 
-func (api *api) ListUsers(r web.Request) models.UsersPaginatedResponse {
+func (api *api) ListUsers(r web.Request) (any, error) {
 	pageSize := r.GetURLParam("limit")
 	pageNumber := r.GetURLParam("page")
 
@@ -22,14 +22,7 @@ func (api *api) ListUsers(r web.Request) models.UsersPaginatedResponse {
 
 	users, total, err := api.s.GetUsers(page, limit)
 	if err != nil {
-		return models.UsersPaginatedResponse{
-			Items: []models.User{},
-			Pagination: models.Pagination{
-				Page:  page,
-				Limit: limit,
-				Total: 0,
-			},
-		}
+		return models.UsersPaginatedResponse{}, err
 	}
 
 	pagination := models.Pagination{
@@ -42,10 +35,10 @@ func (api *api) ListUsers(r web.Request) models.UsersPaginatedResponse {
 	return models.UsersPaginatedResponse{
 		Items:      users,
 		Pagination: pagination,
-	}
+	}, nil
 }
 
-func (api *api) GetUser(r web.Request) (*models.User, error) {
+func (api *api) GetUser(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
@@ -55,7 +48,7 @@ func (api *api) GetUser(r web.Request) (*models.User, error) {
 	return api.s.GetUserByID(id)
 }
 
-func (api *api) CreateUser(r web.Request) (*models.User, error) {
+func (api *api) CreateUser(r web.Request) (any, error) {
 	body := models.CreateUserRequest{}
 	if err := r.GetValidatedBody(&body); err != nil {
 		return nil, err
@@ -64,7 +57,7 @@ func (api *api) CreateUser(r web.Request) (*models.User, error) {
 	return api.s.CreateUser(&body)
 }
 
-func (api *api) UpdateUser(r web.Request) (*models.User, error) {
+func (api *api) UpdateUser(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
@@ -79,12 +72,12 @@ func (api *api) UpdateUser(r web.Request) (*models.User, error) {
 	return api.s.UpdateUser(id, &body)
 }
 
-func (api *api) DeleteUser(r web.Request) error {
+func (api *api) DeleteUser(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return api.s.DeleteUser(id)
+	return nil, api.s.DeleteUser(id)
 }
