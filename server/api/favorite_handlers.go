@@ -87,6 +87,29 @@ func (api *api) UpdateFavorite(r web.Request) (*models.Favorite, error) {
 	return api.s.UpdateFavorite(id, &body)
 }
 
+func (api *api) UpdateFavoriteProgress(r web.Request) (*models.Favorite, error) {
+	idText := r.GetRouteParam("id")
+	id, err := strconv.Atoi(idText)
+	if err != nil {
+		return nil, err
+	}
+
+	body := models.UpdateFavoriteProgressRequest{}
+	if err := r.GetValidatedBody(&body); err != nil {
+		return nil, err
+	}
+
+	progress := models.NewList([]string{
+		strconv.Itoa(body.Chapter),
+		strconv.Itoa(body.Level),
+	})
+	updatedBody := models.UpdateFavoriteRequest{
+		Progress: progress.String(),
+	}
+
+	return api.s.UpdateFavorite(id, &updatedBody)
+}
+
 func (api *api) DeleteFavorite(r web.Request) error {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)

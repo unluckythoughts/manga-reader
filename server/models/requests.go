@@ -49,6 +49,12 @@ type UpdateFavoriteRequest struct {
 	Categories string `json:"categories,omitempty"`
 }
 
+// UpdateFavoriteProgressRequest represents the request body for updating a favorite's progress
+type UpdateFavoriteProgressRequest struct {
+	Chapter int `json:"chapter" valid:"required,numeric,min=1"`
+	Level   int `json:"level" valid:"optional,numeric,min=0"`
+}
+
 // CreateCategoryRequest represents the request body for creating a category
 type CreateCategoryRequest struct {
 	Name string `json:"name" valid:"required"`

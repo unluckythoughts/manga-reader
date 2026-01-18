@@ -36,12 +36,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PageParam'
         - $ref: '#/components/parameters/LimitParam'
-        - name: type
-          in: query
-          description: Filter by book type
-          schema:
-            type: string
-            enum: [manga, novel]
         - name: source_id
           in: query
           description: Filter by source ID
@@ -71,38 +65,6 @@ paths:
                           $ref: '#/components/schemas/Book'
                       pagination:
                         $ref: '#/components/schemas/Pagination'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    
-    post:
-      tags:
-        - Books
-      summary: Create a new book
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BookInput'
-      responses:
-        '201':
-          description: Book created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    example: true
-                  error:
-                    type: string
-                    nullable: true
-                    example: null
-                  data:
-                    $ref: '#/components/schemas/Book'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -173,38 +135,6 @@ paths:
                           $ref: '#/components/schemas/Chapter'
                       pagination:
                         $ref: '#/components/schemas/Pagination'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    
-    post:
-      tags:
-        - Chapters
-      summary: Create a new chapter
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChapterInput'
-      responses:
-        '201':
-          description: Chapter created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    example: true
-                  error:
-                    type: string
-                    nullable: true
-                    example: null
-                  data:
-                    $ref: '#/components/schemas/Chapter'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -561,6 +491,44 @@ paths:
       responses:
         '200':
           description: Favorite updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Favorite'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    patch:
+      tags:
+        - Favorites
+      summary: Update favorite reading progress
+      parameters:
+        - $ref: '#/components/parameters/IDParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - chapter
+                - level
+              properties:
+                chapter:
+                  type: integer
+                  example: 45
+                  description: Current chapter number
+                level:
+                  type: integer
+                  example: 3
+                  description: Reading progress level within chapter
+      responses:
+        '200':
+          description: Favorite progress updated successfully
           content:
             application/json:
               schema:

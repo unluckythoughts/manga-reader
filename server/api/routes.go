@@ -44,6 +44,7 @@ func (a *api) registerRoutes(router web.Router) {
 	router.GET("/api/v1/favorites/:id", a.GetFavorite)
 	router.POST("/api/v1/favorites", a.CreateFavorite)
 	router.PUT("/api/v1/favorites/:id", a.UpdateFavorite)
+	router.PATCH("/api/v1/favorites/:id", a.UpdateFavoriteProgress)
 	router.DELETE("/api/v1/favorites/:id", a.DeleteFavorite)
 }
 
