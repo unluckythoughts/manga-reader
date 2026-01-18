@@ -21,13 +21,12 @@ init:
 build:
 	go build -o book-reader.exe .
 
-# Docker build
 docker-build:
-	docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+	docker build -f deploy/Dockerfile --no-cache -t temp-build:latest .
 
 # Docker build and run
-docker-up: docker-build
-	docker-compose -f deploy/docker-compose.yml up -d
+docker-up:
+	docker-compose -f deploy/docker-compose.yml up -d --build
 
 # Docker stop and remove
 docker-down:
