@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  book-reader:
+    build: ..
+    image: book-reader:latest
+    container_name: book-reader
+    ports:
+      - "8080:8080"
+    env_file:
+      - deploy/.env
+    volumes:
+      - ../data:/root/data
+      - ./.env:/root/.env:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: PostgreSQL database (if using postgresql instead of sqlite)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: book-reader-db
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: book_reader
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+
+  # Optional: Redis cache (if using cache)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: book-reader-cache
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   restart: unless-stopped
+
+# volumes:
+#   postgres_data:
+#   redis_data:
