@@ -93,6 +93,6 @@ func (c *BasicConnector) GetBookChapters(bookURL string) ([]models.Chapter, erro
 	return chapters, nil
 }
 
-func (c *BasicConnector) GetChapterContent(chapterURL string) (models.Content, error) {
+func (c *BasicConnector) GetChapterContent(chapterURL string) (models.List, error) {
 	return "", fmt.Errorf("To be implemented")
 }

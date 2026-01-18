@@ -7,7 +7,7 @@ type Favorite struct {
 	ID         int        `gorm:"primaryKey;autoIncrement" json:"id"`
 	UserID     int        `gorm:"column:user_id" json:"user_id,omitempty"`
 	BookID     int        `gorm:"column:book_id" json:"book_id,omitempty"`
-	Progress   string     `json:"progress,omitempty"`
+	Progress   List       `json:"progress,omitempty"`
 	Categories string     `json:"categories,omitempty"`
 	UpdatedAt  time.Time  `gorm:"not null" json:"updated_at"`
 	DeletedAt  *time.Time `gorm:"index" json:"deleted_at,omitempty"`
