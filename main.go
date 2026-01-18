@@ -5,6 +5,7 @@ import (
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/go-microservice"
+	"github.com/unluckythoughts/manga-reader/server/api"
 	"go.uber.org/zap"
 )
 
@@ -20,9 +21,7 @@ func main() {
 		ProxyTransport: proxyTransport,
 	}
 	s := microservice.New(opts)
-	readerService := service.New(s.GetDB())
-
-	reader.RegisterRoutes(s.HttpRouter(), readerService)
+	api.Register(s.HttpRouter(), s.GetDB())
 	s.HttpRouter().ServeFiles("/static/*filepath", http.Dir("./public"))
 	s.Start()
 }
