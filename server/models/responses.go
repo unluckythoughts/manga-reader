@@ -26,3 +26,9 @@ type BooksPaginatedResponse struct {
 	Items      []Book     `json:"items"`
 	Pagination Pagination `json:"pagination"`
 }
+
+// SourcesPaginatedResponse represents a paginated response for sources
+type SourcesPaginatedResponse struct {
+	Items      []Source   `json:"items"`
+	Pagination Pagination `json:"pagination"`
+}

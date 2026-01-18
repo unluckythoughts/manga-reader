@@ -9,6 +9,7 @@ require (
 	github.com/unluckythoughts/go-microservice v1.4.4
 	github.com/unluckythoughts/go-scraper v0.1.7
 	go.uber.org/zap v1.27.1
+	gorm.io/gorm v1.30.0
 )
 
 require (
@@ -60,5 +61,4 @@ require (
 	google.golang.org/protobuf v1.36.10 // indirect
 	gorm.io/driver/postgres v1.6.0 // indirect
 	gorm.io/driver/sqlite v1.5.7 // indirect
-	gorm.io/gorm v1.30.0 // indirect
 )
