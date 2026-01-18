@@ -179,7 +179,7 @@ func (d *DB) HardDeleteFavorite(id int) error {
 }
 
 // ListFavorites retrieves all favorites with optional filters
-func (d *DB) ListFavorites(offset, limit int, userID, bookID int) ([]models.Favorite, error) {
+func (d *DB) ListFavorites(offset, limit, userID int) ([]models.Favorite, error) {
 	var favorites []models.Favorite
 	query := d.db.Offset(offset)
 
@@ -191,27 +191,20 @@ func (d *DB) ListFavorites(offset, limit int, userID, bookID int) ([]models.Favo
 		query = query.Where("user_id = ?", userID)
 	}
 
-	if bookID > 0 {
-		query = query.Where("book_id = ?", bookID)
-	}
-
 	if err := query.Order("updated_at DESC").Find(&favorites).Error; err != nil {
 		return nil, err
 	}
+
 	return favorites, nil
 }
 
 // CountFavorites returns the total number of favorites
-func (d *DB) CountFavorites(userID, bookID int) (int64, error) {
+func (d *DB) CountFavorites(userID int) (int64, error) {
 	var count int64
 	query := d.db.Model(&models.Favorite{})
 
 	if userID > 0 {
 		query = query.Where("user_id = ?", userID)
-	}
-
-	if bookID > 0 {
-		query = query.Where("book_id = ?", bookID)
 	}
 
 	if err := query.Count(&count).Error; err != nil {

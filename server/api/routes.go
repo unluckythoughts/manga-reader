@@ -34,6 +34,13 @@ func (a *api) registerRoutes(router web.Router) {
 	router.POST("/api/v1/categories", a.CreateCategory)
 	router.PUT("/api/v1/categories/:id", a.UpdateCategory)
 	router.DELETE("/api/v1/categories/:id", a.DeleteCategory)
+
+	// Favorites API
+	router.GET("/api/v1/favorites", a.ListFavorites)
+	router.GET("/api/v1/favorites/:id", a.GetFavorite)
+	router.POST("/api/v1/favorites", a.CreateFavorite)
+	router.PUT("/api/v1/favorites/:id", a.UpdateFavorite)
+	router.DELETE("/api/v1/favorites/:id", a.DeleteFavorite)
 }
 
 func Register(router web.Router, gormDB *gorm.DB) {
