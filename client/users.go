@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/go-microservice/tools/auth"
 )
 
 // ListUsers retrieves a paginated list of users
@@ -20,10 +21,10 @@ func (c *Client) ListUsers(page, limit int) (*models.UsersPaginatedResponse, err
 }
 
 // GetUser retrieves a user by ID
-func (c *Client) GetUser(id int) (*models.User, error) {
+func (c *Client) GetUser(id int) (*auth.User, error) {
 	url := fmt.Sprintf("/api/v1/users/%d", id)
 
-	var response models.User
+	var response auth.User
 	_, err := c.client.GetResponse(url, &response)
 	if err != nil {
 		return nil, err
@@ -33,10 +34,12 @@ func (c *Client) GetUser(id int) (*models.User, error) {
 }
 
 // CreateUser creates a new user
-func (c *Client) CreateUser(request *models.CreateUserRequest) (*models.User, error) {
+// Note: This endpoint has been removed. Use auth.Service.GetRoleUserRegister instead.
+// This method is kept for backwards compatibility but will not work without auth routes.
+func (c *Client) CreateUser(request *auth.RegisterRequest) (*auth.User, error) {
 	url := "/api/v1/users"
 
-	var response models.User
+	var response auth.User
 	_, err := c.client.PostResponse(url, request, &response)
 	if err != nil {
 		return nil, err
@@ -46,10 +49,12 @@ func (c *Client) CreateUser(request *models.CreateUserRequest) (*models.User, er
 }
 
 // UpdateUser updates an existing user
-func (c *Client) UpdateUser(id int, request *models.UpdateUserRequest) (*models.User, error) {
+// Note: This endpoint has been removed. Use auth.Service.UpdateUserHandler instead.
+// This method is kept for backwards compatibility but will not work without auth routes.
+func (c *Client) UpdateUser(id int, request *auth.UpdateUserRequest) (*auth.User, error) {
 	url := fmt.Sprintf("/api/v1/users/%d", id)
 
-	var response models.User
+	var response auth.User
 	_, err := c.client.PutResponse(url, request, &response)
 	if err != nil {
 		return nil, err

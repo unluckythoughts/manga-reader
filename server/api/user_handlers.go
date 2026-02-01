@@ -1,12 +1,32 @@
 package api
 
+// NOTE: User authentication and management is now handled by the auth package from go-microservice.
+// To use authentication in your application:
+// 1. Import: "github.com/unluckythoughts/go-microservice/tools/auth"
+// 2. Create an auth.Service instance with auth.New(options)
+// 3. Use the auth handlers for login, register, update user, etc.
+//
+// The auth package provides:
+// - LoginHandler: POST /auth/login
+// - GetRoleUserRegister: POST /auth/register
+// - LogoutHandler: POST /auth/logout
+// - GetUser: GET /auth/me
+// - UpdateUserHandler: PUT /auth/me
+// - ChangePasswordHandler: POST /auth/change-password
+// - SendVerificationHandler: POST /auth/send-verification
+// - VerifyHandler: GET /auth/verify/:token
+// - UpdatePasswordHandler: POST /auth/update-password
+// - Google OAuth handlers for social login
+//
+// For admin operations (listing all users, etc.), you can keep using the db and service methods:
+
 import (
 	"strconv"
 
-	"github.com/unluckythoughts/book-reader/server/models"
 	"github.com/unluckythoughts/go-microservice/tools/web"
 )
 
+// ListUsers retrieves a paginated list of all users (admin operation)
 func (api *api) ListUsers(r web.Request) (any, error) {
 	pageSize := r.GetURLParam("limit")
 	pageNumber := r.GetURLParam("page")
@@ -22,22 +42,20 @@ func (api *api) ListUsers(r web.Request) (any, error) {
 
 	users, total, err := api.s.GetUsers(page, limit)
 	if err != nil {
-		return models.UsersPaginatedResponse{}, err
+		return nil, err
 	}
 
-	pagination := models.Pagination{
-		Page:  page,
-		Limit: limit,
-		Total: total,
-	}
-	pagination.CalculateTotalPages()
-
-	return models.UsersPaginatedResponse{
-		Items:      users,
-		Pagination: pagination,
+	return map[string]interface{}{
+		"items": users,
+		"pagination": map[string]interface{}{
+			"page":  page,
+			"limit": limit,
+			"total": total,
+		},
 	}, nil
 }
 
+// GetUser retrieves a single user by ID (admin operation)
 func (api *api) GetUser(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
@@ -48,36 +66,7 @@ func (api *api) GetUser(r web.Request) (any, error) {
 	return api.s.GetUserByID(id)
 }
 
-func (api *api) CreateUser(r web.Request) (any, error) {
-	body := models.CreateUserRequest{}
-	if err := r.GetValidatedBody(&body); err != nil {
-		return nil, err
-	}
-
-	return api.s.CreateUser(&body)
-}
-
-func (api *api) UpdateUser(r web.Request) (any, error) {
-	idText := r.GetRouteParam("id")
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		return nil, err
-	}
-
-	body := models.UpdateUserRequest{}
-	if err := r.GetValidatedBody(&body); err != nil {
-		return nil, err
-	}
-
-	return api.s.UpdateUser(id, &body)
-}
-
-func (api *api) DeleteUser(r web.Request) (any, error) {
-	idText := r.GetRouteParam("id")
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, api.s.DeleteUser(id)
-}
+// The following handlers are commented out as they should be replaced with auth package handlers:
+// - CreateUser -> Use auth.GetRoleUserRegister
+// - UpdateUser -> Use auth.UpdateUserHandler
+// - DeleteUser -> Can be implemented as admin operation if needed

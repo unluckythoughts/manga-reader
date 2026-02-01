@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/unluckythoughts/go-microservice/tools/auth"
+)
 
 // Favorite represents a user's favorite book with progress tracking
 type Favorite struct {
@@ -13,8 +17,8 @@ type Favorite struct {
 	DeletedAt  *time.Time `gorm:"index" json:"deleted_at,omitempty"`
 
 	// Relationships
-	User *User `gorm:"foreignKey:UserID" json:"user,omitempty"`
-	Book *Book `gorm:"foreignKey:BookID" json:"book,omitempty"`
+	User *auth.User `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Book *Book      `gorm:"foreignKey:BookID" json:"book,omitempty"`
 }
 
 // TableName specifies the table name for Favorite model

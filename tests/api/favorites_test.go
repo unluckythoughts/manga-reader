@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/go-microservice/tools/auth"
 )
 
 type FavoritesTestSuite struct {
@@ -20,8 +21,10 @@ func TestFavoritesTestSuite(t *testing.T) {
 func (suite *FavoritesTestSuite) getTestUserAndBook() (int, int, func()) {
 	// Create a test user
 	name := fmt.Sprintf("testuser_%d", time.Now().Unix())
-	userRequest := &models.CreateUserRequest{
-		Name: name,
+	userRequest := &auth.RegisterRequest{
+		Name:     name,
+		Email:    fmt.Sprintf("%s@test.com", name),
+		Password: "TestPass123!",
 	}
 	user, err := suite.Client.CreateUser(userRequest)
 	if err != nil {
@@ -31,17 +34,17 @@ func (suite *FavoritesTestSuite) getTestUserAndBook() (int, int, func()) {
 	// Get a book
 	booksResponse, err := suite.Client.ListBooks(1, 1, 0)
 	if err != nil || len(booksResponse.Items) == 0 {
-		suite.Client.DeleteUser(user.ID)
+		suite.Client.DeleteUser(int(user.ID))
 		suite.T().Fatal("No books available for testing")
 	}
 
 	bookID := booksResponse.Items[0].ID
 
 	cleanup := func() {
-		suite.Client.DeleteUser(user.ID)
+		suite.Client.DeleteUser(int(user.ID))
 	}
 
-	return user.ID, bookID, cleanup
+	return int(user.ID), bookID, cleanup
 }
 
 func (suite *FavoritesTestSuite) TestCreateFavorite() {
@@ -318,7 +321,7 @@ func (suite *FavoritesTestSuite) TestListFavoritesVerifyPreload() {
 
 	for _, favorite := range response.Items {
 		assert.NotNil(suite.T(), favorite.User, "User should be preloaded for favorite ID %d", favorite.ID)
-		assert.Equal(suite.T(), favorite.UserID, favorite.User.ID)
+		assert.Equal(suite.T(), favorite.UserID, int(favorite.User.ID))
 
 		assert.NotNil(suite.T(), favorite.Book, "Book should be preloaded for favorite ID %d", favorite.ID)
 		assert.Equal(suite.T(), favorite.BookID, favorite.Book.ID)

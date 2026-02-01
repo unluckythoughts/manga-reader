@@ -1,13 +1,14 @@
 package service
 
 import (
-	"time"
-
-	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/go-microservice/tools/auth"
 )
 
+// NOTE: User creation, updates, and authentication should be handled by auth.Service from go-microservice.
+// These service methods are kept for admin/internal operations only.
+
 // GetUsers retrieves a paginated list of users
-func (s *ReaderService) GetUsers(page, limit int) ([]models.User, int64, error) {
+func (s *ReaderService) GetUsers(page, limit int) ([]auth.User, int64, error) {
 	offset := (page - 1) * limit
 
 	users, err := s.db.ListUsers(offset, limit)
@@ -24,42 +25,11 @@ func (s *ReaderService) GetUsers(page, limit int) ([]models.User, int64, error) 
 }
 
 // GetUserByID retrieves a user by its ID
-func (s *ReaderService) GetUserByID(id int) (*models.User, error) {
+func (s *ReaderService) GetUserByID(id int) (*auth.User, error) {
 	return s.db.GetUserByIDWithRelations(id, "Favorites")
 }
 
-// CreateUser creates a new user
-func (s *ReaderService) CreateUser(input *models.CreateUserRequest) (*models.User, error) {
-	user := &models.User{
-		Name:      input.Name,
-		UpdatedAt: time.Now(),
-	}
-
-	if err := s.db.CreateUser(user); err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
-// UpdateUser updates an existing user
-func (s *ReaderService) UpdateUser(id int, input *models.UpdateUserRequest) (*models.User, error) {
-	user, err := s.db.GetUserByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	user.Name = input.Name
-	user.UpdatedAt = time.Now()
-
-	if err := s.db.UpdateUser(user); err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
-// DeleteUser deletes a user by its ID
+// DeleteUser deletes a user by its ID (admin operation)
 func (s *ReaderService) DeleteUser(id int) error {
 	return s.db.DeleteUser(id)
 }

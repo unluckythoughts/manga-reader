@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/go-microservice/tools/auth"
 )
 
 type UsersTestSuite struct {
@@ -20,8 +20,10 @@ func TestUsersTestSuite(t *testing.T) {
 func (suite *UsersTestSuite) TestCreateUser() {
 	// Test creating a new user
 	name := fmt.Sprintf("testuser_%d", time.Now().Unix())
-	request := &models.CreateUserRequest{
-		Name: name,
+	request := &auth.RegisterRequest{
+		Name:     name,
+		Email:    fmt.Sprintf("%s@test.com", name),
+		Password: "TestPass123!",
 	}
 
 	user, err := suite.Client.CreateUser(request)
@@ -33,7 +35,7 @@ func (suite *UsersTestSuite) TestCreateUser() {
 	assert.False(suite.T(), user.UpdatedAt.IsZero())
 
 	// Cleanup
-	suite.Client.DeleteUser(user.ID)
+	suite.Client.DeleteUser(int(user.ID))
 }
 
 func (suite *UsersTestSuite) TestListUsers() {
@@ -73,16 +75,18 @@ func (suite *UsersTestSuite) TestListUsersWithDifferentPageSizes() {
 func (suite *UsersTestSuite) TestGetUser() {
 	// Create a user first
 	name := fmt.Sprintf("testuser_%d", time.Now().Unix())
-	createRequest := &models.CreateUserRequest{
-		Name: name,
+	createRequest := &auth.RegisterRequest{
+		Name:     name,
+		Email:    fmt.Sprintf("%s@test.com", name),
+		Password: "TestPass123!",
 	}
 
 	createdUser, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
-	defer suite.Client.DeleteUser(createdUser.ID)
+	defer suite.Client.DeleteUser(int(createdUser.ID))
 
 	// Test getting the user
-	user, err := suite.Client.GetUser(createdUser.ID)
+	user, err := suite.Client.GetUser(int(createdUser.ID))
 
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), user)
@@ -100,21 +104,23 @@ func (suite *UsersTestSuite) TestGetUserNotFound() {
 func (suite *UsersTestSuite) TestUpdateUser() {
 	// Create a user first
 	name := fmt.Sprintf("testuser_%d", time.Now().Unix())
-	createRequest := &models.CreateUserRequest{
-		Name: name,
+	createRequest := &auth.RegisterRequest{
+		Name:     name,
+		Email:    fmt.Sprintf("%s@test.com", name),
+		Password: "TestPass123!",
 	}
 
 	createdUser, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
-	defer suite.Client.DeleteUser(createdUser.ID)
+	defer suite.Client.DeleteUser(int(createdUser.ID))
 
 	// Update the user
 	newName := fmt.Sprintf("updated_%s", name)
-	updateRequest := &models.UpdateUserRequest{
+	updateRequest := &auth.UpdateUserRequest{
 		Name: newName,
 	}
 
-	updatedUser, err := suite.Client.UpdateUser(createdUser.ID, updateRequest)
+	updatedUser, err := suite.Client.UpdateUser(int(createdUser.ID), updateRequest)
 
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), updatedUser)
@@ -126,21 +132,23 @@ func (suite *UsersTestSuite) TestUpdateUser() {
 func (suite *UsersTestSuite) TestUpdateUserPartial() {
 	// Create a user first
 	name := fmt.Sprintf("testuser_%d", time.Now().Unix())
-	createRequest := &models.CreateUserRequest{
-		Name: name,
+	createRequest := &auth.RegisterRequest{
+		Name:     name,
+		Email:    fmt.Sprintf("%s@test.com", name),
+		Password: "TestPass123!",
 	}
 
 	createdUser, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
-	defer suite.Client.DeleteUser(createdUser.ID)
+	defer suite.Client.DeleteUser(int(createdUser.ID))
 
 	// Update name
 	newName := fmt.Sprintf("partial_%s", name)
-	updateRequest := &models.UpdateUserRequest{
+	updateRequest := &auth.UpdateUserRequest{
 		Name: newName,
 	}
 
-	updatedUser, err := suite.Client.UpdateUser(createdUser.ID, updateRequest)
+	updatedUser, err := suite.Client.UpdateUser(int(createdUser.ID), updateRequest)
 
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), updatedUser)
@@ -150,19 +158,21 @@ func (suite *UsersTestSuite) TestUpdateUserPartial() {
 func (suite *UsersTestSuite) TestDeleteUser() {
 	// Create a user first
 	name := fmt.Sprintf("testuser_%d", time.Now().Unix())
-	createRequest := &models.CreateUserRequest{
-		Name: name,
+	createRequest := &auth.RegisterRequest{
+		Name:     name,
+		Email:    fmt.Sprintf("%s@test.com", name),
+		Password: "TestPass123!",
 	}
 
 	createdUser, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
 
 	// Delete the user
-	err = suite.Client.DeleteUser(createdUser.ID)
+	err = suite.Client.DeleteUser(int(createdUser.ID))
 	assert.NoError(suite.T(), err)
 
 	// Verify user is deleted
-	_, err = suite.Client.GetUser(createdUser.ID)
+	_, err = suite.Client.GetUser(int(createdUser.ID))
 	assert.Error(suite.T(), err)
 }
 
@@ -173,24 +183,29 @@ func (suite *UsersTestSuite) TestDeleteUserNotFound() {
 	assert.Error(suite.T(), err)
 }
 
-func (suite *UsersTestSuite) TestCreateUserDuplicateName() {
+func (suite *UsersTestSuite) TestCreateUserDuplicateEmail() {
 	// Create a user
 	name := fmt.Sprintf("testuser_%d", time.Now().Unix())
-	createRequest := &models.CreateUserRequest{
-		Name: name,
+	email := fmt.Sprintf("%s@test.com", name)
+	createRequest := &auth.RegisterRequest{
+		Name:     name,
+		Email:    email,
+		Password: "TestPass123!",
 	}
 
 	user1, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
-	defer suite.Client.DeleteUser(user1.ID)
+	defer suite.Client.DeleteUser(int(user1.ID))
 
-	// Try to create another user with the same name
-	createRequest2 := &models.CreateUserRequest{
-		Name: name,
+	// Try to create another user with the same email
+	createRequest2 := &auth.RegisterRequest{
+		Name:     name + "_2",
+		Email:    email, // Same email
+		Password: "TestPass123!",
 	}
 
 	_, err = suite.Client.CreateUser(createRequest2)
-	assert.Error(suite.T(), err) // Should fail due to duplicate name
+	assert.Error(suite.T(), err) // Should fail due to duplicate email
 }
 
 func (suite *UsersTestSuite) TestUserCRUDFlow() {
@@ -198,24 +213,26 @@ func (suite *UsersTestSuite) TestUserCRUDFlow() {
 
 	// 1. Create
 	name := fmt.Sprintf("crudtest_%d", time.Now().Unix())
-	createRequest := &models.CreateUserRequest{
-		Name: name,
+	createRequest := &auth.RegisterRequest{
+		Name:     name,
+		Email:    fmt.Sprintf("%s@test.com", name),
+		Password: "TestPass123!",
 	}
 
 	user, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), user)
-	originalID := user.ID
+	originalID := int(user.ID)
 
 	// 2. Read
 	fetchedUser, err := suite.Client.GetUser(originalID)
 	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), originalID, fetchedUser.ID)
+	assert.Equal(suite.T(), user.ID, fetchedUser.ID)
 	assert.Equal(suite.T(), name, fetchedUser.Name)
 
 	// 3. Update
 	newName := fmt.Sprintf("updated_%s", name)
-	updateRequest := &models.UpdateUserRequest{
+	updateRequest := &auth.UpdateUserRequest{
 		Name: newName,
 	}
 

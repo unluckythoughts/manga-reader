@@ -25,16 +25,6 @@ type CreateChapterRequest struct {
 	OtherID    string `json:"other_id,omitempty"`
 }
 
-// CreateUserRequest represents the request body for creating a new user
-type CreateUserRequest struct {
-	Name string `json:"name" valid:"required"`
-}
-
-// UpdateUserRequest represents the request body for updating a user
-type UpdateUserRequest struct {
-	Name string `json:"name" valid:"required"`
-}
-
 // CreateFavoriteRequest represents the request body for creating a favorite
 type CreateFavoriteRequest struct {
 	UserID     int    `json:"user_id" valid:"required"`

@@ -25,12 +25,10 @@ func (a *api) registerRoutes(router web.Router) {
 	router.GET("/api/v1/sources", a.ListSources)
 	router.GET("/api/v1/sources/:id", a.GetSource)
 
-	// Users API
+	// Users API (admin operations only - for auth, use auth package handlers)
+	// Authentication routes (login, register, etc.) should be handled by auth.Service
 	router.GET("/api/v1/users", a.ListUsers)
 	router.GET("/api/v1/users/:id", a.GetUser)
-	router.POST("/api/v1/users", a.CreateUser)
-	router.PUT("/api/v1/users/:id", a.UpdateUser)
-	router.DELETE("/api/v1/users/:id", a.DeleteUser)
 
 	// Categories API
 	router.GET("/api/v1/categories", a.ListCategories)

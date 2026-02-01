@@ -56,8 +56,21 @@ CREATE TABLE IF NOT EXISTS category (
 );
 
 CREATE TABLE IF NOT EXISTS user (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  name        TEXT,
-  updated_at  DATETIME NOT NULL,
-  deleted_at  DATETIME
+  id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at          DATETIME,
+  updated_at          DATETIME,
+  deleted_at          DATETIME,
+  name                TEXT NOT NULL,
+  email               TEXT NOT NULL UNIQUE,
+  email_verified      BOOLEAN NOT NULL DEFAULT FALSE,
+  mobile              TEXT UNIQUE,
+  mobile_verified     BOOLEAN NOT NULL DEFAULT FALSE,
+  password            TEXT NOT NULL,
+  role                INTEGER NOT NULL DEFAULT 1,
+  verify_token        TEXT NOT NULL,
+  token_expires_at    DATETIME,
+  google_id           TEXT,
+  google_avatar       TEXT
 );
+CREATE INDEX IF NOT EXISTS idx_user_deleted_at ON user(deleted_at);
+CREATE INDEX IF NOT EXISTS idx_user_email ON user(email);
