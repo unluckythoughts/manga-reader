@@ -31,7 +31,8 @@ func NewFreeWebNovelConnector() models.IConnector {
 					Number: ".main .top h1.tit a||a",
 					Title:  ".main .top h1.tit a||a",
 					Content: models.ContentSelectors{
-						Data: "#article p",
+						Data:            "#article p",
+						ReplacePatterns: []models.Pattern{},
 					},
 				},
 			},

@@ -1,7 +1,38 @@
 package models
 
+import "strings"
+
+type Pattern struct {
+	Match       string `json:"match,omitempty"`
+	ReplaceWith string `json:"replace_with,omitempty"`
+}
+
+func (p *Pattern) IsRegex() bool {
+	return strings.HasPrefix(p.Match, "/")
+}
+
+func (p *Pattern) GetRegexFlags() string {
+	if !p.IsRegex() {
+		return ""
+	}
+
+	// Find the last / to get flags
+	lastSlashIdx := strings.LastIndex(p.Match, "/")
+	if lastSlashIdx <= 0 || lastSlashIdx == len(p.Match)-1 {
+		return ""
+	}
+
+	return p.Match[lastSlashIdx+1:]
+}
+
+func (p *Pattern) IsCaseSensitive() bool {
+	flags := p.GetRegexFlags()
+	return !strings.Contains(flags, "i")
+}
+
 type ContentSelectors struct {
-	Data string `json:"data,omitempty"`
+	Data            string    `json:"data,omitempty"`
+	ReplacePatterns []Pattern `json:"replace_patterns,omitempty"`
 }
 
 type ChapterSelectors struct {

@@ -1,6 +1,9 @@
 package theme
 
 import (
+	"regexp"
+	"strings"
+
 	"github.com/unluckythoughts/book-reader/server/models"
 	"github.com/unluckythoughts/book-reader/server/utils"
 	"github.com/unluckythoughts/go-scraper"
@@ -72,4 +75,24 @@ func getChapter(data string, conn models.Connector) (models.Chapter, error) {
 	}
 
 	return chapter, nil
+}
+
+func cleanData(data string, patterns []models.Pattern) string {
+	for _, pattern := range patterns {
+		if pattern.IsRegex() {
+			if !pattern.IsCaseSensitive() {
+				data = strings.ToLower(data)
+				pattern.Match = strings.ToLower(pattern.Match)
+			}
+			re, err := regexp.Compile(pattern.Match)
+			if err != nil {
+				continue
+			}
+			data = re.ReplaceAllString(data, pattern.ReplaceWith)
+		}
+
+		data = strings.ReplaceAll(data, pattern.Match, pattern.ReplaceWith)
+	}
+
+	return data
 }

@@ -1,8 +1,6 @@
 package theme
 
 import (
-	"fmt"
-
 	"github.com/unluckythoughts/book-reader/server/models"
 	"github.com/unluckythoughts/book-reader/server/utils"
 	"github.com/unluckythoughts/go-scraper"
@@ -94,5 +92,28 @@ func (c *BasicConnector) GetBookChapters(bookURL string) ([]models.Chapter, erro
 }
 
 func (c *BasicConnector) GetChapterContent(chapterURL string) (models.List, error) {
-	return "", fmt.Errorf("To be implemented")
+	url := c.getCompleteURL(chapterURL)
+	var content models.List
+
+	htmlContent, err := c.s.ScrapeHTML(url)
+	if err != nil {
+		return content, err
+	}
+
+	contentData, err := scraper.GetText(htmlContent, c.conn.Selectors.Book.Chapter.Content.Data)
+	if err != nil {
+		return content, err
+	}
+
+	patterns := c.conn.Selectors.Book.Chapter.Content.ReplacePatterns
+	for _, data := range contentData {
+		switch c.conn.Type {
+		case models.BookTypeNovel:
+			content.Add(cleanData(data, patterns))
+		case models.BookTypeManga:
+			content.Add(data)
+		}
+	}
+
+	return content, nil
 }
