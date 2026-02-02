@@ -78,7 +78,7 @@ func (w *ServiceWorker) updateSourceBooks(ctx web.Context, source models.Source,
 
 		// Fetch all books if books is empty
 		// Books will be empty if connector supports last page selector
-		if books == nil || len(books) == 0 {
+		if len(books) == 0 {
 			books, err = conn.GetBooks()
 			if err != nil {
 				ctx.Logger().Errorf("Failed to get all books for source %s: %v", source.Name, err)
