@@ -7,8 +7,8 @@ toolchain go1.24.3
 require (
 	github.com/DaRealFreak/cloudflare-bp-go v1.0.4
 	github.com/stretchr/testify v1.11.1
-	github.com/unluckythoughts/go-microservice v1.4.6
-	github.com/unluckythoughts/go-scraper v0.1.9
+	github.com/unluckythoughts/go-microservice v1.6.0
+	github.com/unluckythoughts/go-scraper v0.1.10
 	go.uber.org/zap v1.27.1
 	gorm.io/gorm v1.31.1
 )
@@ -54,6 +54,7 @@ require (
 	github.com/nlnwa/whatwg-url v0.6.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/temoto/robotstxt v1.1.2 // indirect

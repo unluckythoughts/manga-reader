@@ -9,7 +9,7 @@ import (
 
 var (
 	lock         = sync.RWMutex{}
-	ConnectorMap = map[string]models.IConnector{}
+	connectorMap = map[string]models.IConnector{}
 )
 
 func init() {
@@ -18,7 +18,7 @@ func init() {
 	for _, connector := range []models.IConnector{
 		// Add connectors here
 	} {
-		ConnectorMap[connector.GetDomain()] = connector
+		connectorMap[connector.GetDomain()] = connector
 	}
 }
 
@@ -26,7 +26,7 @@ func GetAllConnectors() map[string]models.IConnector {
 	lock.RLock()
 	defer lock.RUnlock()
 	cMap := make(map[string]models.IConnector)
-	for k, v := range ConnectorMap {
+	for k, v := range connectorMap {
 		cMap[k] = v
 	}
 	return cMap
@@ -35,7 +35,7 @@ func GetAllConnectors() map[string]models.IConnector {
 func GetConnector(domain string) (models.IConnector, error) {
 	lock.RLock()
 	defer lock.RUnlock()
-	conn, ok := ConnectorMap[domain]
+	conn, ok := connectorMap[domain]
 	if !ok {
 		return nil, fmt.Errorf("could not find config for %s", domain)
 	}

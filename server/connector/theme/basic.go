@@ -1,6 +1,10 @@
 package theme
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/unluckythoughts/book-reader/server/models"
 	"github.com/unluckythoughts/book-reader/server/utils"
 	"github.com/unluckythoughts/go-scraper"
@@ -71,7 +75,7 @@ func (c *BasicConnector) GetBooks() ([]models.Book, error) {
 	return books, nil
 }
 
-func (c *BasicConnector) GetBookChapters(bookURL string) ([]models.Chapter, error) {
+func (c *BasicConnector) GetBookChapters(bookURL, chapterNum string) ([]models.Chapter, error) {
 	url := c.getCompleteURL(bookURL)
 	config := scraper.PaginationConfig{
 		NextPageSelector: c.conn.Selectors.Book.NextPage,
@@ -80,14 +84,28 @@ func (c *BasicConnector) GetBookChapters(bookURL string) ([]models.Chapter, erro
 	if err != nil {
 		return nil, err
 	}
+
 	chapters := []models.Chapter{}
 	for chapterItem := range chapterItemsChan {
 		chapter, err := getChapter(chapterItem.Data, c.conn)
 		if err != nil {
 			return nil, err
 		}
-		chapters = append(chapters, chapter)
+
+		if chapterNum != "" {
+			result, err := utils.CompareNumbers(chapter.Number, chapterNum)
+			if err != nil {
+				return nil, err
+			}
+
+			if result > 0 {
+				chapters = append(chapters, chapter)
+			}
+		} else {
+			chapters = append(chapters, chapter)
+		}
 	}
+
 	return chapters, nil
 }
 
@@ -116,4 +134,56 @@ func (c *BasicConnector) GetChapterContent(chapterURL string) (models.List, erro
 	}
 
 	return content, nil
+}
+
+func (c *BasicConnector) GetBookCount() (int, []models.Book, error) {
+	if c.conn.Selectors.LastPage == "" {
+		books, err := c.GetBooks()
+		if err != nil {
+			return 0, books, err
+		}
+		return len(books), books, nil
+	}
+	url := c.getCompleteURL(c.conn.BookListURL)
+	html, err := c.s.ScrapeHTML(url)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	bookItems, err := scraper.GetOuterHTML(html, c.conn.Selectors.BookListItem)
+	if err != nil {
+		return 0, nil, err
+	}
+	booksPerPageCount := len(bookItems)
+
+	lastPageItems, err := scraper.GetOuterHTML(html, c.conn.Selectors.LastPage)
+	if err != nil {
+		return 0, nil, err
+	} else if len(lastPageItems) == 0 {
+		return 0, nil, fmt.Errorf("error while getting books count: could not get lastpage number")
+	}
+
+	lastPageNum, err := scraper.GetInt(lastPageItems[0], "")
+	if err != nil {
+		return 0, nil, err
+	}
+
+	if lastPageNum == 0 {
+		return 0, nil, fmt.Errorf("error while getting books count: last page number is zero")
+	}
+
+	lastPageURL := strings.ReplaceAll(
+		c.conn.Selectors.NextPageURLPattern,
+		"::page::", strconv.Itoa(lastPageNum),
+	)
+	lastPageURL = scraper.GetFullURL(url, lastPageURL)
+
+	lastPageBookItems, err := c.s.ScrapeOuterHTML(lastPageURL, c.conn.Selectors.BookListItem)
+	if err != nil {
+		return 0, nil, err
+	}
+	lastPageBooksCount := len(lastPageBookItems)
+	totalBooks := (lastPageNum-1)*booksPerPageCount + lastPageBooksCount
+
+	return totalBooks, nil, nil
 }

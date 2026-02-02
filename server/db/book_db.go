@@ -29,6 +29,28 @@ func (d *DB) GetBookByID(id int) (*models.Book, error) {
 	return &book, nil
 }
 
+// CheckBookExists checks if a book exists by source ID and book URL
+func (d *DB) CheckBookExists(sourceID int, bookURL string) (bool, error) {
+	var count int64
+	if err := d.db.Model(&models.Book{}).
+		Where("source_id = ? AND url = ?", sourceID, bookURL).
+		Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+// GetBookCountBySourceID returns the count of books for a given source ID
+func (d *DB) GetBookCountBySourceID(sourceID int) (int64, error) {
+	var count int64
+	if err := d.db.Model(&models.Book{}).
+		Where("source_id = ?", sourceID).
+		Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 // GetBookByIDWithRelations retrieves a book by its ID with related data
 func (d *DB) GetBookByIDWithRelations(id int, preload ...string) (*models.Book, error) {
 	var book models.Book

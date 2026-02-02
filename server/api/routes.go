@@ -4,6 +4,7 @@ import (
 	"github.com/unluckythoughts/book-reader/server/db"
 	"github.com/unluckythoughts/book-reader/server/service"
 	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/go-microservice/tools/worker"
 	"gorm.io/gorm"
 )
 
@@ -46,8 +47,8 @@ func (a *api) registerRoutes(router web.Router) {
 	router.DELETE("/api/v1/favorites/:id", a.DeleteFavorite)
 }
 
-func Register(router web.Router, gormDB *gorm.DB) {
-	s := service.New(db.New(gormDB))
+func Register(router web.Router, gormDB *gorm.DB, w *worker.Worker) {
+	s := service.New(db.New(gormDB), w)
 	api := &api{s: s}
 
 	api.registerRoutes(router)

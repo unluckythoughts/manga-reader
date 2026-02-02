@@ -77,6 +77,7 @@ type IConnector interface {
 	GetIconURL() string
 	GetSelectors() Selectors
 	GetBooks() ([]Book, error)
-	GetBookChapters(bookURL string) ([]Chapter, error)
+	GetBookChapters(bookURL, chapterNum string) ([]Chapter, error)
 	GetChapterContent(chapterURL string) (List, error)
+	GetBookCount() (int, []Book, error)
 }

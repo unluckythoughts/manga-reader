@@ -55,14 +55,23 @@ func getChapter(data string, conn models.Connector) (models.Chapter, error) {
 		return chapter, err
 	}
 
+	number := ""
+	if sels.Number != "" {
+		number, err = scraper.GetTextSingle(data, sels.Number)
+		if err != nil {
+			return chapter, err
+		}
+	}
+
 	uploadDateText, err := scraper.GetTextSingle(data, sels.UploadDate)
 	if err != nil {
 		return chapter, err
 	}
 
 	chapter = models.Chapter{
-		URL:   utils.GetTrucattedURL(url),
-		Title: title,
+		URL:    utils.GetTrucattedURL(url),
+		Title:  title,
+		Number: number,
 	}
 
 	if uploadDateText != "" && sels.DateFormat != "" {
