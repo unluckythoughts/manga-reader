@@ -6,12 +6,22 @@ import (
 
 	"github.com/unluckythoughts/book-reader/server/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // CreateChapter creates a new chapter in the database
 func (d *DB) CreateChapter(chapter *models.Chapter) error {
 	chapter.UpdatedAt = time.Now()
-	if err := d.db.Create(chapter).Error; err != nil {
+	if err := d.db.Clauses(
+		clause.OnConflict{
+			Columns:   []clause.Column{{Name: "id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"url", "title", "book_id", "number", "content", "upload_date", "completed", "downloaded", "other_id", "updated_at"}),
+		},
+		clause.OnConflict{
+			Columns:   []clause.Column{{Name: "book_id"}, {Name: "number"}},
+			DoUpdates: clause.AssignmentColumns([]string{"url", "title", "content", "upload_date", "completed", "downloaded", "other_id", "updated_at"}),
+		},
+	).Create(chapter).Error; err != nil {
 		return err
 	}
 	return nil
@@ -24,7 +34,16 @@ func (d *DB) CreateChaptersBatch(chapters []models.Chapter) error {
 		chapters[i].UpdatedAt = now
 	}
 
-	if err := d.db.Create(&chapters).Error; err != nil {
+	if err := d.db.Clauses(
+		clause.OnConflict{
+			Columns:   []clause.Column{{Name: "id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"url", "title", "book_id", "number", "content", "upload_date", "completed", "downloaded", "other_id", "updated_at"}),
+		},
+		clause.OnConflict{
+			Columns:   []clause.Column{{Name: "book_id"}, {Name: "number"}},
+			DoUpdates: clause.AssignmentColumns([]string{"url", "title", "content", "upload_date", "completed", "downloaded", "other_id", "updated_at"}),
+		},
+	).Create(&chapters).Error; err != nil {
 		return err
 	}
 	return nil

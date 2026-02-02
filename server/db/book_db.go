@@ -6,14 +6,25 @@ import (
 
 	"github.com/unluckythoughts/book-reader/server/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // CreateBook creates a new book in the database
 func (d *DB) CreateBook(book *models.Book) error {
 	book.UpdatedAt = time.Now()
-	if err := d.db.Create(book).Error; err != nil {
+	if err := d.db.Clauses(
+		clause.OnConflict{
+			Columns:   []clause.Column{{Name: "id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"url", "title", "type", "image_url", "synopsis", "slug", "other_id", "source_id", "updated_at"}),
+		},
+		clause.OnConflict{
+			Columns:   []clause.Column{{Name: "source_id"}, {Name: "url"}},
+			DoUpdates: clause.AssignmentColumns([]string{"title", "type", "image_url", "synopsis", "slug", "other_id", "updated_at"}),
+		},
+	).Create(book).Error; err != nil {
 		return err
 	}
+
 	return nil
 }
 

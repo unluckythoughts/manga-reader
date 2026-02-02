@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS book (
   updated_at  DATETIME NOT NULL,
   deleted_at  DATETIME
 );
-CREATE UNIQUE INDEX IF NOT EXISTS book_title_unique ON book(source_id, title);
+CREATE UNIQUE INDEX IF NOT EXISTS book_url_unique ON book(source_id, url);
 
 CREATE TABLE IF NOT EXISTS source (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
