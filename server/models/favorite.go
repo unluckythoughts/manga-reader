@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/unluckythoughts/go-microservice/tools/auth"
+	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
 )
 
 // Favorite represents a user's favorite book with progress tracking

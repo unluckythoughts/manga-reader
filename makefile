@@ -18,7 +18,6 @@ init:
 	go mod download
 
 build:
-	$$env:DOCKER_BUILDKIT="1"
 	docker build -f deploy/Dockerfile -t book-reader:latest .
 
 start: 

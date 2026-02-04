@@ -4,7 +4,7 @@ The book-reader application now uses the `auth` package from `go-microservice` f
 
 ## What Changed
 
-1. **User Model**: The local `User` model has been removed. We now use `auth.User` from `github.com/unluckythoughts/go-microservice/tools/auth`.
+1. **User Model**: The local `User` model has been removed. We now use `auth.User` from `github.com/unluckythoughts/go-microservice/v2/tools/auth`.
 
 2. **Database Schema**: The user table now includes authentication fields:
    - `email` (unique, required)
@@ -30,7 +30,7 @@ In your main application file, create an auth service instance:
 
 ```go
 import (
-    "github.com/unluckythoughts/go-microservice/tools/auth"
+    "github.com/unluckythoughts/go-microservice/v2/tools/auth"
     "gorm.io/gorm"
 )
 

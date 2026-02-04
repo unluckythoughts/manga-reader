@@ -21,7 +21,7 @@ func main() {
 		ProxyTransport: proxyTransport,
 	}
 	s := microservice.New(opts)
-	api.Register(s.HttpRouter(), s.GetDB(), s.GetWorker())
+	api.Register(s.HttpRouter(), s.GetDB(), s.GetLogger(), s.GetWorker())
 	s.HttpRouter().ServeFiles("/static/*filepath", http.Dir("./public"))
 	s.Start()
 }

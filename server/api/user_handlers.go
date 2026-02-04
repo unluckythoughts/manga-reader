@@ -2,7 +2,7 @@ package api
 
 // NOTE: User authentication and management is now handled by the auth package from go-microservice.
 // To use authentication in your application:
-// 1. Import: "github.com/unluckythoughts/go-microservice/tools/auth"
+// 1. Import: "github.com/unluckythoughts/go-microservice/v2/tools/auth"
 // 2. Create an auth.Service instance with auth.New(options)
 // 3. Use the auth handlers for login, register, update user, etc.
 //

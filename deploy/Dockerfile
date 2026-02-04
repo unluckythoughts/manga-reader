@@ -2,7 +2,7 @@
 # Migrations stage
 FROM flyway/flyway:latest-alpine AS migrations
 
-COPY ../migrations /flyway/sql
+COPY migrations /flyway/sql
 
 RUN apk add sqlite
 
@@ -27,7 +27,7 @@ RUN apk add git gcc musl-dev sqlite-dev
 WORKDIR /app
 
 # Copy go mod files
-COPY ../go.mod ../go.sum ./
+COPY go.mod go.sum ./
 
 # Download dependencies with cache mount
 RUN --mount=type=cache,target=/go/pkg/mod \
@@ -35,7 +35,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
 # Copy source code
-COPY ../ ./
+COPY . ./
 
 # Build the application with cache mount
 RUN --mount=type=cache,target=/go/pkg/mod \

@@ -11,7 +11,7 @@ The book-reader application has been successfully migrated to use the `auth` pac
 ### Modified Files
 
 #### 1. server/models/favorite.go
-- Updated import to include `github.com/unluckythoughts/go-microservice/tools/auth`
+- Updated import to include `github.com/unluckythoughts/go-microservice/v2/tools/auth`
 - Changed `User *User` to `User *auth.User` in the Favorite struct
 
 #### 2. server/models/requests.go
@@ -23,7 +23,7 @@ The book-reader application has been successfully migrated to use the `auth` pac
 - Updated `UsersPaginatedResponse` to use `[]auth.User` instead of `[]User`
 
 #### 4. server/db/user_db.go
-- Updated import to use `github.com/unluckythoughts/go-microservice/tools/auth`
+- Updated import to use `github.com/unluckythoughts/go-microservice/v2/tools/auth`
 - Updated all function signatures to use `auth.User` instead of `models.User`
 - Removed manual `UpdatedAt` timestamp management (handled by GORM)
 - Updated all database operations to work with auth.User model
