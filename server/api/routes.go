@@ -30,6 +30,12 @@ func (a *api) registerRoutes(router web.Router) {
 		router.POST("/api/v1/auth/register", a.a.GetRegisterHandlerForUserRole(userRole))
 		router.POST("/api/v1/auth/logout", a.a.LogoutHandler)
 
+		// Check if Google OAuth is configured
+		if a.a.GoogleOauthConfig.ClientID != "" && a.a.GoogleOauthConfig.ClientSecret != "" {
+			// OAUTH API
+			router.POST("/api/v1/oauth/login/google", a.a.GoogleOAuthLogin)
+		}
+
 		// Verification API
 		router.PATCH("/api/v1/auth/verify/:target", a.a.SendTokenHandler)
 		router.GET("/api/v1/auth/verify/:target/:token", a.a.VerifyTokenHandler)
@@ -81,8 +87,9 @@ func Register(router web.Router, gormDB *gorm.DB, l *zap.Logger, w *worker.Worke
 	utils.ParseEnvironmentVars(&api)
 	if api.enableAuth {
 		a := auth.NewAuthService(auth.Options{
-			DB:     gormDB,
-			Logger: l.Named("auth"),
+			DB:                gormDB,
+			Logger:            l.Named("auth"),
+			TokenValidInHours: 24,
 		})
 		api.a = a
 	}
