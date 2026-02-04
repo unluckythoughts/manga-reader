@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/unluckythoughts/book-reader/server/models"
-	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/go-microservice/v2/tools/web"
 )
 
 func (api *api) ListChapters(r web.Request) (any, error) {

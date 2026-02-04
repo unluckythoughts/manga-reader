@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/unluckythoughts/book-reader/server/models"
-	"github.com/unluckythoughts/go-microservice/tools/auth"
+	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
 )
 
 type FavoritesTestSuite struct {

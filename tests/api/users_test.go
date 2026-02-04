@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/unluckythoughts/go-microservice/tools/auth"
+	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
 )
 
 type UsersTestSuite struct {

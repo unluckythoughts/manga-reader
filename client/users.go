@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/unluckythoughts/book-reader/server/models"
-	"github.com/unluckythoughts/go-microservice/tools/auth"
+	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
 )
 
 // ListUsers retrieves a paginated list of users

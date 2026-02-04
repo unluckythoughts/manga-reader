@@ -1,10 +1,10 @@
 
 # Migrations stage
-FROM redgate/flyway:latest-alpine AS migrations
+FROM flyway/flyway:latest-alpine AS migrations
 
 COPY ../migrations /flyway/sql
 
-RUN apk --no-cache add sqlite
+RUN apk add sqlite
 
 # Create directory for SQLite database
 RUN mkdir -p /flyway/data
@@ -21,7 +21,7 @@ RUN flyway \
 FROM golang:1.24-alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache git gcc musl-dev sqlite-dev
+RUN apk add git gcc musl-dev sqlite-dev
 
 # Set working directory
 WORKDIR /app
@@ -29,20 +29,24 @@ WORKDIR /app
 # Copy go mod files
 COPY ../go.mod ../go.sum ./
 
-# Download dependencies
-RUN go mod download
+# Download dependencies with cache mount
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go mod download
 
 # Copy source code
 COPY ../ ./
 
-# Build the application
-RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o book-reader .
+# Build the application with cache mount
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o book-reader .
 
 # Runtime stage
 FROM alpine:latest
 
 # Install runtime dependencies
-RUN apk --no-cache add ca-certificates sqlite-libs
+RUN apk add ca-certificates sqlite-libs
 
 # Set working directory
 WORKDIR /root/

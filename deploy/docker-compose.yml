@@ -1,14 +1,15 @@
 services:
   book-reader:
-    build:
-      context: ..
-      dockerfile: deploy/Dockerfile
     image: book-reader:latest
     container_name: book-reader
     ports:
       - "8080:8080"
     env_file:
       - .env
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+      - 8.8.4.4
     restart: unless-stopped
     networks:
       - book-reader

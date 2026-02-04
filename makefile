@@ -17,16 +17,17 @@ init:
 	go mod tidy
 	go mod download
 
-# Build the application locally
 build:
-	go build -o book-reader.exe .
+	$$env:DOCKER_BUILDKIT="1"
+	docker build -f deploy/Dockerfile -t book-reader:latest .
 
-docker-build:
-	docker build -f deploy/Dockerfile --no-cache -t temp-build:latest .
+start: 
+	docker-compose -f deploy/docker-compose.yml up -d
 
-# Docker build and run
-docker-up:
-	docker-compose -f deploy/docker-compose.yml up -d --build
+stop:
+	docker-compose -f deploy/docker-compose.yml down -v
+
+run: start
 
 # Docker stop and remove
 docker-down:

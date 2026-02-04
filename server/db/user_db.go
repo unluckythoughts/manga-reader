@@ -3,7 +3,7 @@ package db
 import (
 	"errors"
 
-	"github.com/unluckythoughts/go-microservice/tools/auth"
+	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
 	"gorm.io/gorm"
 )
 

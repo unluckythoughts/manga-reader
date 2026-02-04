@@ -23,7 +23,7 @@ package api
 import (
 	"strconv"
 
-	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/go-microservice/v2/tools/web"
 )
 
 // ListUsers retrieves a paginated list of all users (admin operation)

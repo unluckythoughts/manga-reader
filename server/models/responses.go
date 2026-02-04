@@ -1,6 +1,6 @@
 package models
 
-import "github.com/unluckythoughts/go-microservice/tools/auth"
+import "github.com/unluckythoughts/go-microservice/v2/tools/auth"
 
 // PaginatedResponse represents a paginated API response
 type PaginatedResponse struct {

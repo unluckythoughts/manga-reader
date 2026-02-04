@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/unluckythoughts/go-microservice/tools/auth"
+	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
 )
 
 // NOTE: User creation, updates, and authentication should be handled by auth.Service from go-microservice.
