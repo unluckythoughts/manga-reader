@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/unluckythoughts/book-reader/server/db"
 	localWorker "github.com/unluckythoughts/book-reader/server/worker"
-	"github.com/unluckythoughts/go-microservice/tools/worker"
+	"github.com/unluckythoughts/go-microservice/v2/tools/worker"
 )
 
 type ReaderService struct {

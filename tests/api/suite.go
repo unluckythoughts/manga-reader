@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 	"github.com/unluckythoughts/book-reader/client"
-	"github.com/unluckythoughts/go-microservice/tools/logger"
-	"github.com/unluckythoughts/go-microservice/tools/psql"
+	"github.com/unluckythoughts/go-microservice/v2/tools/logger"
+	"github.com/unluckythoughts/go-microservice/v2/tools/psql"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

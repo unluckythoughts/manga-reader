@@ -3,8 +3,8 @@ package api
 import (
 	"github.com/unluckythoughts/book-reader/server/db"
 	"github.com/unluckythoughts/book-reader/server/service"
-	"github.com/unluckythoughts/go-microservice/tools/web"
-	"github.com/unluckythoughts/go-microservice/tools/worker"
+	"github.com/unluckythoughts/go-microservice/v2/tools/web"
+	"github.com/unluckythoughts/go-microservice/v2/tools/worker"
 	"gorm.io/gorm"
 )
 

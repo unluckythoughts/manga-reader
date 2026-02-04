@@ -5,7 +5,7 @@ import (
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/book-reader/server/api"
-	"github.com/unluckythoughts/go-microservice"
+	"github.com/unluckythoughts/go-microservice/v2"
 	"go.uber.org/zap"
 )
 

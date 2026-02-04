@@ -2,7 +2,7 @@ package worker
 
 import (
 	"github.com/unluckythoughts/book-reader/server/db"
-	"github.com/unluckythoughts/go-microservice/tools/worker"
+	"github.com/unluckythoughts/go-microservice/v2/tools/worker"
 )
 
 type ServiceWorker struct {

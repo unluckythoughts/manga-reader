@@ -3,7 +3,7 @@ package worker
 import (
 	"github.com/unluckythoughts/book-reader/server/connector"
 	"github.com/unluckythoughts/book-reader/server/models"
-	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/go-microservice/v2/tools/web"
 )
 
 func (w *ServiceWorker) updateFavoritesTask(ctx web.Context) error {

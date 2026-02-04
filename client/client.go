@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/unluckythoughts/go-microservice/tools/web"
+	"github.com/unluckythoughts/go-microservice/v2/tools/web"
 )
 
 // Client provides methods to interact with the Manga Reader API

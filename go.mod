@@ -8,6 +8,7 @@ require (
 	github.com/DaRealFreak/cloudflare-bp-go v1.0.4
 	github.com/stretchr/testify v1.11.1
 	github.com/unluckythoughts/go-microservice v1.6.0
+	github.com/unluckythoughts/go-microservice/v2 v2.0.3
 	github.com/unluckythoughts/go-scraper v0.1.10
 	go.uber.org/zap v1.27.1
 	gorm.io/gorm v1.31.1
