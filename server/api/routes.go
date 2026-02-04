@@ -6,12 +6,13 @@ import (
 	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
 	"github.com/unluckythoughts/go-microservice/v2/tools/web"
 	"github.com/unluckythoughts/go-microservice/v2/tools/worker"
+	"github.com/unluckythoughts/go-microservice/v2/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type api struct {
-	enableAuth bool
+	enableAuth bool `env:"SERVICE_AUTH_ENABLE" envDefault:"false"`
 	s          *service.ReaderService
 	a          *auth.Auth
 }
@@ -74,8 +75,10 @@ func (a *api) registerRoutes(router web.Router) {
 
 func Register(router web.Router, gormDB *gorm.DB, l *zap.Logger, w *worker.Worker) {
 	s := service.New(db.New(gormDB), w)
+	api := &api{s: s}
 
-	api := &api{s: s, enableAuth: false}
+	// enable auth if configured
+	utils.ParseEnvironmentVars(&api)
 	if api.enableAuth {
 		a := auth.NewAuthService(auth.Options{
 			DB:     gormDB,
