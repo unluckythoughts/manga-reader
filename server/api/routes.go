@@ -12,7 +12,7 @@ import (
 )
 
 type api struct {
-	enableAuth bool `env:"SERVICE_AUTH_ENABLE" envDefault:"false"`
+	EnableAuth bool `env:"SERVICE_AUTH_ENABLE" envDefault:"false"`
 	s          *service.ReaderService
 	a          *auth.Auth
 }
@@ -24,7 +24,7 @@ const (
 
 // registerRoutes registers all API routes
 func (a *api) registerRoutes(router web.Router) {
-	if a.enableAuth {
+	if a.EnableAuth {
 		// Auth API
 		router.POST("/api/v1/auth/login", a.a.LoginHandler)
 		router.POST("/api/v1/auth/register", a.a.GetRegisterHandlerForUserRole(userRole))
@@ -41,7 +41,7 @@ func (a *api) registerRoutes(router web.Router) {
 		router.GET("/api/v1/auth/verify/:target/:token", a.a.VerifyTokenHandler)
 
 		// User API
-		router.GET("/api/v1/user", a.a.GetUser)
+		router.GET("/api/v1/user", a.a.GetUserHandler)
 		router.PUT("/api/v1/user", a.a.UpdateUserHandler)
 		router.PATCH("/api/v1/user/change-password", a.a.ChangePasswordHandler)
 		router.GET("/api/v1/user/reset-password", a.a.ResetPasswordHandler)
@@ -84,8 +84,8 @@ func Register(router web.Router, gormDB *gorm.DB, l *zap.Logger, w *worker.Worke
 	api := &api{s: s}
 
 	// enable auth if configured
-	utils.ParseEnvironmentVars(&api)
-	if api.enableAuth {
+	utils.ParseEnvironmentVars(api)
+	if api.EnableAuth {
 		a := auth.NewAuthService(auth.Options{
 			DB:                gormDB,
 			Logger:            l.Named("auth"),

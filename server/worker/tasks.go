@@ -22,6 +22,7 @@ func (w *ServiceWorker) checkDBSources(ctx web.Context) error {
 	}
 
 	conns := connector.GetAllConnectors()
+	ctx.Logger().Infof("found %d connectors", len(conns))
 	for _, conn := range conns {
 		found := false
 		for _, source := range sources {

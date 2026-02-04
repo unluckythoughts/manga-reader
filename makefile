@@ -2,7 +2,7 @@
 SHELL = powershell.exe
 .SHELLFLAGS = -NoProfile -Command
 MIGRATIONS_FOLDER=$(PWD)/migrations
-DB_FILE=$(PWD)/db.sqlite
+DB_FILE=$(PWD)/data/book_reader.db
 MAKEFLAGS += --no-print-directory
 UI_DIR = book-reader-ui
 
@@ -20,7 +20,7 @@ init:
 build:
 	docker build -f deploy/Dockerfile -t book-reader:latest .
 
-start: 
+start: db-migrate
 	docker-compose -f deploy/docker-compose.yml up -d
 
 stop:
@@ -46,11 +46,8 @@ test-coverage:
 	go tool cover -html=coverage.out -o coverage.html
 
 flyway-run:
-	@docker run \
-		-v $(MIGRATIONS_FOLDER):/flyway/sql \
-		-v $(DB_FILE):/flyway/db \
-		--network host flyway/flyway:latest-alpine \
-		-url=jdbc:sqlite:/flyway/db $(FLYWAY_OPTS) $(FLYWAY_CMD)
+	docker run --rm -v "$(CURDIR)/migrations:/flyway/sql:ro" -v "$(CURDIR)/data:/flyway/data" -w /flyway flyway/flyway:latest-alpine -url=jdbc:sqlite:/flyway/data/book_reader.db $(FLYWAY_OPTS) $(FLYWAY_CMD)
+	docker run --rm -v "$(CURDIR)/migrations:/flyway/sql:ro" -v "$(CURDIR)/data:/flyway/data" -w /flyway flyway/flyway:latest-alpine -url=jdbc:sqlite:/flyway/data/book_reader_auth.db $(FLYWAY_OPTS) $(FLYWAY_CMD)
 
 db-migrate: FLYWAY_CMD=migrate
 db-migrate: flyway-run

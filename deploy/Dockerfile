@@ -1,22 +1,3 @@
-
-# Migrations stage
-FROM flyway/flyway:latest-alpine AS migrations
-
-COPY migrations /flyway/sql
-
-RUN apk add sqlite
-
-# Create directory for SQLite database
-RUN mkdir -p /flyway/data
-
-# Run migrations on SQLite database
-RUN flyway \
-    -url=jdbc:sqlite:/flyway/data/book-reader.db \
-    -user=dummy \
-    -password=dummy \
-    -locations=filesystem:/flyway/sql \
-    migrate 2>&1 | tee ./migration.log
-
 # Build stage
 FROM golang:1.24-alpine AS builder
 
@@ -59,10 +40,6 @@ COPY --from=builder /app/book-reader .
 
 # Create directory for SQLite database
 RUN mkdir -p /root/data
-
-# Copy the migrated SQLite database from migrations stage
-COPY --from=migrations /flyway/data/book-reader.db /root/data/book_reader.db
-COPY --from=migrations /flyway/migration.log /root/migration.log
 
 # Expose port
 EXPOSE 8080

@@ -17,6 +17,7 @@ func init() {
 	defer lock.Unlock()
 	for _, connector := range []models.IConnector{
 		// Add connectors here
+		NewFreeWebNovelConnector(),
 	} {
 		connectorMap[connector.GetDomain()] = connector
 	}

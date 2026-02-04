@@ -6,6 +6,8 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    volumes:
+      - ../data/book_reader.db:/app/data/book_reader.db
     dns:
       - 1.1.1.1
       - 8.8.8.8
@@ -27,6 +29,8 @@ services:
       - "8081:8080"
     env_file:
       - .env.auth
+    volumes:
+      - ../data/book_reader_auth.db:/app/data/book_reader.db
     dns:
       - 1.1.1.1
       - 8.8.8.8
