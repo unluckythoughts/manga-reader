@@ -19,7 +19,7 @@ func init() {
 		// Add connectors here
 		NewFreeWebNovelConnector(),
 	} {
-		connectorMap[connector.GetDomain()] = connector
+		connectorMap[connector.GetName()] = connector
 	}
 }
 

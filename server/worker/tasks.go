@@ -54,6 +54,7 @@ func (w *ServiceWorker) updateSourceBooks(ctx web.Context, source models.Source,
 		ctx.Logger().Errorf("Failed to get DB book count for source %s: %v", source.Name, err)
 		return err
 	}
+	ctx.Logger().Infof("Source %s has %d books in DB", source.Name, dbBooksCount)
 
 	books := []models.Book{}
 	// If no books in DB, fetch all books

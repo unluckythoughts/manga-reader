@@ -16,34 +16,34 @@ services:
     networks:
       - book-reader
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/_status"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "-O", "/dev/null", "http://localhost:8080/_status"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-  book-reader-auth:
-    image: book-reader:latest
-    container_name: book-reader-auth
-    ports:
-      - "8081:8080"
-    env_file:
-      - .env.auth
-    volumes:
-      - ../data/book_reader_auth.db:/app/data/book_reader.db
-    dns:
-      - 1.1.1.1
-      - 8.8.8.8
-      - 8.8.4.4
-    restart: unless-stopped
-    networks:
-      - book-reader
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/_status"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+  # book-reader-auth:
+  #   image: book-reader:latest
+  #   container_name: book-reader-auth
+  #   ports:
+  #     - "8081:8080"
+  #   env_file:
+  #     - .env.auth
+  #   volumes:
+  #     - ../data/book_reader_auth.db:/app/data/book_reader.db
+  #   dns:
+  #     - 1.1.1.1
+  #     - 8.8.8.8
+  #     - 8.8.4.4
+  #   restart: unless-stopped
+  #   networks:
+  #     - book-reader
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--no-verbose", "--tries=1", "-O", "/dev/null", "http://localhost:8080/_status"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
 
   # Optional: PostgreSQL database (if using postgresql instead of sqlite)
   # postgres:
