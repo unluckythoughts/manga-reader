@@ -40,6 +40,18 @@ test:
 test-api:
 	go test ./tests/api/... -v
 
+# Run connector integration tests
+test-connector:
+	go test ./tests/connector/... -v -timeout 5m
+
+# Run connector tests in short mode (skip network requests)
+test-connector-short:
+	go test ./tests/connector/... -v -short
+
+# Run connector benchmarks
+test-connector-bench:
+	go test ./tests/connector/... -bench=. -benchmem
+
 # Run tests with coverage
 test-coverage:
 	go test ./tests/api/... -coverprofile=coverage.out

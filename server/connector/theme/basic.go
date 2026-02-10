@@ -20,6 +20,7 @@ func NewBasic(conn models.Connector) models.IConnector {
 		s: scraper.New(scraper.Options{
 			UserAgent:           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 			MaxRetries:          5,
+			UseCloudflareBypass: true,
 			MaxParallelRequests: 2, // Reduce parallelism to appear less bot-like
 		}),
 		conn: conn,
