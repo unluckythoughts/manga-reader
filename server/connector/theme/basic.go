@@ -158,6 +158,15 @@ func (c *BasicConnector) GetBookCount() (int, []models.Book, error) {
 	}
 	booksPerPageCount := len(bookItems)
 
+	books := []models.Book{}
+	for _, bookItem := range bookItems {
+		book, err := getBook(bookItem, c.conn)
+		if err != nil {
+			return 0, nil, err
+		}
+		books = append(books, book)
+	}
+
 	lastPageItems, err := scraper.GetOuterHTML(html, c.conn.Selectors.LastPage)
 	if err != nil {
 		return 0, nil, err
@@ -187,5 +196,5 @@ func (c *BasicConnector) GetBookCount() (int, []models.Book, error) {
 	lastPageBooksCount := len(lastPageBookItems)
 	totalBooks := (lastPageNum-1)*booksPerPageCount + lastPageBooksCount
 
-	return totalBooks, nil, nil
+	return totalBooks, books, nil
 }

@@ -14,11 +14,11 @@ func NewFreeWebNovelConnector() models.IConnector {
 		Name:        "FreeWebNovel",
 		Domain:      "freewebnovel.com",
 		IconURL:     "/static/freewebnovel/favicon.ico",
-		Type:        "Novel",
+		Type:        models.BookTypeNovel,
 		BookListURL: "/sort/latest-novel/",
 		Selectors: models.Selectors{
 			BookListItem:       ".main .wp .ul-list1 .li .con",
-			LastPage:           ".main .wp .pages ul li:last-child a[href]",
+			LastPage:           ".main .wp .pages ul li a:last-child[href]",
 			NextPageURLPattern: "/sort/latest-novel/::page::",
 			Book: models.BookSelectors{
 				URL:             ".txt h3.tit a[href]",

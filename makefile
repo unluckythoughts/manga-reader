@@ -18,7 +18,7 @@ init:
 	go mod download
 
 build:
-	docker build -f deploy/Dockerfile -t book-reader:latest .
+	docker build -f deploy/Dockerfile -t book-reader:latest ..
 
 start: db-migrate
 	docker-compose -f deploy/docker-compose.yml up -d

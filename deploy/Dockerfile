@@ -12,16 +12,16 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Copy go mod files
-COPY go.mod go.sum ./
+# Copy book-reader go mod files
+COPY book-reader/go.mod book-reader/go.sum ./
 
 # Download dependencies with cache mount
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go mod download
 
-# Copy source code
-COPY . ./
+# Copy book-reader source code
+COPY book-reader/ ./
 
 # Build the application with cache mount
 RUN --mount=type=cache,target=/go/pkg/mod \

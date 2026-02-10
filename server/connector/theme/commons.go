@@ -2,6 +2,7 @@ package theme
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/unluckythoughts/book-reader/server/models"
@@ -50,17 +51,25 @@ func getChapter(data string, conn models.Connector) (models.Chapter, error) {
 		return chapter, err
 	}
 
-	title, err := scraper.GetTextSingle(data, sels.Title)
-	if err != nil {
-		return chapter, err
+	title := ""
+	if sels.Title != "" {
+		title, err = scraper.GetTextSingle(data, sels.Title)
+		if err != nil {
+			return chapter, err
+		}
+
+		// Clean the text - remove chapter number from title if present
+		cleanPattern := regexp.MustCompile(`[Cc]hapter[ -]?[0-9.]+[- :]*`)
+		title = cleanPattern.ReplaceAllString(title, "")
 	}
 
 	number := ""
 	if sels.Number != "" {
-		number, err = scraper.GetTextSingle(data, sels.Number)
+		floatNum, err := scraper.GetFloat(data, sels.Number)
 		if err != nil {
 			return chapter, err
 		}
+		number = strconv.FormatFloat(floatNum, 'f', -1, 64)
 	}
 
 	uploadDateText, err := scraper.GetTextSingle(data, sels.UploadDate)
