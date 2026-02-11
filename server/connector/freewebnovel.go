@@ -3,13 +3,14 @@ package connector
 import (
 	"github.com/unluckythoughts/book-reader/server/connector/theme"
 	"github.com/unluckythoughts/book-reader/server/models"
+	"go.uber.org/zap"
 )
 
 type fwb struct {
 	*theme.BasicConnector
 }
 
-func NewFreeWebNovelConnector() models.IConnector {
+func NewFreeWebNovelConnector(l *zap.Logger) models.IConnector {
 	conn := models.Connector{
 		Name:        "FreeWebNovel",
 		Domain:      "freewebnovel.com",
@@ -39,7 +40,6 @@ func NewFreeWebNovelConnector() models.IConnector {
 		},
 	}
 
-	bc := theme.NewBasic(conn).(*theme.BasicConnector)
-
+	bc := theme.NewBasic(conn, l).(*theme.BasicConnector)
 	return &fwb{bc}
 }

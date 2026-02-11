@@ -8,6 +8,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/unluckythoughts/book-reader/server/connector"
 	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/go-microservice/v2/tools/logger"
+	"go.uber.org/zap"
 )
 
 type FreeWebNovelTestSuite struct {
@@ -20,7 +22,10 @@ func TestFreeWebNovelTestSuite(t *testing.T) {
 }
 
 func (s *FreeWebNovelTestSuite) SetupSuite() {
-	s.connector = connector.NewFreeWebNovelConnector()
+	l := logger.New(logger.Options{
+		LogLevel: zap.DebugLevel.String(),
+	})
+	s.connector = connector.NewFreeWebNovelConnector(l.Named("FreeWebNovel"))
 }
 
 // isRodBlockedError checks if the error is due to Windows blocking rod/leakless
@@ -242,7 +247,10 @@ func (s *FreeWebNovelTestSuite) TestIntegrationFlow() {
 
 // Benchmark tests for performance monitoring
 func BenchmarkGetBooks(b *testing.B) {
-	conn := connector.NewFreeWebNovelConnector()
+	l := logger.New(logger.Options{
+		LogLevel: zap.DebugLevel.String(),
+	})
+	conn := connector.NewFreeWebNovelConnector(l.Named("FreeWebNovel"))
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
@@ -254,7 +262,10 @@ func BenchmarkGetBooks(b *testing.B) {
 }
 
 func BenchmarkGetBookCount(b *testing.B) {
-	conn := connector.NewFreeWebNovelConnector()
+	l := logger.New(logger.Options{
+		LogLevel: zap.DebugLevel.String(),
+	})
+	conn := connector.NewFreeWebNovelConnector(l.Named("FreeWebNovel"))
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {

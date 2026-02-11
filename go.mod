@@ -8,7 +8,7 @@ require (
 	github.com/DaRealFreak/cloudflare-bp-go v1.0.4
 	github.com/stretchr/testify v1.11.1
 	github.com/unluckythoughts/go-microservice/v2 v2.5.0
-	github.com/unluckythoughts/go-scraper v0.1.15
+	github.com/unluckythoughts/go-scraper v0.1.16
 	go.uber.org/zap v1.27.1
 	gorm.io/gorm v1.31.1
 )
@@ -76,5 +76,3 @@ require (
 	gorm.io/driver/postgres v1.6.0 // indirect
 	gorm.io/driver/sqlite v1.6.0 // indirect
 )
-
-replace github.com/unluckythoughts/go-scraper => ../go-scraper

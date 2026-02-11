@@ -8,14 +8,16 @@ import (
 	"github.com/unluckythoughts/book-reader/server/models"
 	"github.com/unluckythoughts/book-reader/server/utils"
 	"github.com/unluckythoughts/go-scraper"
+	"go.uber.org/zap"
 )
 
 type BasicConnector struct {
 	s    *scraper.Scraper
+	l    *zap.Logger
 	conn models.Connector
 }
 
-func NewBasic(conn models.Connector) models.IConnector {
+func NewBasic(conn models.Connector, logger *zap.Logger) models.IConnector {
 	return &BasicConnector{
 		s: scraper.New(scraper.Options{
 			UserAgent:           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -24,6 +26,7 @@ func NewBasic(conn models.Connector) models.IConnector {
 			MaxParallelRequests: 2, // Reduce parallelism to appear less bot-like
 		}),
 		conn: conn,
+		l:    logger,
 	}
 }
 
@@ -75,6 +78,57 @@ func (c *BasicConnector) GetBooks() ([]models.Book, error) {
 	}
 
 	return books, nil
+}
+
+func (c *BasicConnector) SupportsLastPageSelector() bool {
+	if c.conn.Selectors.LastPage == "" {
+		return false
+	}
+
+	if c.conn.Selectors.NextPageURLPattern == "" {
+		return false
+	}
+
+	if !strings.Contains(c.conn.Selectors.NextPageURLPattern, "::page::") {
+		return false
+	}
+
+	return true
+}
+
+func (c *BasicConnector) GetBooksAsync() (<-chan models.Book, error) {
+	url := c.getCompleteURL(c.conn.BookListURL)
+	config := scraper.PaginationConfig{
+		NextPageSelector:   c.conn.Selectors.NextPage,
+		LastPageSelector:   c.conn.Selectors.LastPage,
+		NextPageURLPattern: c.conn.Selectors.NextPageURLPattern,
+	}
+	bookItemsChan, err := c.s.ScrapePaginated(url, c.conn.Selectors.BookListItem, config)
+	if err != nil {
+		return nil, err
+	}
+
+	booksChan := make(chan models.Book)
+
+	go func() {
+		defer close(booksChan)
+		for bookItem := range bookItemsChan {
+			if bookItem.Err != nil {
+				c.l.Debug("Error while scraping book item", zap.Error(bookItem.Err))
+				continue
+			}
+
+			book, err := getBook(bookItem.Data, c.conn)
+			if err != nil {
+				c.l.Debug("Error while getting book", zap.Error(err))
+				continue
+			}
+
+			booksChan <- book
+		}
+	}()
+
+	return booksChan, nil
 }
 
 func (c *BasicConnector) GetBookChapters(bookURL, chapterNum string) ([]models.Chapter, error) {

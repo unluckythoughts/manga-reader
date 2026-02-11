@@ -5,6 +5,8 @@ import (
 	"sync"
 
 	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/go-microservice/v2/tools/logger"
+	"github.com/unluckythoughts/go-microservice/v2/utils"
 )
 
 var (
@@ -13,11 +15,14 @@ var (
 )
 
 func init() {
+	opts := logger.Options{}
+	utils.ParseEnvironmentVars(&opts)
+	l := logger.New(opts)
 	lock.Lock()
 	defer lock.Unlock()
 	for _, connector := range []models.IConnector{
 		// Add connectors here
-		NewFreeWebNovelConnector(),
+		NewFreeWebNovelConnector(l.Named("FreeWebNovel")),
 	} {
 		connectorMap[connector.GetName()] = connector
 	}

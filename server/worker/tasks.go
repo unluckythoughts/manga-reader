@@ -56,18 +56,9 @@ func (w *ServiceWorker) updateSourceBooks(ctx web.Context, source models.Source,
 	}
 	ctx.Logger().Infof("Source %s has %d books in DB", source.Name, dbBooksCount)
 
-	books := []models.Book{}
-	// If no books in DB, fetch all books
-	if dbBooksCount <= 0 {
-		books, err = conn.GetBooks()
-		if err != nil {
-			ctx.Logger().Errorf("Failed to get all books for source %s: %v", source.Name, err)
-			return err
-		}
-	} else {
-		var count int
+	if dbBooksCount > 0 && conn.SupportsLastPageSelector() {
 		// books will be nil if connector supports only count fetching
-		count, books, err = conn.GetBookCount()
+		count, _, err := conn.GetBookCount()
 		if err != nil {
 			ctx.Logger().Errorf("Failed to get book count for source %s: %v", source.Name, err)
 			return err
@@ -77,26 +68,22 @@ func (w *ServiceWorker) updateSourceBooks(ctx web.Context, source models.Source,
 			ctx.Logger().Infof("No new books for source %s. DB count: %d, Connector count: %d", source.Name, dbBooksCount, count)
 			return nil
 		}
-
-		// Fetch all books if books is empty
-		// Books will be empty if connector supports last page selector
-		if len(books) == 0 {
-			books, err = conn.GetBooks()
-			if err != nil {
-				ctx.Logger().Errorf("Failed to get all books for source %s: %v", source.Name, err)
-				return err
-			}
-		}
 	}
 
-	ctx.Logger().Infof("New books found for source %s. DB count: %d, Connector count: %d", source.Name, dbBooksCount, len(books))
-	for _, book := range books {
+	bookChan, err := conn.GetBooksAsync()
+	if err != nil {
+		ctx.Logger().Errorf("Failed to get all books for source %s: %v", source.Name, err)
+		return err
+	}
+
+	for book := range bookChan {
 		book.SourceID = source.ID
-		err = w.db.CreateBook(&book)
+		err := w.db.CreateBook(&book)
 		if err != nil {
 			ctx.Logger().Errorf("Failed to create book for source %s: %v", source.Name, err)
-			return err
+			continue
 		}
+		ctx.Logger().Debugf("Added or Updated book '%s' for source %s", book.Title, source.Name)
 	}
 
 	return nil
