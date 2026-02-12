@@ -14,7 +14,7 @@ func NewFreeWebNovelConnector(l *zap.Logger) models.IConnector {
 	conn := models.Connector{
 		Name:        "FreeWebNovel",
 		Domain:      "freewebnovel.com",
-		IconURL:     "/static/freewebnovel/favicon.ico",
+		IconURL:     "/static/freewebnovel/images/logo.png",
 		Type:        models.BookTypeNovel,
 		BookListURL: "/sort/latest-novel/",
 		Selectors: models.Selectors{
