@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { authStore, isAuthenticated, logout } from '$lib/stores';
+	import { auth, isAuthenticated } from '$lib/stores';
 
 	let currentPath = $derived($page.url.pathname);
 
 	function handleLogout() {
-		logout();
+		auth.logout();
 		window.location.href = '/auth/login';
 	}
 </script>
@@ -42,10 +42,10 @@
 
 			<!-- Auth Section -->
 			<div class="flex items-center gap-4">
-				{#if $isAuthenticated && $authStore.user}
+				{#if $isAuthenticated && $auth.user}
 					<div class="flex items-center gap-4">
 						<span class="text-gray-700 font-medium hidden sm:block">
-							{$authStore.user.username}
+							{$auth.user.username}
 						</span>
 						<button
 							onclick={handleLogout}

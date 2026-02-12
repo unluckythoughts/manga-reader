@@ -4,7 +4,7 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import Navigation from '$lib/components/Navigation.svelte';
-	import { authStore, isAuthenticated } from '$lib/stores';
+	import { auth } from '$lib/stores';
 
 	let { children } = $props();
 	
