@@ -23,3 +23,8 @@ vendor/
 
 # Temporary files 
 temp/
+
+.claude
+.vscode
+.idea
+*.log

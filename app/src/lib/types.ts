@@ -32,6 +32,7 @@ export interface Chapter {
 	updated_at: string;
 	deleted_at?: string;
 	book?: Book;
+	type?: 'manga' | 'novel';
 }
 
 export interface Source {
