@@ -24,13 +24,21 @@ export interface FetchOptions extends RequestInit {
 /**
  * Base API client configuration
  */
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 /**
  * Build URL with query parameters
  */
 function buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
-	const url = new URL(endpoint, window.location.origin);
+	// If endpoint is already a full URL, use it as base
+	let url: URL;
+	if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+		url = new URL(endpoint);
+	} else {
+		// Construct full URL from base + endpoint
+		const fullUrl = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+		url = new URL(fullUrl);
+	}
 	
 	if (params) {
 		Object.entries(params).forEach(([key, value]) => {

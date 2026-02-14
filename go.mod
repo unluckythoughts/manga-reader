@@ -7,7 +7,7 @@ toolchain go1.24.3
 require (
 	github.com/DaRealFreak/cloudflare-bp-go v1.0.4
 	github.com/stretchr/testify v1.11.1
-	github.com/unluckythoughts/go-microservice/v2 v2.5.0
+	github.com/unluckythoughts/go-microservice/v2 v2.5.1
 	github.com/unluckythoughts/go-scraper v0.1.16
 	go.uber.org/zap v1.27.1
 	gorm.io/gorm v1.31.1
@@ -50,7 +50,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
-	github.com/mattn/go-sqlite3 v1.14.33 // indirect
+	github.com/mattn/go-sqlite3 v1.14.34 // indirect
 	github.com/nlnwa/whatwg-url v0.6.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -60,16 +60,16 @@ require (
 	github.com/temoto/robotstxt v1.1.2 // indirect
 	github.com/ysmood/fetchup v0.2.3 // indirect
 	github.com/ysmood/goob v0.4.0 // indirect
-	github.com/ysmood/got v0.40.0 // indirect
+	github.com/ysmood/got v0.42.3 // indirect
 	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
-	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/oauth2 v0.34.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
+	golang.org/x/net v0.50.0 // indirect
+	golang.org/x/oauth2 v0.35.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
