@@ -1,5 +1,12 @@
 package models
 
+import "github.com/unluckythoughts/go-microservice/v2/tools/auth"
+
+const (
+	UserRole  auth.Role = 1
+	AdminRole auth.Role = 99
+)
+
 // CreateBookRequest represents the request body for creating a new book
 type CreateBookRequest struct {
 	URL      string   `json:"url" valid:"required"`

@@ -9,6 +9,8 @@ interface AuthState {
 	error: string | null;
 }
 
+const ENABLE_AUTH = import.meta.env.ENABLE_AUTH !== 'false' && import.meta.env.VITE_ENABLE_AUTH !== 'false';
+
 function createAuthStore() {
 	const { subscribe, set, update } = writable<AuthState>({
 		user: null,
@@ -25,6 +27,23 @@ function createAuthStore() {
 		async init() {
 			update(state => ({ ...state, loading: true, error: null }));
 			
+			// If auth is disabled, auto-login with dummy credentials first
+			if (!ENABLE_AUTH) {
+				try {
+					console.log('Auth disabled, auto-logging in with dummy credentials...');
+					const { user } = await authApi.login({ 
+						username: 'dummy@example.com', 
+						password: 'dummy' 
+					});
+					console.log('Auto-login successful');
+					set({ user, loading: false, error: null });
+					return user;
+				} catch (error: unknown) {
+					console.error('Auto-login failed:', error);
+					// Continue to try getting user anyway
+				}
+			}
+			
 			try {
 				const user = await authApi.getUser();
 				set({ user, loading: false, error: null });
@@ -36,7 +55,7 @@ function createAuthStore() {
 				} else if (error instanceof ApiClientError && 
 				          (error.message.toLowerCase().includes('securecookie') || 
 				           error.error.toLowerCase().includes('securecookie'))) {
-					// Securecookie error - cookies were already cleared, just reset state
+					// Securecookie error - cookies were already cleared and retried
 					console.info('Session invalid, logged out');
 					set({ user: null, loading: false, error: null });
 				} else {
