@@ -118,8 +118,8 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/temoto/robotstxt v1.1.2 h1:W2pOjSJ6SWvldyEuiFXNxz3xZ8aiWX5LbfDiOFd7Fxg=
 github.com/temoto/robotstxt v1.1.2/go.mod h1:+1AmkuG3IYkh1kv0d2qEB9Le88ehNO0zwOr3ujewlOo=
-github.com/unluckythoughts/go-microservice/v2 v2.5.1 h1:7XauHFWsRUH5LwLcQcysCNd95hia0K6Y2pUP9LUb52E=
-github.com/unluckythoughts/go-microservice/v2 v2.5.1/go.mod h1:akcRYU+0tPPYrM2EO24mPc9ExLmFn0SbKZpe+CZ1wEs=
+github.com/unluckythoughts/go-microservice/v2 v2.6.0 h1:vqOhJLSZerB9QTFY4BZAfuMRpIF25UWfiY73hw5Pvp8=
+github.com/unluckythoughts/go-microservice/v2 v2.6.0/go.mod h1:akcRYU+0tPPYrM2EO24mPc9ExLmFn0SbKZpe+CZ1wEs=
 github.com/unluckythoughts/go-scraper v0.1.16 h1:SllqawC+S2ZgY7a22/XnytqBu+Zncc0uHQH7Ynu4sWM=
 github.com/unluckythoughts/go-scraper v0.1.16/go.mod h1:3mKej8JX8kUjEIGHj/7qo+QRs8NQLO4c1CYMZZ3QL3c=
 github.com/ysmood/fetchup v0.2.3 h1:ulX+SonA0Vma5zUFXtv52Kzip/xe7aj4vqT5AJwQ+ZQ=

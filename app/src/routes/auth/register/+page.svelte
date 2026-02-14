@@ -3,7 +3,7 @@
 	import type { RegisterRequest } from '$lib/types';
 
 	let formData = $state<RegisterRequest>({
-		username: '',
+		name: '',
 		email: '',
 		password: ''
 	});
@@ -13,7 +13,7 @@
 	let showConfirmPassword = $state(false);
 	let acceptTerms = $state(false);
 	let touched = $state({
-		username: false,
+		name: false,
 		email: false,
 		password: false,
 		confirmPassword: false,
@@ -24,10 +24,10 @@
 	let fieldErrors = $derived.by(() => {
 		const errors: Record<string, string> = {};
 		
-		if (touched.username && !formData.username) {
-			errors.username = 'Username is required';
-		} else if (touched.username && formData.username.length < 3) {
-			errors.username = 'Username must be at least 3 characters';
+		if (touched.name && !formData.name) {
+			errors.name = 'Name is required';
+		} else if (touched.name && formData.name.length < 3) {
+			errors.name = 'Name must be at least 3 characters';
 		}
 		
 		if (touched.email && !formData.email) {
@@ -74,8 +74,8 @@
 
 	let passwordsMatch = $derived(formData.password && formData.password === confirmPassword);
 	let canSubmit = $derived(
-		!!formData.username &&
-		formData.username.length >= 3 &&
+		!!formData.name &&
+		formData.name.length >= 3 &&
 		!!formData.email &&
 		/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
 		!!formData.password &&
@@ -100,7 +100,7 @@
 
 	async function handleSubmit() {
 		// Mark all fields as touched to show validation errors
-		touched.username = true;
+		touched.name = true;
 		touched.email = true;
 		touched.password = true;
 		touched.confirmPassword = true;
@@ -109,7 +109,7 @@
 		if (!canSubmit) return;
 
 		try {
-			await auth.register(formData.username, formData.email, formData.password);
+			await auth.register(formData.name, formData.email, formData.password);
 			// Redirect to home
 			window.location.href = '/';
 		} catch (error) {
@@ -151,23 +151,23 @@
 
 			<!-- Register Form -->
 			<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-5">
-				<!-- Username -->
+				<!-- Name -->
 				<div>
-					<label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-						Username
+					<label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+						Name
 					</label>
 					<input
-						id="username"
+						id="name"
 						type="text"
-						bind:value={formData.username}
-						onblur={() => markTouched('username')}
+						bind:value={formData.name}
+						onblur={() => markTouched('name')}
 						required
 						disabled={$auth.loading}
-						placeholder="Choose a username"
-						class="w-full px-4 py-3 border {fieldErrors.username ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition disabled:bg-gray-100 disabled:cursor-not-allowed"
+						placeholder="Your full name"
+						class="w-full px-4 py-3 border {fieldErrors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition disabled:bg-gray-100 disabled:cursor-not-allowed"
 					/>
-					{#if fieldErrors.username}
-						<p class="mt-1 text-sm text-red-600">{fieldErrors.username}</p>
+					{#if fieldErrors.name}
+						<p class="mt-1 text-sm text-red-600">{fieldErrors.name}</p>
 					{/if}
 				</div>
 
