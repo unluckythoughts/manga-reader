@@ -18,7 +18,7 @@ func (d *DB) CreateCategory(category *models.Category) error {
 }
 
 // GetCategoryByID retrieves a category by its ID
-func (d *DB) GetCategoryByID(id int) (*models.Category, error) {
+func (d *DB) GetCategoryByID(id uint) (*models.Category, error) {
 	var category models.Category
 	if err := d.db.First(&category, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -51,7 +51,7 @@ func (d *DB) UpdateCategory(category *models.Category) error {
 }
 
 // UpdateCategoryFields updates specific fields of a category
-func (d *DB) UpdateCategoryFields(id int, fields map[string]interface{}) error {
+func (d *DB) UpdateCategoryFields(id uint, fields map[string]interface{}) error {
 	fields["updated_at"] = time.Now()
 	result := d.db.Model(&models.Category{}).Where("id = ?", id).Updates(fields)
 	if result.Error != nil {
@@ -64,7 +64,7 @@ func (d *DB) UpdateCategoryFields(id int, fields map[string]interface{}) error {
 }
 
 // DeleteCategory soft deletes a category by setting DeletedAt
-func (d *DB) DeleteCategory(id int) error {
+func (d *DB) DeleteCategory(id uint) error {
 	result := d.db.Delete(&models.Category{}, id)
 	if result.Error != nil {
 		return result.Error
@@ -76,7 +76,7 @@ func (d *DB) DeleteCategory(id int) error {
 }
 
 // HardDeleteCategory permanently deletes a category from the database
-func (d *DB) HardDeleteCategory(id int) error {
+func (d *DB) HardDeleteCategory(id uint) error {
 	result := d.db.Unscoped().Delete(&models.Category{}, id)
 	if result.Error != nil {
 		return result.Error

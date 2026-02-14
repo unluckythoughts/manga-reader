@@ -1,8 +1,6 @@
 package service
 
 import (
-	"time"
-
 	"github.com/unluckythoughts/book-reader/server/models"
 )
 
@@ -24,7 +22,7 @@ func (s *ReaderService) GetCategories(page, limit int) ([]models.Category, int64
 }
 
 // GetCategoryByID retrieves a category by its ID
-func (s *ReaderService) GetCategoryByID(id int) (*models.Category, error) {
+func (s *ReaderService) GetCategoryByID(id uint) (*models.Category, error) {
 	return s.db.GetCategoryByID(id)
 }
 
@@ -32,7 +30,6 @@ func (s *ReaderService) GetCategoryByID(id int) (*models.Category, error) {
 func (s *ReaderService) CreateCategory(input *models.CreateCategoryRequest) (*models.Category, error) {
 	category := &models.Category{
 		Name:      input.Name,
-		UpdatedAt: time.Now(),
 	}
 
 	if err := s.db.CreateCategory(category); err != nil {
@@ -43,14 +40,13 @@ func (s *ReaderService) CreateCategory(input *models.CreateCategoryRequest) (*mo
 }
 
 // UpdateCategory updates an existing category
-func (s *ReaderService) UpdateCategory(id int, input *models.UpdateCategoryRequest) (*models.Category, error) {
+func (s *ReaderService) UpdateCategory(id uint, input *models.UpdateCategoryRequest) (*models.Category, error) {
 	category, err := s.db.GetCategoryByID(id)
 	if err != nil {
 		return nil, err
 	}
 
 	category.Name = input.Name
-	category.UpdatedAt = time.Now()
 
 	if err := s.db.UpdateCategory(category); err != nil {
 		return nil, err
@@ -60,6 +56,6 @@ func (s *ReaderService) UpdateCategory(id int, input *models.UpdateCategoryReque
 }
 
 // DeleteCategory deletes a category by its ID
-func (s *ReaderService) DeleteCategory(id int) error {
+func (s *ReaderService) DeleteCategory(id uint) error {
 	return s.db.DeleteCategory(id)
 }

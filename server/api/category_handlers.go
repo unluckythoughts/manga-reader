@@ -45,7 +45,7 @@ func (api *api) GetCategory(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.GetCategoryByID(id)
+	return api.s.GetCategoryByID(uint(id))
 }
 
 func (api *api) CreateCategory(r web.Request) (any, error) {
@@ -69,7 +69,7 @@ func (api *api) UpdateCategory(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.UpdateCategory(id, &body)
+	return api.s.UpdateCategory(uint(id), &body)
 }
 
 func (api *api) DeleteCategory(r web.Request) (any, error) {
@@ -79,5 +79,5 @@ func (api *api) DeleteCategory(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return nil, api.s.DeleteCategory(id)
+	return nil, api.s.DeleteCategory(uint(id))
 }

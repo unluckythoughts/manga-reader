@@ -7,7 +7,7 @@ import (
 )
 
 // ListBooks retrieves a paginated list of books
-func (c *Client) ListBooks(page, limit, sourceID int) (*models.BooksPaginatedResponse, error) {
+func (c *Client) ListBooks(page, limit int, sourceID uint) (*models.BooksPaginatedResponse, error) {
 	url := fmt.Sprintf("/api/v1/books?page=%d&limit=%d", page, limit)
 	if sourceID > 0 {
 		url += fmt.Sprintf("&source_id=%d", sourceID)
@@ -23,7 +23,7 @@ func (c *Client) ListBooks(page, limit, sourceID int) (*models.BooksPaginatedRes
 }
 
 // GetBook retrieves a book by ID
-func (c *Client) GetBook(id int) (*models.Book, error) {
+func (c *Client) GetBook(id uint) (*models.Book, error) {
 	url := fmt.Sprintf("/api/v1/books/%d", id)
 
 	var response models.Book

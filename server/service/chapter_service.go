@@ -1,13 +1,11 @@
 package service
 
 import (
-	"time"
-
 	"github.com/unluckythoughts/book-reader/server/models"
 )
 
 // GetChapters retrieves a paginated list of chapters with optional book_id filter
-func (s *ReaderService) GetChapters(page, limit, bookID int) ([]models.Chapter, int64, error) {
+func (s *ReaderService) GetChapters(page, limit int, bookID uint) ([]models.Chapter, int64, error) {
 	offset := (page - 1) * limit
 
 	chapters, err := s.db.ListChapters(offset, limit, bookID)
@@ -24,7 +22,7 @@ func (s *ReaderService) GetChapters(page, limit, bookID int) ([]models.Chapter, 
 }
 
 // GetChapterByID retrieves a chapter by its ID
-func (s *ReaderService) GetChapterByID(id int) (*models.Chapter, error) {
+func (s *ReaderService) GetChapterByID(id uint) (*models.Chapter, error) {
 	return s.db.GetChapterByIDWithRelations(id, "Book")
 }
 
@@ -38,7 +36,6 @@ func (s *ReaderService) CreateChapter(input *models.CreateChapterRequest) (*mode
 		Completed:  input.Completed,
 		Downloaded: input.Downloaded,
 		OtherID:    input.OtherID,
-		UpdatedAt:  time.Now(),
 	}
 
 	if err := s.db.CreateChapter(chapter); err != nil {

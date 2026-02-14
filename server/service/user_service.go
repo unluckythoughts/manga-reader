@@ -25,11 +25,11 @@ func (s *ReaderService) GetUsers(page, limit int) ([]auth.User, int64, error) {
 }
 
 // GetUserByID retrieves a user by its ID
-func (s *ReaderService) GetUserByID(id int) (*auth.User, error) {
+func (s *ReaderService) GetUserByID(id uint) (*auth.User, error) {
 	return s.db.GetUserByIDWithRelations(id, "Favorites")
 }
 
 // DeleteUser deletes a user by its ID (admin operation)
-func (s *ReaderService) DeleteUser(id int) error {
+func (s *ReaderService) DeleteUser(id uint) error {
 	return s.db.DeleteUser(id)
 }

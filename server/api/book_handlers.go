@@ -25,7 +25,7 @@ func (api *api) ListBooks(r web.Request) (any, error) {
 		sourceID = 0 // default sourceID
 	}
 
-	books, total, err := api.s.GetBooks(page, limit, sourceID)
+	books, total, err := api.s.GetBooks(page, limit, uint(sourceID))
 	if err != nil {
 		return models.BooksPaginatedResponse{}, err
 	}
@@ -47,5 +47,5 @@ func (api *api) GetBook(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.GetBookByID(id)
+	return api.s.GetBookByID(uint(id))
 }

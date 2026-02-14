@@ -21,10 +21,10 @@ func (api *api) ListFavorites(r web.Request) (any, error) {
 		page = 1 // default page
 	}
 
-	var userID int
+	var userID uint
 	if userIDStr != "" {
 		if id, err := strconv.Atoi(userIDStr); err == nil {
-			userID = id
+			userID = uint(id)
 		}
 	}
 
@@ -53,7 +53,7 @@ func (api *api) GetFavorite(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.GetFavoriteByID(id)
+	return api.s.GetFavoriteByID(uint(id))
 }
 
 func (api *api) CreateFavorite(r web.Request) (any, error) {
@@ -77,7 +77,7 @@ func (api *api) UpdateFavorite(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.UpdateFavorite(id, &body)
+	return api.s.UpdateFavorite(uint(id), &body)
 }
 
 func (api *api) UpdateFavoriteProgress(r web.Request) (any, error) {
@@ -100,7 +100,7 @@ func (api *api) UpdateFavoriteProgress(r web.Request) (any, error) {
 		Progress: progress.String(),
 	}
 
-	return api.s.UpdateFavorite(id, &updatedBody)
+	return api.s.UpdateFavorite(uint(id), &updatedBody)
 }
 
 func (api *api) DeleteFavorite(r web.Request) (any, error) {
@@ -110,5 +110,5 @@ func (api *api) DeleteFavorite(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return nil, api.s.DeleteFavorite(id)
+	return nil, api.s.DeleteFavorite(uint(id))
 }

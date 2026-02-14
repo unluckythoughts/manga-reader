@@ -18,7 +18,7 @@ func TestFavoritesTestSuite(t *testing.T) {
 	NewTestSuite(t)
 }
 
-func (suite *FavoritesTestSuite) getTestUserAndBook() (int, int, func()) {
+func (suite *FavoritesTestSuite) getTestUserAndBook() (uint, uint, func()) {
 	// Create a test user
 	name := fmt.Sprintf("testuser_%d", time.Now().Unix())
 	userRequest := &auth.RegisterRequest{
@@ -34,17 +34,17 @@ func (suite *FavoritesTestSuite) getTestUserAndBook() (int, int, func()) {
 	// Get a book
 	booksResponse, err := suite.Client.ListBooks(1, 1, 0)
 	if err != nil || len(booksResponse.Items) == 0 {
-		suite.Client.DeleteUser(int(user.ID))
+		suite.Client.DeleteUser(user.ID)
 		suite.T().Fatal("No books available for testing")
 	}
 
 	bookID := booksResponse.Items[0].ID
 
 	cleanup := func() {
-		suite.Client.DeleteUser(int(user.ID))
+		suite.Client.DeleteUser(user.ID)
 	}
 
-	return int(user.ID), bookID, cleanup
+	return user.ID, bookID, cleanup
 }
 
 func (suite *FavoritesTestSuite) TestCreateFavorite() {
@@ -321,7 +321,7 @@ func (suite *FavoritesTestSuite) TestListFavoritesVerifyPreload() {
 
 	for _, favorite := range response.Items {
 		assert.NotNil(suite.T(), favorite.User, "User should be preloaded for favorite ID %d", favorite.ID)
-		assert.Equal(suite.T(), favorite.UserID, int(favorite.User.ID))
+		assert.Equal(suite.T(), favorite.UserID, favorite.User.ID)
 
 		assert.NotNil(suite.T(), favorite.Book, "Book should be preloaded for favorite ID %d", favorite.ID)
 		assert.Equal(suite.T(), favorite.BookID, favorite.Book.ID)

@@ -45,5 +45,5 @@ func (api *api) GetSource(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.GetSourceByID(id)
+	return api.s.GetSourceByID(uint(id))
 }

@@ -35,7 +35,7 @@ func (suite *UsersTestSuite) TestCreateUser() {
 	assert.False(suite.T(), user.UpdatedAt.IsZero())
 
 	// Cleanup
-	suite.Client.DeleteUser(int(user.ID))
+	suite.Client.DeleteUser(user.ID)
 }
 
 func (suite *UsersTestSuite) TestListUsers() {
@@ -83,10 +83,10 @@ func (suite *UsersTestSuite) TestGetUser() {
 
 	createdUser, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
-	defer suite.Client.DeleteUser(int(createdUser.ID))
+	defer suite.Client.DeleteUser(createdUser.ID)
 
 	// Test getting the user
-	user, err := suite.Client.GetUser(int(createdUser.ID))
+	user, err := suite.Client.GetUser(createdUser.ID)
 
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), user)
@@ -112,7 +112,7 @@ func (suite *UsersTestSuite) TestUpdateUser() {
 
 	createdUser, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
-	defer suite.Client.DeleteUser(int(createdUser.ID))
+	defer suite.Client.DeleteUser(createdUser.ID)
 
 	// Update the user
 	newName := fmt.Sprintf("updated_%s", name)
@@ -120,7 +120,7 @@ func (suite *UsersTestSuite) TestUpdateUser() {
 		Name: newName,
 	}
 
-	updatedUser, err := suite.Client.UpdateUser(int(createdUser.ID), updateRequest)
+	updatedUser, err := suite.Client.UpdateUser(createdUser.ID, updateRequest)
 
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), updatedUser)
@@ -140,7 +140,7 @@ func (suite *UsersTestSuite) TestUpdateUserPartial() {
 
 	createdUser, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
-	defer suite.Client.DeleteUser(int(createdUser.ID))
+	defer suite.Client.DeleteUser(createdUser.ID)
 
 	// Update name
 	newName := fmt.Sprintf("partial_%s", name)
@@ -148,7 +148,7 @@ func (suite *UsersTestSuite) TestUpdateUserPartial() {
 		Name: newName,
 	}
 
-	updatedUser, err := suite.Client.UpdateUser(int(createdUser.ID), updateRequest)
+	updatedUser, err := suite.Client.UpdateUser(createdUser.ID, updateRequest)
 
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), updatedUser)
@@ -168,11 +168,11 @@ func (suite *UsersTestSuite) TestDeleteUser() {
 	assert.NoError(suite.T(), err)
 
 	// Delete the user
-	err = suite.Client.DeleteUser(int(createdUser.ID))
+	err = suite.Client.DeleteUser(createdUser.ID)
 	assert.NoError(suite.T(), err)
 
 	// Verify user is deleted
-	_, err = suite.Client.GetUser(int(createdUser.ID))
+	_, err = suite.Client.GetUser(createdUser.ID)
 	assert.Error(suite.T(), err)
 }
 
@@ -195,7 +195,7 @@ func (suite *UsersTestSuite) TestCreateUserDuplicateEmail() {
 
 	user1, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
-	defer suite.Client.DeleteUser(int(user1.ID))
+	defer suite.Client.DeleteUser(user1.ID)
 
 	// Try to create another user with the same email
 	createRequest2 := &auth.RegisterRequest{
@@ -222,7 +222,7 @@ func (suite *UsersTestSuite) TestUserCRUDFlow() {
 	user, err := suite.Client.CreateUser(createRequest)
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), user)
-	originalID := int(user.ID)
+	originalID := user.ID
 
 	// 2. Read
 	fetchedUser, err := suite.Client.GetUser(originalID)

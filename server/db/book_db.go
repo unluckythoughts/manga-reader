@@ -29,7 +29,7 @@ func (d *DB) CreateBook(book *models.Book) error {
 }
 
 // GetBookByID retrieves a book by its ID
-func (d *DB) GetBookByID(id int) (*models.Book, error) {
+func (d *DB) GetBookByID(id uint) (*models.Book, error) {
 	var book models.Book
 	if err := d.db.First(&book, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -41,7 +41,7 @@ func (d *DB) GetBookByID(id int) (*models.Book, error) {
 }
 
 // CheckBookExists checks if a book exists by source ID and book URL
-func (d *DB) CheckBookExists(sourceID int, bookURL string) (bool, error) {
+func (d *DB) CheckBookExists(sourceID uint, bookURL string) (bool, error) {
 	var count int64
 	if err := d.db.Model(&models.Book{}).
 		Where("source_id = ? AND url = ?", sourceID, bookURL).
@@ -52,7 +52,7 @@ func (d *DB) CheckBookExists(sourceID int, bookURL string) (bool, error) {
 }
 
 // GetBookCountBySourceID returns the count of books for a given source ID
-func (d *DB) GetBookCountBySourceID(sourceID int) (int64, error) {
+func (d *DB) GetBookCountBySourceID(sourceID uint) (int64, error) {
 	var count int64
 	if err := d.db.Model(&models.Book{}).
 		Where("source_id = ?", sourceID).
@@ -63,7 +63,7 @@ func (d *DB) GetBookCountBySourceID(sourceID int) (int64, error) {
 }
 
 // GetBookByIDWithRelations retrieves a book by its ID with related data
-func (d *DB) GetBookByIDWithRelations(id int, preload ...string) (*models.Book, error) {
+func (d *DB) GetBookByIDWithRelations(id uint, preload ...string) (*models.Book, error) {
 	var book models.Book
 	query := d.db
 
@@ -102,7 +102,7 @@ func (d *DB) UpdateBook(book *models.Book) error {
 }
 
 // DeleteBook soft deletes a book by setting DeletedAt
-func (d *DB) DeleteBook(id int) error {
+func (d *DB) DeleteBook(id uint) error {
 	result := d.db.Delete(&models.Book{}, id)
 	if result.Error != nil {
 		return result.Error
@@ -114,7 +114,7 @@ func (d *DB) DeleteBook(id int) error {
 }
 
 // HardDeleteBook permanently deletes a book from the database
-func (d *DB) HardDeleteBook(id int) error {
+func (d *DB) HardDeleteBook(id uint) error {
 	result := d.db.Unscoped().Delete(&models.Book{}, id)
 	if result.Error != nil {
 		return result.Error
@@ -126,7 +126,7 @@ func (d *DB) HardDeleteBook(id int) error {
 }
 
 // ListBooks retrieves all books with optional filters and returns total count
-func (d *DB) ListBooks(offset, limit int, bookType string, sourceID int) ([]models.Book, int64, error) {
+func (d *DB) ListBooks(offset, limit int, bookType string, sourceID uint) ([]models.Book, int64, error) {
 	var books []models.Book
 	var total int64
 
@@ -163,7 +163,7 @@ func (d *DB) ListBooks(offset, limit int, bookType string, sourceID int) ([]mode
 }
 
 // ListBooksWithRelations retrieves all books with related data
-func (d *DB) ListBooksWithRelations(offset, limit int, bookType string, sourceID int, preload ...string) ([]models.Book, error) {
+func (d *DB) ListBooksWithRelations(offset, limit int, bookType string, sourceID uint, preload ...string) ([]models.Book, error) {
 	var books []models.Book
 	query := d.db.Offset(offset)
 
@@ -190,7 +190,7 @@ func (d *DB) ListBooksWithRelations(offset, limit int, bookType string, sourceID
 }
 
 // CountBooks returns the total number of books
-func (d *DB) CountBooks(bookType string, sourceID int) (int64, error) {
+func (d *DB) CountBooks(bookType string, sourceID uint) (int64, error) {
 	var count int64
 	query := d.db.Model(&models.Book{})
 
@@ -224,7 +224,7 @@ func (d *DB) SearchBooks(searchTerm string, offset, limit int) ([]models.Book, e
 }
 
 // GetBookBySourceAndOtherID retrieves a book by source_id and other_id
-func (d *DB) GetBookBySourceAndOtherID(sourceID int, otherID string) (*models.Book, error) {
+func (d *DB) GetBookBySourceAndOtherID(sourceID uint, otherID string) (*models.Book, error) {
 	var book models.Book
 	if err := d.db.Where("source_id = ? AND other_id = ?", sourceID, otherID).First(&book).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

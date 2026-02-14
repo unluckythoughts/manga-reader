@@ -21,10 +21,10 @@ func (api *api) ListChapters(r web.Request) (any, error) {
 		page = 1 // default page
 	}
 
-	var bookID int
+	var bookID uint
 	if bookIDStr != "" {
 		if id, err := strconv.Atoi(bookIDStr); err == nil {
-			bookID = id
+			bookID = uint(id)
 		}
 	}
 
@@ -53,5 +53,5 @@ func (api *api) GetChapter(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.GetChapterByID(id)
+	return api.s.GetChapterByID(uint(id))
 }

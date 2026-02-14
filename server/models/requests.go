@@ -9,14 +9,14 @@ type CreateBookRequest struct {
 	Synopsis string   `json:"synopsis,omitempty"`
 	Slug     string   `json:"slug,omitempty"`
 	OtherID  string   `json:"other_id,omitempty"`
-	SourceID int      `json:"source_id,omitempty"`
+	SourceID uint     `json:"source_id,omitempty"`
 }
 
 // CreateChapterRequest represents the request body for creating a new chapter
 type CreateChapterRequest struct {
 	URL        string `json:"url" valid:"required"`
 	Title      string `json:"title" valid:"required"`
-	BookID     int    `json:"book_id" valid:"required"`
+	BookID     uint   `json:"book_id" valid:"required"`
 	Number     string `json:"number,omitempty"`
 	Content    string `json:"content,omitempty"`
 	UploadDate string `json:"upload_date,omitempty"`
@@ -27,8 +27,8 @@ type CreateChapterRequest struct {
 
 // CreateFavoriteRequest represents the request body for creating a favorite
 type CreateFavoriteRequest struct {
-	UserID     int    `json:"user_id" valid:"required"`
-	BookID     int    `json:"book_id" valid:"required"`
+	UserID     uint   `json:"user_id" valid:"required"`
+	BookID     uint   `json:"book_id" valid:"required"`
 	Progress   string `json:"progress,omitempty"`
 	Categories string `json:"categories,omitempty"`
 }

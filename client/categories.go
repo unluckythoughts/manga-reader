@@ -20,7 +20,7 @@ func (c *Client) ListCategories(page, limit int) (*models.CategoriesPaginatedRes
 }
 
 // GetCategory retrieves a category by ID
-func (c *Client) GetCategory(id int) (*models.Category, error) {
+func (c *Client) GetCategory(id uint) (*models.Category, error) {
 	url := fmt.Sprintf("/api/v1/categories/%d", id)
 
 	var response models.Category
@@ -46,7 +46,7 @@ func (c *Client) CreateCategory(request *models.CreateCategoryRequest) (*models.
 }
 
 // UpdateCategory updates an existing category
-func (c *Client) UpdateCategory(id int, request *models.UpdateCategoryRequest) (*models.Category, error) {
+func (c *Client) UpdateCategory(id uint, request *models.UpdateCategoryRequest) (*models.Category, error) {
 	url := fmt.Sprintf("/api/v1/categories/%d", id)
 
 	var response models.Category
@@ -59,7 +59,7 @@ func (c *Client) UpdateCategory(id int, request *models.UpdateCategoryRequest) (
 }
 
 // DeleteCategory deletes a category by ID
-func (c *Client) DeleteCategory(id int) error {
+func (c *Client) DeleteCategory(id uint) error {
 	url := fmt.Sprintf("/api/v1/categories/%d", id)
 
 	_, err := c.client.DeleteResponse(url, nil, nil)

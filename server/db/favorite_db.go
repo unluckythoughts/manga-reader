@@ -18,7 +18,7 @@ func (d *DB) CreateFavorite(favorite *models.Favorite) error {
 }
 
 // GetFavoriteByID retrieves a favorite by its ID
-func (d *DB) GetFavoriteByID(id int) (*models.Favorite, error) {
+func (d *DB) GetFavoriteByID(id uint) (*models.Favorite, error) {
 	var favorite models.Favorite
 	if err := d.db.First(&favorite, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -30,7 +30,7 @@ func (d *DB) GetFavoriteByID(id int) (*models.Favorite, error) {
 }
 
 // GetFavoriteByIDWithRelations retrieves a favorite by its ID with related data
-func (d *DB) GetFavoriteByIDWithRelations(id int, preload ...string) (*models.Favorite, error) {
+func (d *DB) GetFavoriteByIDWithRelations(id uint, preload ...string) (*models.Favorite, error) {
 	var favorite models.Favorite
 	query := d.db
 
@@ -48,7 +48,7 @@ func (d *DB) GetFavoriteByIDWithRelations(id int, preload ...string) (*models.Fa
 }
 
 // GetFavoriteByUserAndBook retrieves a favorite by user_id and book_id
-func (d *DB) GetFavoriteByUserAndBook(userID, bookID int) (*models.Favorite, error) {
+func (d *DB) GetFavoriteByUserAndBook(userID, bookID uint) (*models.Favorite, error) {
 	var favorite models.Favorite
 	if err := d.db.Where("user_id = ? AND book_id = ?", userID, bookID).First(&favorite).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -60,7 +60,7 @@ func (d *DB) GetFavoriteByUserAndBook(userID, bookID int) (*models.Favorite, err
 }
 
 // GetFavoritesByUserID retrieves all favorites for a specific user
-func (d *DB) GetFavoritesByUserID(userID int, offset, limit int) ([]models.Favorite, error) {
+func (d *DB) GetFavoritesByUserID(userID uint, offset, limit int) ([]models.Favorite, error) {
 	var favorites []models.Favorite
 	query := d.db.Where("user_id = ?", userID).Offset(offset)
 
@@ -75,7 +75,7 @@ func (d *DB) GetFavoritesByUserID(userID int, offset, limit int) ([]models.Favor
 }
 
 // GetFavoritesByUserIDWithRelations retrieves all favorites for a user with related data
-func (d *DB) GetFavoritesByUserIDWithRelations(userID int, offset, limit int, preload ...string) ([]models.Favorite, error) {
+func (d *DB) GetFavoritesByUserIDWithRelations(userID uint, offset, limit int, preload ...string) ([]models.Favorite, error) {
 	var favorites []models.Favorite
 	query := d.db.Where("user_id = ?", userID).Offset(offset)
 
@@ -94,7 +94,7 @@ func (d *DB) GetFavoritesByUserIDWithRelations(userID int, offset, limit int, pr
 }
 
 // GetFavoritesByBookID retrieves all favorites for a specific book
-func (d *DB) GetFavoritesByBookID(bookID int) ([]models.Favorite, error) {
+func (d *DB) GetFavoritesByBookID(bookID uint) ([]models.Favorite, error) {
 	var favorites []models.Favorite
 	if err := d.db.Where("book_id = ?", bookID).Find(&favorites).Error; err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (d *DB) UpdateFavorite(favorite *models.Favorite) error {
 }
 
 // UpdateFavoriteFields updates specific fields of a favorite
-func (d *DB) UpdateFavoriteFields(id int, fields map[string]interface{}) error {
+func (d *DB) UpdateFavoriteFields(id uint, fields map[string]interface{}) error {
 	fields["updated_at"] = time.Now()
 	result := d.db.Model(&models.Favorite{}).Where("id = ?", id).Updates(fields)
 	if result.Error != nil {
@@ -125,17 +125,17 @@ func (d *DB) UpdateFavoriteFields(id int, fields map[string]interface{}) error {
 }
 
 // UpdateFavoriteProgress updates the progress field of a favorite
-func (d *DB) UpdateFavoriteProgress(id int, progress string) error {
+func (d *DB) UpdateFavoriteProgress(id uint, progress string) error {
 	return d.UpdateFavoriteFields(id, map[string]interface{}{"progress": progress})
 }
 
 // UpdateFavoriteCategories updates the categories field of a favorite
-func (d *DB) UpdateFavoriteCategories(id int, categories string) error {
+func (d *DB) UpdateFavoriteCategories(id uint, categories string) error {
 	return d.UpdateFavoriteFields(id, map[string]interface{}{"categories": categories})
 }
 
 // DeleteFavorite soft deletes a favorite by setting DeletedAt
-func (d *DB) DeleteFavorite(id int) error {
+func (d *DB) DeleteFavorite(id uint) error {
 	result := d.db.Delete(&models.Favorite{}, id)
 	if result.Error != nil {
 		return result.Error
@@ -147,7 +147,7 @@ func (d *DB) DeleteFavorite(id int) error {
 }
 
 // DeleteFavoriteByUserAndBook deletes a favorite by user_id and book_id
-func (d *DB) DeleteFavoriteByUserAndBook(userID, bookID int) error {
+func (d *DB) DeleteFavoriteByUserAndBook(userID, bookID uint) error {
 	result := d.db.Where("user_id = ? AND book_id = ?", userID, bookID).Delete(&models.Favorite{})
 	if result.Error != nil {
 		return result.Error
@@ -159,7 +159,7 @@ func (d *DB) DeleteFavoriteByUserAndBook(userID, bookID int) error {
 }
 
 // DeleteFavoritesByUserID deletes all favorites for a specific user
-func (d *DB) DeleteFavoritesByUserID(userID int) error {
+func (d *DB) DeleteFavoritesByUserID(userID uint) error {
 	if err := d.db.Where("user_id = ?", userID).Delete(&models.Favorite{}).Error; err != nil {
 		return err
 	}
@@ -167,7 +167,7 @@ func (d *DB) DeleteFavoritesByUserID(userID int) error {
 }
 
 // HardDeleteFavorite permanently deletes a favorite from the database
-func (d *DB) HardDeleteFavorite(id int) error {
+func (d *DB) HardDeleteFavorite(id uint) error {
 	result := d.db.Unscoped().Delete(&models.Favorite{}, id)
 	if result.Error != nil {
 		return result.Error
@@ -179,7 +179,7 @@ func (d *DB) HardDeleteFavorite(id int) error {
 }
 
 // ListFavorites retrieves all favorites with optional filters
-func (d *DB) ListFavorites(offset, limit, userID int) ([]models.Favorite, error) {
+func (d *DB) ListFavorites(offset, limit int, userID uint) ([]models.Favorite, error) {
 	var favorites []models.Favorite
 	query := d.db.Offset(offset)
 
@@ -199,7 +199,7 @@ func (d *DB) ListFavorites(offset, limit, userID int) ([]models.Favorite, error)
 }
 
 // CountFavorites returns the total number of favorites
-func (d *DB) CountFavorites(userID int) (int64, error) {
+func (d *DB) CountFavorites(userID uint) (int64, error) {
 	var count int64
 	query := d.db.Model(&models.Favorite{})
 
@@ -214,7 +214,7 @@ func (d *DB) CountFavorites(userID int) (int64, error) {
 }
 
 // FavoriteExists checks if a favorite exists for a user and book
-func (d *DB) FavoriteExists(userID, bookID int) (bool, error) {
+func (d *DB) FavoriteExists(userID, bookID uint) (bool, error) {
 	var count int64
 	if err := d.db.Model(&models.Favorite{}).Where("user_id = ? AND book_id = ?", userID, bookID).Count(&count).Error; err != nil {
 		return false, err

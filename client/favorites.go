@@ -7,7 +7,7 @@ import (
 )
 
 // ListFavorites retrieves a paginated list of favorites
-func (c *Client) ListFavorites(page, limit, userID, bookID int) (*models.FavoritesPaginatedResponse, error) {
+func (c *Client) ListFavorites(page, limit int, userID, bookID uint) (*models.FavoritesPaginatedResponse, error) {
 	url := fmt.Sprintf("/api/v1/favorites?page=%d&limit=%d", page, limit)
 	if userID > 0 {
 		url += fmt.Sprintf("&user_id=%d", userID)
@@ -26,7 +26,7 @@ func (c *Client) ListFavorites(page, limit, userID, bookID int) (*models.Favorit
 }
 
 // GetFavorite retrieves a favorite by ID
-func (c *Client) GetFavorite(id int) (*models.Favorite, error) {
+func (c *Client) GetFavorite(id uint) (*models.Favorite, error) {
 	url := fmt.Sprintf("/api/v1/favorites/%d", id)
 
 	var response models.Favorite
@@ -52,7 +52,7 @@ func (c *Client) CreateFavorite(request *models.CreateFavoriteRequest) (*models.
 }
 
 // UpdateFavorite updates an existing favorite
-func (c *Client) UpdateFavorite(id int, request *models.UpdateFavoriteRequest) (*models.Favorite, error) {
+func (c *Client) UpdateFavorite(id uint, request *models.UpdateFavoriteRequest) (*models.Favorite, error) {
 	url := fmt.Sprintf("/api/v1/favorites/%d", id)
 
 	var response models.Favorite
@@ -65,7 +65,7 @@ func (c *Client) UpdateFavorite(id int, request *models.UpdateFavoriteRequest) (
 }
 
 // UpdateFavoriteProgress updates the reading progress of a favorite
-func (c *Client) UpdateFavoriteProgress(id int, request *models.UpdateFavoriteProgressRequest) (*models.Favorite, error) {
+func (c *Client) UpdateFavoriteProgress(id uint, request *models.UpdateFavoriteProgressRequest) (*models.Favorite, error) {
 	url := fmt.Sprintf("/api/v1/favorites/%d", id)
 
 	var response models.Favorite
@@ -78,7 +78,7 @@ func (c *Client) UpdateFavoriteProgress(id int, request *models.UpdateFavoritePr
 }
 
 // DeleteFavorite deletes a favorite by ID
-func (c *Client) DeleteFavorite(id int) error {
+func (c *Client) DeleteFavorite(id uint) error {
 	url := fmt.Sprintf("/api/v1/favorites/%d", id)
 
 	_, err := c.client.DeleteResponse(url, nil, nil)

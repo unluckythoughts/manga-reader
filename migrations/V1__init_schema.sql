@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS chapter (
+CREATE TABLE IF NOT EXISTS chapters (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   url         TEXT NOT NULL,
   title       TEXT NOT NULL,
@@ -10,11 +10,12 @@ CREATE TABLE IF NOT EXISTS chapter (
   downloaded  BOOLEAN NOT NULL DEFAULT FALSE,
   other_id    TEXT,
   updated_at  DATETIME NOT NULL,
-  deleted_at  DATETIME
+  deleted_at  DATETIME,
+  FOREIGN KEY (book_id) REFERENCES books(id)
 );
-CREATE UNIQUE INDEX IF NOT EXISTS chapter_number_unique ON chapter(book_id, number);
+CREATE UNIQUE INDEX IF NOT EXISTS chapter_number_unique ON chapters(book_id, number);
 
-CREATE TABLE IF NOT EXISTS book (
+CREATE TABLE IF NOT EXISTS books (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   url         TEXT NOT NULL,
   title       TEXT NOT NULL,
@@ -25,11 +26,12 @@ CREATE TABLE IF NOT EXISTS book (
   other_id    TEXT,
   source_id   INTEGER,
   updated_at  DATETIME NOT NULL,
-  deleted_at  DATETIME
+  deleted_at  DATETIME,
+  FOREIGN KEY (source_id) REFERENCES sources(id)
 );
-CREATE UNIQUE INDEX IF NOT EXISTS book_url_unique ON book(source_id, url);
+CREATE UNIQUE INDEX IF NOT EXISTS book_url_unique ON books(source_id, url);
 
-CREATE TABLE IF NOT EXISTS source (
+CREATE TABLE IF NOT EXISTS sources (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   name          TEXT UNIQUE NOT NULL,
   domain        TEXT UNIQUE NOT NULL,
@@ -38,24 +40,26 @@ CREATE TABLE IF NOT EXISTS source (
   deleted_at    DATETIME
 );
 
-CREATE TABLE IF NOT EXISTS favorite (
+CREATE TABLE IF NOT EXISTS favorites (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id     INTEGER,
   book_id     INTEGER,
   progress    TEXT,
   categories  TEXT,
   updated_at  DATETIME NOT NULL,
-  deleted_at  DATETIME
+  deleted_at  DATETIME,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (book_id) REFERENCES books(id)
 );
 
-CREATE TABLE IF NOT EXISTS category (
+CREATE TABLE IF NOT EXISTS categories (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   name        TEXT,
   updated_at  DATETIME NOT NULL,
   deleted_at  DATETIME
 );
 
-CREATE TABLE IF NOT EXISTS user (
+CREATE TABLE IF NOT EXISTS users (
   id                  INTEGER PRIMARY KEY AUTOINCREMENT,
   name                TEXT NOT NULL,
   email               TEXT UNIQUE,
@@ -69,8 +73,8 @@ CREATE TABLE IF NOT EXISTS user (
   updated_at          DATETIME NOT NULL,
   deleted_at          DATETIME
 );
-CREATE INDEX IF NOT EXISTS idx_user_deleted_at ON user(deleted_at);
-CREATE INDEX IF NOT EXISTS idx_user_email ON user(email);
+CREATE INDEX IF NOT EXISTS idx_users_deleted_at ON users(deleted_at);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 
 CREATE TABLE IF NOT EXISTS verify (
   id              INTEGER PRIMARY KEY AUTOINCREMENT,

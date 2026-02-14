@@ -18,7 +18,7 @@ func (d *DB) CreateSource(source *models.Source) error {
 }
 
 // GetSourceByID retrieves a source by its ID
-func (d *DB) GetSourceByID(id int) (*models.Source, error) {
+func (d *DB) GetSourceByID(id uint) (*models.Source, error) {
 	var source models.Source
 	if err := d.db.First(&source, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -30,7 +30,7 @@ func (d *DB) GetSourceByID(id int) (*models.Source, error) {
 }
 
 // GetSourceByIDWithRelations retrieves a source by its ID with related data
-func (d *DB) GetSourceByIDWithRelations(id int, preload ...string) (*models.Source, error) {
+func (d *DB) GetSourceByIDWithRelations(id uint, preload ...string) (*models.Source, error) {
 	var source models.Source
 	query := d.db
 
@@ -81,7 +81,7 @@ func (d *DB) UpdateSource(source *models.Source) error {
 }
 
 // UpdateSourceFields updates specific fields of a source
-func (d *DB) UpdateSourceFields(id int, fields map[string]interface{}) error {
+func (d *DB) UpdateSourceFields(id uint, fields map[string]interface{}) error {
 	fields["updated_at"] = time.Now()
 	result := d.db.Model(&models.Source{}).Where("id = ?", id).Updates(fields)
 	if result.Error != nil {
@@ -94,7 +94,7 @@ func (d *DB) UpdateSourceFields(id int, fields map[string]interface{}) error {
 }
 
 // DeleteSource soft deletes a source by setting DeletedAt
-func (d *DB) DeleteSource(id int) error {
+func (d *DB) DeleteSource(id uint) error {
 	result := d.db.Delete(&models.Source{}, id)
 	if result.Error != nil {
 		return result.Error
@@ -106,7 +106,7 @@ func (d *DB) DeleteSource(id int) error {
 }
 
 // HardDeleteSource permanently deletes a source from the database
-func (d *DB) HardDeleteSource(id int) error {
+func (d *DB) HardDeleteSource(id uint) error {
 	result := d.db.Unscoped().Delete(&models.Source{}, id)
 	if result.Error != nil {
 		return result.Error

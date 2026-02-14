@@ -7,7 +7,7 @@ import (
 )
 
 // ListChapters retrieves a paginated list of chapters
-func (c *Client) ListChapters(page, limit, bookID int) (*models.ChaptersPaginatedResponse, error) {
+func (c *Client) ListChapters(page, limit int, bookID uint) (*models.ChaptersPaginatedResponse, error) {
 	url := fmt.Sprintf("/api/v1/chapters?page=%d&limit=%d", page, limit)
 	if bookID > 0 {
 		url += fmt.Sprintf("&book_id=%d", bookID)
@@ -23,7 +23,7 @@ func (c *Client) ListChapters(page, limit, bookID int) (*models.ChaptersPaginate
 }
 
 // GetChapter retrieves a chapter by ID
-func (c *Client) GetChapter(id int) (*models.Chapter, error) {
+func (c *Client) GetChapter(id uint) (*models.Chapter, error) {
 	url := fmt.Sprintf("/api/v1/chapters/%d", id)
 
 	var response models.Chapter

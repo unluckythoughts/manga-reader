@@ -16,7 +16,7 @@ func (d *DB) CreateUser(user *auth.User) error {
 }
 
 // GetUserByID retrieves a user by its ID
-func (d *DB) GetUserByID(id int) (*auth.User, error) {
+func (d *DB) GetUserByID(id uint) (*auth.User, error) {
 	var user auth.User
 	if err := d.db.First(&user, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -28,7 +28,7 @@ func (d *DB) GetUserByID(id int) (*auth.User, error) {
 }
 
 // GetUserByIDWithRelations retrieves a user by its ID with related data
-func (d *DB) GetUserByIDWithRelations(id int, preload ...string) (*auth.User, error) {
+func (d *DB) GetUserByIDWithRelations(id uint, preload ...string) (*auth.User, error) {
 	var user auth.User
 	query := d.db
 
@@ -66,7 +66,7 @@ func (d *DB) UpdateUser(user *auth.User) error {
 }
 
 // UpdateUserFields updates specific fields of a user
-func (d *DB) UpdateUserFields(id int, fields map[string]interface{}) error {
+func (d *DB) UpdateUserFields(id uint, fields map[string]interface{}) error {
 	result := d.db.Model(&auth.User{}).Where("id = ?", id).Updates(fields)
 	if result.Error != nil {
 		return result.Error
@@ -78,7 +78,7 @@ func (d *DB) UpdateUserFields(id int, fields map[string]interface{}) error {
 }
 
 // DeleteUser soft deletes a user by setting DeletedAt
-func (d *DB) DeleteUser(id int) error {
+func (d *DB) DeleteUser(id uint) error {
 	result := d.db.Delete(&auth.User{}, id)
 	if result.Error != nil {
 		return result.Error
@@ -90,7 +90,7 @@ func (d *DB) DeleteUser(id int) error {
 }
 
 // HardDeleteUser permanently deletes a user from the database
-func (d *DB) HardDeleteUser(id int) error {
+func (d *DB) HardDeleteUser(id uint) error {
 	result := d.db.Unscoped().Delete(&auth.User{}, id)
 	if result.Error != nil {
 		return result.Error

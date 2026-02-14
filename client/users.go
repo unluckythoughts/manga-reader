@@ -21,7 +21,7 @@ func (c *Client) ListUsers(page, limit int) (*models.UsersPaginatedResponse, err
 }
 
 // GetUser retrieves a user by ID
-func (c *Client) GetUser(id int) (*auth.User, error) {
+func (c *Client) GetUser(id uint) (*auth.User, error) {
 	url := fmt.Sprintf("/api/v1/users/%d", id)
 
 	var response auth.User
@@ -51,7 +51,7 @@ func (c *Client) CreateUser(request *auth.RegisterRequest) (*auth.User, error) {
 // UpdateUser updates an existing user
 // Note: This endpoint has been removed. Use auth.Service.UpdateUserHandler instead.
 // This method is kept for backwards compatibility but will not work without auth routes.
-func (c *Client) UpdateUser(id int, request *auth.UpdateUserRequest) (*auth.User, error) {
+func (c *Client) UpdateUser(id uint, request *auth.UpdateUserRequest) (*auth.User, error) {
 	url := fmt.Sprintf("/api/v1/users/%d", id)
 
 	var response auth.User
@@ -64,7 +64,7 @@ func (c *Client) UpdateUser(id int, request *auth.UpdateUserRequest) (*auth.User
 }
 
 // DeleteUser deletes a user by ID
-func (c *Client) DeleteUser(id int) error {
+func (c *Client) DeleteUser(id uint) error {
 	url := fmt.Sprintf("/api/v1/users/%d", id)
 
 	_, err := c.client.DeleteResponse(url, nil, nil)

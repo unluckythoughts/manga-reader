@@ -20,7 +20,7 @@ func (c *Client) ListSources(page, limit int) (*models.SourcesPaginatedResponse,
 }
 
 // GetSource retrieves a source by ID
-func (c *Client) GetSource(id int) (*models.Source, error) {
+func (c *Client) GetSource(id uint) (*models.Source, error) {
 	url := fmt.Sprintf("/api/v1/sources/%d", id)
 
 	var response models.Source

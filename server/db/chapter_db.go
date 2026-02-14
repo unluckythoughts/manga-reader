@@ -50,7 +50,7 @@ func (d *DB) CreateChaptersBatch(chapters []models.Chapter) error {
 }
 
 // GetChapterByID retrieves a chapter by its ID
-func (d *DB) GetChapterByID(id int) (*models.Chapter, error) {
+func (d *DB) GetChapterByID(id uint) (*models.Chapter, error) {
 	var chapter models.Chapter
 	if err := d.db.First(&chapter, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -62,7 +62,7 @@ func (d *DB) GetChapterByID(id int) (*models.Chapter, error) {
 }
 
 // GetChapterByIDWithRelations retrieves a chapter by its ID with related data
-func (d *DB) GetChapterByIDWithRelations(id int, preload ...string) (*models.Chapter, error) {
+func (d *DB) GetChapterByIDWithRelations(id uint, preload ...string) (*models.Chapter, error) {
 	var chapter models.Chapter
 	query := d.db
 
@@ -92,7 +92,7 @@ func (d *DB) GetChapterByURL(url string) (*models.Chapter, error) {
 }
 
 // GetChaptersByBookID retrieves all chapters for a specific book
-func (d *DB) GetChaptersByBookID(bookID int, offset, limit int) ([]models.Chapter, error) {
+func (d *DB) GetChaptersByBookID(bookID uint, offset, limit int) ([]models.Chapter, error) {
 	var chapters []models.Chapter
 	query := d.db.Where("book_id = ?", bookID).Offset(offset)
 
@@ -116,7 +116,7 @@ func (d *DB) UpdateChapter(chapter *models.Chapter) error {
 }
 
 // UpdateChapterFields updates specific fields of a chapter
-func (d *DB) UpdateChapterFields(id int, fields map[string]interface{}) error {
+func (d *DB) UpdateChapterFields(id uint, fields map[string]interface{}) error {
 	fields["updated_at"] = time.Now()
 	result := d.db.Model(&models.Chapter{}).Where("id = ?", id).Updates(fields)
 	if result.Error != nil {
@@ -129,17 +129,17 @@ func (d *DB) UpdateChapterFields(id int, fields map[string]interface{}) error {
 }
 
 // MarkChapterAsCompleted marks a chapter as completed
-func (d *DB) MarkChapterAsCompleted(id int) error {
+func (d *DB) MarkChapterAsCompleted(id uint) error {
 	return d.UpdateChapterFields(id, map[string]interface{}{"completed": true})
 }
 
 // MarkChapterAsDownloaded marks a chapter as downloaded
-func (d *DB) MarkChapterAsDownloaded(id int) error {
+func (d *DB) MarkChapterAsDownloaded(id uint) error {
 	return d.UpdateChapterFields(id, map[string]interface{}{"downloaded": true})
 }
 
 // DeleteChapter soft deletes a chapter by setting DeletedAt
-func (d *DB) DeleteChapter(id int) error {
+func (d *DB) DeleteChapter(id uint) error {
 	result := d.db.Delete(&models.Chapter{}, id)
 	if result.Error != nil {
 		return result.Error
@@ -151,7 +151,7 @@ func (d *DB) DeleteChapter(id int) error {
 }
 
 // DeleteChaptersByBookID deletes all chapters for a specific book
-func (d *DB) DeleteChaptersByBookID(bookID int) error {
+func (d *DB) DeleteChaptersByBookID(bookID uint) error {
 	if err := d.db.Where("book_id = ?", bookID).Delete(&models.Chapter{}).Error; err != nil {
 		return err
 	}
@@ -159,7 +159,7 @@ func (d *DB) DeleteChaptersByBookID(bookID int) error {
 }
 
 // HardDeleteChapter permanently deletes a chapter from the database
-func (d *DB) HardDeleteChapter(id int) error {
+func (d *DB) HardDeleteChapter(id uint) error {
 	result := d.db.Unscoped().Delete(&models.Chapter{}, id)
 	if result.Error != nil {
 		return result.Error
@@ -171,7 +171,7 @@ func (d *DB) HardDeleteChapter(id int) error {
 }
 
 // ListChapters retrieves all chapters with optional filters
-func (d *DB) ListChapters(offset, limit int, bookID int) ([]models.Chapter, error) {
+func (d *DB) ListChapters(offset, limit int, bookID uint) ([]models.Chapter, error) {
 	var chapters []models.Chapter
 	query := d.db.Offset(offset)
 
@@ -190,7 +190,7 @@ func (d *DB) ListChapters(offset, limit int, bookID int) ([]models.Chapter, erro
 }
 
 // CountChapters returns the total number of chapters
-func (d *DB) CountChapters(bookID int) (int64, error) {
+func (d *DB) CountChapters(bookID uint) (int64, error) {
 	var count int64
 	query := d.db.Model(&models.Chapter{})
 
@@ -205,7 +205,7 @@ func (d *DB) CountChapters(bookID int) (int64, error) {
 }
 
 // GetChapterByBookAndNumber retrieves a chapter by book_id and chapter number
-func (d *DB) GetChapterByBookAndNumber(bookID int, number string) (*models.Chapter, error) {
+func (d *DB) GetChapterByBookAndNumber(bookID uint, number string) (*models.Chapter, error) {
 	var chapter models.Chapter
 	if err := d.db.Where("book_id = ? AND number = ?", bookID, number).First(&chapter).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

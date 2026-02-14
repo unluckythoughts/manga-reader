@@ -20,6 +20,6 @@ func (s *ReaderService) GetSources(page, limit int) ([]models.Source, int64, err
 }
 
 // GetSourceByID retrieves a source by its ID
-func (s *ReaderService) GetSourceByID(id int) (*models.Source, error) {
+func (s *ReaderService) GetSourceByID(id uint) (*models.Source, error) {
 	return s.db.GetSourceByID(id)
 }

@@ -63,7 +63,7 @@ func (api *api) GetUser(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.GetUserByID(id)
+	return api.s.GetUserByID(uint(id))
 }
 
 // The following handlers are commented out as they should be replaced with auth package handlers:
