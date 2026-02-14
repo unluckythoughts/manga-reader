@@ -33,6 +33,12 @@ function createAuthStore() {
 				if (error instanceof ApiClientError && error.status === 401) {
 					// Not authenticated, this is expected
 					set({ user: null, loading: false, error: null });
+				} else if (error instanceof ApiClientError && 
+				          (error.message.toLowerCase().includes('securecookie') || 
+				           error.error.toLowerCase().includes('securecookie'))) {
+					// Securecookie error - cookies were already cleared, just reset state
+					console.info('Session invalid, logged out');
+					set({ user: null, loading: false, error: null });
 				} else {
 					const errorMessage = error instanceof ApiClientError 
 						? error.message 

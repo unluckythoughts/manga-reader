@@ -20,6 +20,14 @@ init:
 build:
 	docker build -f deploy/Dockerfile -t book-reader:latest ..
 
+# Build locally for debugging
+build-local:
+	go build -gcflags="all=-N -l" -o book-reader.exe .
+
+# Run locally with debug output
+debug: build-local db-migrate
+	$$env:LOG_LEVEL="debug"; $$env:AUTH_JWT_KEY="debug-secret-key-change-in-production"; ./book-reader.exe
+
 start: db-migrate
 	docker-compose -f deploy/docker-compose.yml up -d
 

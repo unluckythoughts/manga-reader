@@ -27,6 +27,31 @@ export interface FetchOptions extends RequestInit {
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 /**
+ * Clear all cookies - useful when encountering securecookie errors
+ */
+function clearAllCookies(): void {
+	const cookies = document.cookie.split(';');
+	
+	for (const cookie of cookies) {
+		const eqPos = cookie.indexOf('=');
+		const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+		
+		// Clear for all paths and domains
+		document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+		document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+	}
+}
+
+/**
+ * Check if error is a securecookie validation error
+ */
+function isSecureCookieError(error: string | undefined): boolean {
+	return error?.toLowerCase().includes('securecookie') || 
+	       error?.toLowerCase().includes('the value is not valid') ||
+	       false;
+}
+
+/**
  * Build URL with query parameters
  */
 function buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
@@ -85,6 +110,13 @@ export async function apiRequest<T>(
 					status: response.status
 				};
 			}
+			
+			// Check for securecookie errors and clear cookies
+			if (isSecureCookieError(errorData.error) || isSecureCookieError(errorData.message)) {
+				console.warn('Detected securecookie error, clearing all cookies');
+				clearAllCookies();
+			}
+			
 			throw new ApiClientError(response.status, errorData.error, errorData.message);
 		}
 

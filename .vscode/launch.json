@@ -19,6 +19,32 @@
       "program": "${workspaceFolder}/tmp/test.go"
     },
     {
+      "name": "Debug Book Reader",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/main.go",
+      "preLaunchTask": "Run All Migrations",
+      "env": {
+        "SERVICE_NAME": "book-reader",
+        "SERVICE_ENABLE_DB": "true",
+        "SERVICE_DB_TYPE": "sqlite",
+        "SERVICE_ENABLE_CACHE": "false",
+        "SERVICE_ENABLE_BUS": "false",
+        "SERVICE_AUTH_ENABLE": "true",
+        "DB_FILE_PATH": "./data/book_reader.db",
+        "WEB_PORT": "8080",
+        "WEB_SOCKET_PATH": "/socket",
+        "WEB_WORKER_COUNT": "20",
+        "WEB_CORS": "true",
+        "WEB_PROXY": "false",
+        "LOG_LEVEL": "debug",
+        "AUTH_JWT_KEY": "debug-secret-key-change-in-production"
+      },
+      "console": "integratedTerminal",
+      "showLog": true
+    },
+    {
       "name": "Launch Package",
       "type": "go",
       "request": "launch",
@@ -28,7 +54,7 @@
         "DB_FILE_PATH": "db.sqlite",
         "WEB_CORS": "true",
         "WEB_PROXY": "true",
-        "DB_DEBUG": "true",
+        "DB_DEBUG": "true"
       },
       "program": "${workspaceFolder}/main.go"
     }

@@ -6,6 +6,7 @@ import (
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/unluckythoughts/book-reader/server/api"
 	"github.com/unluckythoughts/go-microservice/v2"
+	_ "github.com/unluckythoughts/go-microservice/v2/utils" // Import to register custom validators
 	"go.uber.org/zap"
 )
 

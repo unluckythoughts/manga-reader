@@ -12,9 +12,9 @@
 	let isAuthPage = $derived($page.url.pathname.startsWith('/auth'));
 	
 	// Initialize auth store on mount
-	onMount(() => {
-		// Auth store will automatically check for stored tokens
-		// No need to explicitly initialize
+	onMount(async () => {
+		// Try to load current user session
+		await auth.init();
 	});
 </script>
 
