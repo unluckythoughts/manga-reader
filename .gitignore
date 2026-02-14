@@ -28,3 +28,9 @@ temp/
 .vscode
 .idea
 *.log
+.env
+.env.local
+.env.*.local
+**/.env
+**/app/.env
+.env.auth
