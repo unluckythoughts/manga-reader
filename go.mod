@@ -7,7 +7,7 @@ toolchain go1.24.3
 require (
 	github.com/DaRealFreak/cloudflare-bp-go v1.0.4
 	github.com/stretchr/testify v1.11.1
-	github.com/unluckythoughts/go-microservice/v2 v2.6.5
+	github.com/unluckythoughts/go-microservice/v2 v2.6.6
 	github.com/unluckythoughts/go-scraper v0.1.16
 	go.uber.org/zap v1.27.1
 	gorm.io/gorm v1.31.1

@@ -37,7 +37,6 @@ func (a *api) registerRoutes(router web.Router) {
 		router.GET("/api/v1/auth/verify/:target/:token", a.a.VerifyTokenHandler)
 
 		// User API
-		router.GET("/api/v1/user", a.a.GetUserHandler)
 		router.PUT("/api/v1/user", a.a.UpdateUserHandler)
 		router.PATCH("/api/v1/user/change-password", a.a.ChangePasswordHandler)
 		router.GET("/api/v1/user/reset-password", a.a.ResetPasswordHandler)
@@ -54,6 +53,9 @@ func (a *api) registerRoutes(router web.Router) {
 			Role:     models.AdminRole, // Assign admin role for testing purposes
 		})
 	}
+
+	// User API
+	router.GET("/api/v1/user", a.a.GetUserHandler)
 
 	// Books API
 	router.GET("/api/v1/reader/books", a.ListBooks)
@@ -87,16 +89,16 @@ func Register(router web.Router, gormDB *gorm.DB, l *zap.Logger, w *worker.Worke
 	s := service.New(db.New(gormDB), w)
 	api := &api{s: s}
 
-	// enable auth if configured
+	// Initialize auth service (needed even when auth is disabled for dummy user)
+	a := auth.NewAuthService(auth.Options{
+		DB:                gormDB,
+		Logger:            l.Named("auth"),
+		TokenValidInHours: 24,
+	})
+	api.a = a
+
+	// Check if auth should be enabled
 	utils.ParseEnvironmentVars(api)
-	if api.EnableAuth {
-		a := auth.NewAuthService(auth.Options{
-			DB:                gormDB,
-			Logger:            l.Named("auth"),
-			TokenValidInHours: 24,
-		})
-		api.a = a
-	}
 
 	api.registerRoutes(router)
 }
