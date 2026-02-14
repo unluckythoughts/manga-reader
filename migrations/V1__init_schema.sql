@@ -4,11 +4,12 @@ CREATE TABLE IF NOT EXISTS chapters (
   title       TEXT NOT NULL,
   book_id     INTEGER,
   number      TEXT,
-  image_urls  TEXT,
+  content     TEXT,
   upload_date DATETIME,
   completed   BOOLEAN NOT NULL DEFAULT FALSE,
   downloaded  BOOLEAN NOT NULL DEFAULT FALSE,
   other_id    TEXT,
+  created_at  DATETIME NOT NULL,
   updated_at  DATETIME NOT NULL,
   deleted_at  DATETIME,
   FOREIGN KEY (book_id) REFERENCES books(id)
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS books (
   slug        TEXT,
   other_id    TEXT,
   source_id   INTEGER,
+  created_at  DATETIME NOT NULL,
   updated_at  DATETIME NOT NULL,
   deleted_at  DATETIME,
   FOREIGN KEY (source_id) REFERENCES sources(id)
@@ -36,6 +38,7 @@ CREATE TABLE IF NOT EXISTS sources (
   name          TEXT UNIQUE NOT NULL,
   domain        TEXT UNIQUE NOT NULL,
   icon_url      TEXT,
+  created_at    DATETIME NOT NULL,
   updated_at    DATETIME NOT NULL,
   deleted_at    DATETIME
 );
@@ -46,6 +49,7 @@ CREATE TABLE IF NOT EXISTS favorites (
   book_id     INTEGER,
   progress    TEXT,
   categories  TEXT,
+  created_at  DATETIME NOT NULL,
   updated_at  DATETIME NOT NULL,
   deleted_at  DATETIME,
   FOREIGN KEY (user_id) REFERENCES users(id),
@@ -55,6 +59,7 @@ CREATE TABLE IF NOT EXISTS favorites (
 CREATE TABLE IF NOT EXISTS categories (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   name        TEXT,
+  created_at  DATETIME NOT NULL,
   updated_at  DATETIME NOT NULL,
   deleted_at  DATETIME
 );
@@ -70,6 +75,7 @@ CREATE TABLE IF NOT EXISTS users (
   role                INTEGER NOT NULL DEFAULT 1,
   google_id           TEXT,
   google_avatar       TEXT,
+  created_at          DATETIME NOT NULL,
   updated_at          DATETIME NOT NULL,
   deleted_at          DATETIME
 );
@@ -82,6 +88,7 @@ CREATE TABLE IF NOT EXISTS verify (
   token           TEXT NOT NULL UNIQUE,
   verified        BOOLEAN NOT NULL DEFAULT FALSE,
   expires_at      DATETIME NOT NULL,
+  created_at      DATETIME NOT NULL,
   updated_at      DATETIME NOT NULL,
   deleted_at      DATETIME
 );
