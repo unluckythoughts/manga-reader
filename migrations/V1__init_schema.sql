@@ -67,9 +67,9 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS users (
   id                  INTEGER PRIMARY KEY AUTOINCREMENT,
   name                TEXT NOT NULL,
-  email               TEXT UNIQUE,
+  email               TEXT,
   email_verified      BOOLEAN NOT NULL DEFAULT FALSE,
-  mobile              TEXT UNIQUE,
+  mobile              TEXT,
   mobile_verified     BOOLEAN NOT NULL DEFAULT FALSE,
   password            TEXT NOT NULL,
   role                INTEGER NOT NULL DEFAULT 1,
@@ -81,6 +81,9 @@ CREATE TABLE IF NOT EXISTS users (
 );
 CREATE INDEX IF NOT EXISTS idx_users_deleted_at ON users(deleted_at);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+-- Unique constraint only when email/mobile is not NULL and not empty
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique ON users(email) WHERE email IS NOT NULL AND email != '';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_mobile_unique ON users(mobile) WHERE mobile IS NOT NULL AND mobile != '';
 
 CREATE TABLE IF NOT EXISTS verify (
   id              INTEGER PRIMARY KEY AUTOINCREMENT,

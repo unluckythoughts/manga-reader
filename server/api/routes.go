@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/unluckythoughts/book-reader/server/db"
 	"github.com/unluckythoughts/book-reader/server/models"
 	"github.com/unluckythoughts/book-reader/server/service"
@@ -22,7 +24,6 @@ type api struct {
 func (a *api) registerRoutes(router web.Router) {
 	if a.EnableAuth {
 		// Auth API
-		router.POST("/api/v1/auth/login", a.a.LoginHandler)
 		router.POST("/api/v1/auth/register", a.a.GetRegisterHandlerForUserRole(models.UserRole))
 		router.POST("/api/v1/auth/logout", a.a.LogoutHandler)
 
@@ -46,15 +47,19 @@ func (a *api) registerRoutes(router web.Router) {
 		router.UseFor("/api/v1/reader/", a.a.GetAuthMiddleware())
 	} else {
 		// If auth is disabled, create a dummy user and set it in the context for all requests
-		a.a.CreateUser(&auth.User{
+		err := a.a.CreateUser(&auth.User{
 			Name:     "dummy",
 			Email:    "dummy@example.com",
-			Password: "dummy",          // In a real application, use a secure password and hash it
-			Role:     models.AdminRole, // Assign admin role for testing purposes
+			Password: "Dummy@example123", // In a real application, use a secure password and hash it
+			Role:     models.AdminRole,   // Assign admin role for testing purposes
 		})
+		if err != nil {
+			panic(fmt.Sprintf("failed to create dummy user with err: %+v", err))
+		}
 	}
 
 	// User API
+	router.POST("/api/v1/auth/login", a.a.LoginHandler)
 	router.GET("/api/v1/user", a.a.GetUserHandler)
 
 	// Books API
