@@ -6,10 +6,10 @@ import (
 )
 
 // GetBooks retrieves a paginated list of books with optional filters
-func (s *ReaderService) GetBooks(page, limit int, sourceID uint) ([]models.Book, int64, error) {
+func (s *ReaderService) GetBooks(page, limit int, search, bookType string, sourceID uint) ([]models.Book, int64, error) {
 	offset := (page - 1) * limit
 
-	return s.db.ListBooks(offset, limit, "", sourceID)
+	return s.db.ListBooks(offset, limit, bookType, search, sourceID)
 }
 
 // GetBookByID retrieves a book by its ID

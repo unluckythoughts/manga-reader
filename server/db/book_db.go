@@ -132,7 +132,7 @@ func (d *DB) HardDeleteBook(id uint) error {
 }
 
 // ListBooks retrieves all books with optional filters and returns total count
-func (d *DB) ListBooks(offset, limit int, bookType string, sourceID uint) ([]models.Book, int64, error) {
+func (d *DB) ListBooks(offset, limit int, bookType, search string, sourceID uint) ([]models.Book, int64, error) {
 	var books []models.Book
 	var total int64
 
@@ -143,6 +143,9 @@ func (d *DB) ListBooks(offset, limit int, bookType string, sourceID uint) ([]mod
 	}
 	if sourceID > 0 {
 		countQuery = countQuery.Where("source_id = ?", sourceID)
+	}
+	if search != "" {
+		countQuery = countQuery.Where("title LIKE ?", "%"+search+"%")
 	}
 
 	// Get total count
@@ -164,6 +167,10 @@ func (d *DB) ListBooks(offset, limit int, bookType string, sourceID uint) ([]mod
 
 	// preload source
 	query = query.Preload("Source")
+
+	if search != "" {
+		query = query.Where("title LIKE ?", "%"+search+"%")
+	}
 
 	if err := query.Find(&books).Error; err != nil {
 		return nil, 0, err
@@ -220,7 +227,7 @@ func (d *DB) CountBooks(bookType string, sourceID uint) (int64, error) {
 // SearchBooks searches books by title
 func (d *DB) SearchBooks(searchTerm string, offset, limit int) ([]models.Book, error) {
 	var books []models.Book
-	query := d.db.Where("title ILIKE ?", "%"+searchTerm+"%").Offset(offset)
+	query := d.db.Where("title LIKE ?", "%"+searchTerm+"%").Offset(offset)
 
 	if limit > 0 {
 		query = query.Limit(limit)

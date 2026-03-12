@@ -123,7 +123,7 @@ func (d *DB) GetAllCategories() ([]models.Category, error) {
 // SearchCategories searches categories by name
 func (d *DB) SearchCategories(searchTerm string, offset, limit int) ([]models.Category, error) {
 	var categories []models.Category
-	query := d.db.Where("name ILIKE ?", "%"+searchTerm+"%").Offset(offset)
+	query := d.db.Where("name LIKE ?", "%"+searchTerm+"%").Offset(offset)
 
 	if limit > 0 {
 		query = query.Limit(limit)

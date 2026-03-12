@@ -156,7 +156,7 @@ func (d *DB) GetAllUsers() ([]auth.User, error) {
 // SearchUsers searches users by name
 func (d *DB) SearchUsers(searchTerm string, offset, limit int) ([]auth.User, error) {
 	var users []auth.User
-	query := d.db.Where("name ILIKE ?", "%"+searchTerm+"%").Offset(offset)
+	query := d.db.Where("name LIKE ?", "%"+searchTerm+"%").Offset(offset)
 
 	if limit > 0 {
 		query = query.Limit(limit)

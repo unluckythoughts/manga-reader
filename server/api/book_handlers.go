@@ -11,6 +11,8 @@ func (api *api) ListBooks(r web.Request) (any, error) {
 	pageSize := r.GetURLParam("limit")
 	pageNumber := r.GetURLParam("page")
 	sourceIDText := r.GetURLParam("source_id")
+	bookTypeText := r.GetURLParam("book_type")
+	search := r.GetURLParam("search")
 
 	limit, err := strconv.Atoi(pageSize)
 	if err != nil || limit <= 0 {
@@ -24,8 +26,13 @@ func (api *api) ListBooks(r web.Request) (any, error) {
 	if err != nil {
 		sourceID = 0 // default sourceID
 	}
+	bookType := "" // default book type (no filter)
+	if bookTypeText == string(models.BookTypeManga) ||
+		bookTypeText == string(models.BookTypeNovel) {
+		bookType = bookTypeText
+	}
 
-	books, total, err := api.s.GetBooks(page, limit, uint(sourceID))
+	books, total, err := api.s.GetBooks(page, limit, search, bookType, uint(sourceID))
 	if err != nil {
 		return models.BooksPaginatedResponse{}, err
 	}

@@ -172,7 +172,7 @@ func (d *DB) GetAllSources() ([]models.Source, error) {
 // SearchSources searches sources by name or domain
 func (d *DB) SearchSources(searchTerm string, offset, limit int) ([]models.Source, error) {
 	var sources []models.Source
-	query := d.db.Where("name ILIKE ? OR domain ILIKE ?", "%"+searchTerm+"%", "%"+searchTerm+"%").Offset(offset)
+	query := d.db.Where("name LIKE ? OR domain LIKE ?", "%"+searchTerm+"%", "%"+searchTerm+"%").Offset(offset)
 
 	if limit > 0 {
 		query = query.Limit(limit)
