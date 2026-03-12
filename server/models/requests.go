@@ -34,7 +34,7 @@ type CreateChapterRequest struct {
 
 // CreateFavoriteRequest represents the request body for creating a favorite
 type CreateFavoriteRequest struct {
-	UserID     uint   `json:"user_id" valid:"required"`
+	UserID     uint   `json:"user_id,omitempty"`
 	BookID     uint   `json:"book_id" valid:"required"`
 	Progress   string `json:"progress,omitempty"`
 	Categories string `json:"categories,omitempty"`

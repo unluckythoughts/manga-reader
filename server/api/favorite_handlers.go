@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
 	"github.com/unluckythoughts/go-microservice/v2/tools/web"
 )
 
@@ -57,10 +58,17 @@ func (api *api) GetFavorite(r web.Request) (any, error) {
 }
 
 func (api *api) CreateFavorite(r web.Request) (any, error) {
+	user, err := auth.GetAuthenticatedUser(r)
+	if err != nil {
+		return nil, err
+	}
+
 	body := models.CreateFavoriteRequest{}
 	if err := r.GetValidatedBody(&body); err != nil {
 		return nil, err
 	}
+
+	body.UserID = user.ID
 
 	return api.s.CreateFavorite(&body)
 }
