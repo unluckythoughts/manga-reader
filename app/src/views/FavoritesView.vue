@@ -15,19 +15,24 @@
             loading="lazy"
           )
           .fav-card__no-cover(v-else) {{ fav.book?.title?.[0] ?? '?' }}
+          img.fav-card__source-icon(
+            v-if="fav.book?.source?.icon_url"
+            :src="resolveImage(fav.book.source.icon_url, fav.book.source.domain)"
+            :alt="fav.book.source.name"
+            :title="fav.book.source.name"
+          )
+        span.fav-card__ribbon(v-if="fav.book?.type" :class="`badge badge--${fav.book.type}`") {{ fav.book.type }}
+        button.fav-card__fav(
+          @click="removeFavorite(fav.ID)"
+          :disabled="removing === fav.ID"
+          title="Remove from favorites"
+        ) {{ removing === fav.ID ? '…' : '♥' }}
         .fav-card__body
-          .fav-card__meta
-            span.badge(v-if="fav.book?.type" :class="`badge--${fav.book.type}`") {{ fav.book.type }}
           router-link.fav-card__title(:to="fav.book?.ID ? `/books/${fav.book.ID}` : '#'")
             | {{ fav.book?.title ?? 'Unknown Book' }}
-          p.fav-card__source(v-if="fav.book?.source") {{ fav.book.source.name }}
           .fav-card__progress(v-if="fav.progress?.length")
             span.fav-card__progress-label Progress:
             span {{ fav.progress.join(', ') }}
-          .fav-card__actions
-            button.btn.btn--danger(@click="removeFavorite(fav.ID)" :disabled="removing === fav.ID")
-              span(v-if="removing === fav.ID") Removing…
-              span(v-else) Remove
     p.empty-state(v-else) No favorites yet. Browse #[router-link(to="/books") books] to add some!
 
     .pagination(v-if="totalPages > 1")
@@ -112,6 +117,7 @@ onMounted(() => loadFavorites(1))
 }
 
 .fav-card {
+  position: relative;
   background-color: @bg-card;
   border: 1px solid @border-color;
   border-radius: @radius-lg;
@@ -120,22 +126,76 @@ onMounted(() => loadFavorites(1))
   flex-direction: column;
 
   &__cover {
+    position: relative;
     aspect-ratio: 2 / 3;
     overflow: hidden;
     background-color: @bg-secondary;
     flex-shrink: 0;
     display: block;
 
-    img {
+    img:not(.fav-card__source-icon) {
       width: 100%;
       height: 100%;
       object-fit: cover;
       transition: transform 0.4s ease;
     }
 
-    &:hover img {
+    &:hover img:not(.fav-card__source-icon) {
       transform: scale(1.04);
     }
+  }
+
+  &__source-icon {
+    position: absolute;
+    bottom: 0.4rem;
+    right: 0.4rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: @radius-sm;
+    object-fit: contain;
+    background: rgba(0, 0, 0, 0.55);
+    padding: 0.15rem;
+    z-index: 2;
+  }
+
+  &__ribbon {
+    position: absolute;
+    top: 0.5rem;
+    left: -1.75rem;
+    width: 6rem;
+    text-align: center;
+    transform: rotate(-45deg);
+    padding: 0.2rem 0;
+    font-size: @fs-xs;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    z-index: 2;
+    pointer-events: none;
+    background-color: #000 !important;
+    color: #aaa !important;
+  }
+
+  &__fav {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    background: rgba(0, 0, 0, 0.55);
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    line-height: 1;
+    color: #e53e3e;
+    cursor: pointer;
+    z-index: 3;
+    transition: color 0.2s ease;
+
+    &:disabled { cursor: default; }
   }
 
   &__no-cover {
@@ -158,9 +218,12 @@ onMounted(() => loadFavorites(1))
     flex: 1;
   }
 
-  &__meta {
+  &__body {
+    padding: 0.85rem;
     display: flex;
+    flex-direction: column;
     gap: 0.4rem;
+    flex: 1;
   }
 
   &__title {
@@ -176,11 +239,6 @@ onMounted(() => loadFavorites(1))
     &:hover { color: @accent; text-decoration: none; }
   }
 
-  &__source {
-    font-size: @fs-xs;
-    color: @text-muted;
-  }
-
   &__progress {
     font-size: @fs-xs;
     color: @text-secondary;
@@ -194,9 +252,5 @@ onMounted(() => loadFavorites(1))
     color: @text-muted;
   }
 
-  &__actions {
-    margin-top: auto;
-    padding-top: 0.5rem;
-  }
 }
 </style>
