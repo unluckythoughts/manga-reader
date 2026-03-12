@@ -11,6 +11,7 @@ db.sqlite
 tmp/
 static/
 public/
+build_errors.txt
 
 # Test binary, built with `go test -c`
 *.test
@@ -34,3 +35,6 @@ temp/
 **/.env
 **/app/.env
 .env.auth
+
+# node modules
+node_modules/
