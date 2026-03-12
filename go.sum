@@ -120,8 +120,8 @@ github.com/temoto/robotstxt v1.1.2 h1:W2pOjSJ6SWvldyEuiFXNxz3xZ8aiWX5LbfDiOFd7Fx
 github.com/temoto/robotstxt v1.1.2/go.mod h1:+1AmkuG3IYkh1kv0d2qEB9Le88ehNO0zwOr3ujewlOo=
 github.com/unluckythoughts/go-microservice/v2 v2.8.1 h1:P2y3C92547jkNUbu6CozzHm/TDHKgdg2RP6thYgoY88=
 github.com/unluckythoughts/go-microservice/v2 v2.8.1/go.mod h1:akcRYU+0tPPYrM2EO24mPc9ExLmFn0SbKZpe+CZ1wEs=
-github.com/unluckythoughts/go-scraper v0.1.16 h1:SllqawC+S2ZgY7a22/XnytqBu+Zncc0uHQH7Ynu4sWM=
-github.com/unluckythoughts/go-scraper v0.1.16/go.mod h1:3mKej8JX8kUjEIGHj/7qo+QRs8NQLO4c1CYMZZ3QL3c=
+github.com/unluckythoughts/go-scraper v0.1.18 h1:oNYbd4LNZHO3Jnhur5CHuUqIb3KVRyjn4KgDVlNoywc=
+github.com/unluckythoughts/go-scraper v0.1.18/go.mod h1:3mKej8JX8kUjEIGHj/7qo+QRs8NQLO4c1CYMZZ3QL3c=
 github.com/ysmood/fetchup v0.2.3 h1:ulX+SonA0Vma5zUFXtv52Kzip/xe7aj4vqT5AJwQ+ZQ=
 github.com/ysmood/fetchup v0.2.3/go.mod h1:xhibcRKziSvol0H1/pj33dnKrYyI2ebIvz5cOOkYGns=
 github.com/ysmood/goob v0.4.0 h1:HsxXhyLBeGzWXnqVKtmT9qM7EuVs/XOgkX7T6r1o1AQ=

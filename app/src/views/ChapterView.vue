@@ -16,7 +16,7 @@
       template(v-if="isManga && chapter.content?.length")
         .manga-reader
           img.manga-reader__page(
-            v-for="(src, idx) in chapter.content"
+            v-for="(src, idx) in chapter.content.split('::;;::')"
             :key="idx"
             :src="src"
             :alt="`Page ${idx + 1}`"
