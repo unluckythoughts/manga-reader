@@ -89,7 +89,7 @@ func getChapter(data string, conn models.Connector) (models.Chapter, error) {
 			return chapter, err
 		}
 
-		chapter.UploadDate = uploadDate
+		chapter.UploadDate = *uploadDate
 	}
 
 	return chapter, nil

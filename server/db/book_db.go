@@ -101,7 +101,38 @@ func (d *DB) GetBookByURL(url string) (*models.Book, error) {
 // UpdateBook updates an existing book
 func (d *DB) UpdateBook(book *models.Book) error {
 	book.UpdatedAt = time.Now()
-	if err := d.db.Save(book).Error; err != nil {
+
+	err := d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Omit("Chapters").Save(book).Error; err != nil {
+			return err
+		}
+
+		if len(book.Chapters) == 0 {
+			return nil
+		}
+
+		now := time.Now()
+		for i := range book.Chapters {
+			book.Chapters[i].BookID = book.ID
+			book.Chapters[i].UpdatedAt = now
+		}
+
+		if err := tx.Clauses(
+			clause.OnConflict{
+				Columns:   []clause.Column{{Name: "id"}},
+				DoUpdates: clause.AssignmentColumns([]string{"url", "title", "book_id", "number", "content", "upload_date", "completed", "downloaded", "other_id", "updated_at"}),
+			},
+			clause.OnConflict{
+				Columns:   []clause.Column{{Name: "book_id"}, {Name: "number"}},
+				DoUpdates: clause.AssignmentColumns([]string{"url", "title", "content", "upload_date", "completed", "downloaded", "other_id", "updated_at"}),
+			},
+		).Create(&book.Chapters).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
 		return err
 	}
 	return nil

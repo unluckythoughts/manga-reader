@@ -1,6 +1,7 @@
 package api
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/unluckythoughts/book-reader/server/models"
@@ -54,7 +55,16 @@ func (api *api) GetBook(r web.Request) (any, error) {
 	idText := r.GetRouteParam("id")
 	id, err := strconv.Atoi(idText)
 	if err != nil {
-		return nil, err
+		return nil, web.NewError(http.StatusNotFound, err)
+	}
+
+	forceText := r.GetURLParam("force")
+	force := false
+	if forceText != "" {
+		force, err = strconv.ParseBool(forceText)
+		if err != nil {
+			return nil, web.NewError(http.StatusUnprocessableEntity, err)
+		}
 	}
 
 	book, err := api.s.GetBookByID(uint(id))
@@ -63,7 +73,10 @@ func (api *api) GetBook(r web.Request) (any, error) {
 	}
 
 	if len(book.Chapters) > 0 || book.Synopsis != "" {
-		return book, nil
+		if !force {
+			// if force is not enabled return db data
+			return book, nil
+		}
 	}
 
 	// If the book has no chapters and an empty synopsis,

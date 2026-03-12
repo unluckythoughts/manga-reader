@@ -27,9 +27,11 @@ func NewAsuraConnector(l *zap.Logger) models.IConnector {
 				Synopsis:        ".main-info .info-right .entry-content p",
 				ChapterListItem: "#chapterlist ul.clstyle li",
 				Chapter: models.ChapterSelectors{
-					URL:    ".main .top h1.tit a[href]||a[href]",
-					Number: "h1.entry-title||a span.chapternum",
-					Title:  "h1.entry-title||a span.chapternum",
+					URL:        ".main .top h1.tit a[href]||a[href]",
+					Number:     "h1.entry-title||a span.chapternum",
+					Title:      "h1.entry-title||a span.chapternum",
+					UploadDate: "a span.chapterdate",
+					DateFormat: "January 2, 2006",
 					Content: models.ContentSelectors{
 						Data: "#readerarea p img[src]",
 					},
@@ -39,5 +41,5 @@ func NewAsuraConnector(l *zap.Logger) models.IConnector {
 	}
 
 	bc := theme.NewBasic(conn, l).(*theme.BasicConnector)
-	return &fwb{bc}
+	return &asura{bc}
 }
