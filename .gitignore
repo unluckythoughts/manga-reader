@@ -12,6 +12,7 @@ tmp/
 static/
 public/
 build_errors.txt
+dist/
 
 # Test binary, built with `go test -c`
 *.test

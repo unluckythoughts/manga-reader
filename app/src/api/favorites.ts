@@ -5,8 +5,8 @@ export const favoritesApi = {
   list: (page = 1, limit = 20) =>
     apiClient.get<PaginatedResponse<Favorite>>(`/reader/favorites?page=${page}&limit=${limit}`),
   get: (id: number) => apiClient.get<Favorite>(`/reader/favorites/${id}`),
-  create: (bookId: number, userId: number) =>
-    apiClient.post<Favorite>('/reader/favorites', { book_id: bookId, user_id: userId }),
+  create: (bookId: number) =>
+    apiClient.post<Favorite>('/reader/favorites', { book_id: bookId }),
   update: (id: number, data: { progress?: string; categories?: string }) =>
     apiClient.put<Favorite>(`/reader/favorites/${id}`, data),
   updateProgress: (id: number, chapter: number, level = 0) =>

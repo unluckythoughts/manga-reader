@@ -12,8 +12,13 @@ import { useAuthStore } from './stores/auth'
 
 const authStore = useAuthStore()
 
-onMounted(() => {
-  authStore.fetchUser()
+onMounted(async () => {
+  if (authStore.token) {
+    authStore.fetchUser()
+  } else {
+    // Auto-login as dummy user when auth is disabled so all requests carry a bearer token
+    await authStore.login('dummy@example.com', 'Dummy@example123')
+  }
 })
 </script>
 

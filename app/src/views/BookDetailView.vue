@@ -29,6 +29,7 @@
             @click="removeFavorite"
             :disabled="favLoading"
           ) ✕ Remove Favorite
+          p.error-msg(v-if="favError") {{ favError }}
 
     .chapters-section
       .chapters-section__header
@@ -55,22 +56,21 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { booksApi } from '../api/books'
 import { favoritesApi } from '../api/favorites'
-import { useAuthStore } from '../stores/auth'
 import type { Book, Favorite } from '../types'
+
+const route = useRoute()
 
 function resolveImage(imageUrl: string, domain?: string): string {
   if (imageUrl.startsWith('http')) return imageUrl
   return `https://${domain}${imageUrl}`
 }
 
-const route = useRoute()
-const authStore = useAuthStore()
-
 const book = ref<Book | null>(null)
 const loading = ref(false)
 const error = ref('')
 const favorited = ref<Favorite | null>(null)
 const favLoading = ref(false)
+const favError = ref('')
 
 const chapters = computed(() =>
   [...(book.value?.chapters ?? [])].sort((a, b) => parseFloat(b.number ?? '0') - parseFloat(a.number ?? '0'))
@@ -105,13 +105,13 @@ async function loadFavorites() {
 }
 
 async function addFavorite() {
-  if (!authStore.user) return
   favLoading.value = true
+  favError.value = ''
   try {
-    const fav = await favoritesApi.create(Number(route.params.id), authStore.user.ID)
+    const fav = await favoritesApi.create(Number(route.params.id))
     favorited.value = fav
-  } catch {
-    // ignore
+  } catch (e: unknown) {
+    favError.value = e instanceof Error ? e.message : 'Failed to add favorite'
   } finally {
     favLoading.value = false
   }
