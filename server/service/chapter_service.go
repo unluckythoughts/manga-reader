@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/unluckythoughts/book-reader/server/connector"
 	"github.com/unluckythoughts/book-reader/server/models"
+	"github.com/unluckythoughts/book-reader/server/utils"
 )
 
 // GetChapters retrieves a paginated list of chapters with optional book_id filter
@@ -45,7 +46,15 @@ func (s *ReaderService) UpdateChapter(chapter *models.Chapter) error {
 	if err != nil {
 		return err
 	}
-	chapter.Content = content
+	if chapter.Book.Type == models.BookTypeManga {
+		var urls models.List
+		for _, url := range content.Values() {
+			urls.Add(utils.GetRelativeURL(url, src.Domain))
+		}
+		chapter.Content = urls
+	} else {
+		chapter.Content = content
+	}
 
 	// save chapter to database after fetching details
 	return s.db.UpdateChapter(chapter)

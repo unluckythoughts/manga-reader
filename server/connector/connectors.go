@@ -23,6 +23,7 @@ func init() {
 	for _, connector := range []models.IConnector{
 		// Add connectors here
 		NewFreeWebNovelConnector(l.Named("FreeWebNovel")),
+		NewAsuraConnector(l.Named("AsuraScans")),
 	} {
 		connectorMap[connector.GetName()] = connector
 	}

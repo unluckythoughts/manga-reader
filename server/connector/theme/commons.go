@@ -33,7 +33,7 @@ func getBook(data string, conn models.Connector) (models.Book, error) {
 	}
 
 	book = models.Book{
-		URL:      utils.GetTrucattedURL(url),
+		URL:      utils.GetRelativeURL(url, conn.Domain),
 		Title:    title,
 		ImageURL: imageURL,
 		Synopsis: synopsis,
@@ -78,7 +78,7 @@ func getChapter(data string, conn models.Connector) (models.Chapter, error) {
 	}
 
 	chapter = models.Chapter{
-		URL:    utils.GetTrucattedURL(url),
+		URL:    utils.GetRelativeURL(url, conn.Domain),
 		Title:  title,
 		Number: number,
 	}

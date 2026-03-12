@@ -124,7 +124,7 @@ func (s *FreeWebNovelTestSuite) TestGetBookChapters() {
 
 	bookURL := books[0].URL
 
-	chapters, err := s.connector.GetBookChapters(bookURL, "")
+	chapters, err := s.connector.GetBookChapters(bookURL)
 
 	if err != nil {
 		s.T().Logf("Warning: GetBookChapters failed: %v", err)
@@ -164,14 +164,14 @@ func (s *FreeWebNovelTestSuite) TestGetBookChaptersWithFilter() {
 	bookURL := books[0].URL
 
 	// Get all chapters first
-	allChapters, err := s.connector.GetBookChapters(bookURL, "")
+	allChapters, err := s.connector.GetBookChapters(bookURL)
 	if err != nil || len(allChapters) == 0 {
 		s.T().Skip("Skipping test: cannot get chapters for testing")
 		return
 	}
 
 	// Try to filter chapters greater than chapter 1
-	filteredChapters, err := s.connector.GetBookChapters(bookURL, "1")
+	filteredChapters, err := s.connector.GetBookChapters(bookURL)
 	assert.NoError(s.T(), err, "GetBookChapters on "+bookURL+" with filter should not return an error")
 
 	// Filtered chapters should be less than or equal to all chapters
@@ -189,7 +189,7 @@ func (s *FreeWebNovelTestSuite) TestGetChapterContent() {
 	assert.NoError(s.T(), err, "GetBookCount should not return an error")
 	assert.NotEmpty(s.T(), books, "Books list should not be empty")
 
-	chapters, err := s.connector.GetBookChapters(books[0].URL, "")
+	chapters, err := s.connector.GetBookChapters(books[0].URL)
 	assert.NoError(s.T(), err, "GetBookChapters should not return an error")
 	assert.NotEmpty(s.T(), chapters, "Chapters list should not be empty")
 
@@ -225,7 +225,7 @@ func (s *FreeWebNovelTestSuite) TestIntegrationFlow() {
 	testBook := books[0]
 
 	// Step 2: Get chapters for the first book
-	chapters, err := s.connector.GetBookChapters(testBook.URL, "")
+	chapters, err := s.connector.GetBookChapters(testBook.URL)
 	if err != nil {
 		s.T().Skip("Skipping integration flow test: cannot get chapters")
 		return
