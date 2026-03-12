@@ -18,9 +18,12 @@ func (d *DB) CreateFavorite(favorite *models.Favorite) error {
 }
 
 // GetFavoriteByID retrieves a favorite by its ID
-func (d *DB) GetFavoriteByID(id uint) (*models.Favorite, error) {
+func (d *DB) GetFavoriteByID(id, user_id uint) (*models.Favorite, error) {
 	var favorite models.Favorite
-	if err := d.db.First(&favorite, id).Error; err != nil {
+
+	query := d.db.Where("id = ? and user_id = ?", id, user_id)
+
+	if err := query.First(&favorite).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("favorite not found")
 		}
@@ -30,7 +33,7 @@ func (d *DB) GetFavoriteByID(id uint) (*models.Favorite, error) {
 }
 
 // GetFavoriteByIDWithRelations retrieves a favorite by its ID with related data
-func (d *DB) GetFavoriteByIDWithRelations(id uint, preload ...string) (*models.Favorite, error) {
+func (d *DB) GetFavoriteByIDWithRelations(id, user_id uint, preload ...string) (*models.Favorite, error) {
 	var favorite models.Favorite
 	query := d.db
 
@@ -38,7 +41,9 @@ func (d *DB) GetFavoriteByIDWithRelations(id uint, preload ...string) (*models.F
 		query = query.Preload(p)
 	}
 
-	if err := query.First(&favorite, id).Error; err != nil {
+	query = query.Where("id = ? and user_id = ?", id, user_id)
+
+	if err := query.First(&favorite).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("favorite not found")
 		}
@@ -111,10 +116,10 @@ func (d *DB) UpdateFavorite(favorite *models.Favorite) error {
 	return nil
 }
 
-// UpdateFavoriteFields updates specific fields of a favorite
-func (d *DB) UpdateFavoriteFields(id uint, fields map[string]interface{}) error {
+// UpdateFavoriteFields updates specific fields of a favorite scoped to user_id
+func (d *DB) UpdateFavoriteFields(id, userID uint, fields map[string]interface{}) error {
 	fields["updated_at"] = time.Now()
-	result := d.db.Model(&models.Favorite{}).Where("id = ?", id).Updates(fields)
+	result := d.db.Model(&models.Favorite{}).Where("id = ? AND user_id = ?", id, userID).Updates(fields)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -125,18 +130,18 @@ func (d *DB) UpdateFavoriteFields(id uint, fields map[string]interface{}) error 
 }
 
 // UpdateFavoriteProgress updates the progress field of a favorite
-func (d *DB) UpdateFavoriteProgress(id uint, progress string) error {
-	return d.UpdateFavoriteFields(id, map[string]interface{}{"progress": progress})
+func (d *DB) UpdateFavoriteProgress(id, userID uint, progress string) error {
+	return d.UpdateFavoriteFields(id, userID, map[string]interface{}{"progress": progress})
 }
 
 // UpdateFavoriteCategories updates the categories field of a favorite
-func (d *DB) UpdateFavoriteCategories(id uint, categories string) error {
-	return d.UpdateFavoriteFields(id, map[string]interface{}{"categories": categories})
+func (d *DB) UpdateFavoriteCategories(id, userID uint, categories string) error {
+	return d.UpdateFavoriteFields(id, userID, map[string]interface{}{"categories": categories})
 }
 
-// DeleteFavorite soft deletes a favorite by setting DeletedAt
-func (d *DB) DeleteFavorite(id uint) error {
-	result := d.db.Delete(&models.Favorite{}, id)
+// DeleteFavorite soft deletes a favorite by id scoped to user_id
+func (d *DB) DeleteFavorite(id, user_id uint) error {
+	result := d.db.Where("id = ? AND user_id = ?", id, user_id).Delete(&models.Favorite{})
 	if result.Error != nil {
 		return result.Error
 	}
@@ -190,6 +195,8 @@ func (d *DB) ListFavorites(offset, limit int, userID uint) ([]models.Favorite, e
 	if userID > 0 {
 		query = query.Where("user_id = ?", userID)
 	}
+
+	query = query.Preload("Book").Preload("Book.Source")
 
 	if err := query.Order("updated_at DESC").Find(&favorites).Error; err != nil {
 		return nil, err

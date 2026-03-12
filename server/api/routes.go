@@ -60,7 +60,12 @@ func (a *api) registerRoutes(router web.Router) {
 				panic(fmt.Sprintf("failed to create dummy user with err: %+v", err))
 			}
 		}
+
+		// Protect favorites API routes
+		router.UseFor("/api/v1/reader/favorites", a.a.GetAuthMiddleware())
 	}
+
+	router.UseFor("/api/v1/user", a.a.GetAuthMiddleware())
 
 	// User API
 	router.POST("/api/v1/auth/login", a.a.LoginHandler)

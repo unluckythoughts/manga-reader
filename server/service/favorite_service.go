@@ -22,8 +22,8 @@ func (s *ReaderService) GetFavorites(page, limit int, userID uint) ([]models.Fav
 }
 
 // GetFavoriteByID retrieves a favorite by its ID
-func (s *ReaderService) GetFavoriteByID(id uint) (*models.Favorite, error) {
-	return s.db.GetFavoriteByIDWithRelations(id, "User", "Book")
+func (s *ReaderService) GetFavoriteByID(id, user_id uint) (*models.Favorite, error) {
+	return s.db.GetFavoriteByIDWithRelations(id, user_id, "User", "Book")
 }
 
 // CreateFavorite creates a new favorite
@@ -41,8 +41,8 @@ func (s *ReaderService) CreateFavorite(input *models.CreateFavoriteRequest) (*mo
 }
 
 // UpdateFavorite updates an existing favorite
-func (s *ReaderService) UpdateFavorite(id uint, input *models.UpdateFavoriteRequest) (*models.Favorite, error) {
-	favorite, err := s.db.GetFavoriteByID(id)
+func (s *ReaderService) UpdateFavorite(id, user_id uint, input *models.UpdateFavoriteRequest) (*models.Favorite, error) {
+	favorite, err := s.db.GetFavoriteByID(id, user_id)
 	if err != nil {
 		return nil, err
 	}
@@ -55,6 +55,6 @@ func (s *ReaderService) UpdateFavorite(id uint, input *models.UpdateFavoriteRequ
 }
 
 // DeleteFavorite deletes a favorite by its ID
-func (s *ReaderService) DeleteFavorite(id uint) error {
-	return s.db.DeleteFavorite(id)
+func (s *ReaderService) DeleteFavorite(id, user_id uint) error {
+	return s.db.DeleteFavorite(id, user_id)
 }
