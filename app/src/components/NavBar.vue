@@ -1,5 +1,5 @@
 <template lang="pug">
-nav.navbar
+nav.navbar(:class="{ 'navbar--hidden': !showNav }")
   .navbar__brand
     router-link(to="/books") 📖 Book Reader
   .navbar__links
@@ -16,16 +16,56 @@ nav.navbar
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const showNav = ref(true)
+
+let lastScrollY = 0
+let upScrollDistance = 0
+
+function handleScroll() {
+  const currentY = window.scrollY
+  const delta = currentY - lastScrollY
+
+  if (currentY <= 20) {
+    showNav.value = true
+    upScrollDistance = 0
+    lastScrollY = currentY
+    return
+  }
+
+  if (delta > 4) {
+    showNav.value = false
+    upScrollDistance = 0
+  } else if (delta < -2) {
+    upScrollDistance += -delta
+    if (upScrollDistance >= 30) {
+      showNav.value = true
+      upScrollDistance = 0
+    }
+  }
+
+  lastScrollY = currentY
+}
 
 function handleLogout() {
   authStore.logout()
   router.push('/login')
 }
+void handleLogout
+
+onMounted(() => {
+  lastScrollY = window.scrollY
+  window.addEventListener('scroll', handleScroll, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>
 
 <style lang="less" scoped>
@@ -41,6 +81,11 @@ function handleLogout() {
   top: 0;
   z-index: 100;
   gap: 1rem;
+  transition: transform 0.25s ease;
+
+  &--hidden {
+    transform: translateY(-100%);
+  }
 
   &__brand {
     a {

@@ -19,6 +19,11 @@
         p.detail-hero__synopsis(v-if="book.synopsis") {{ book.synopsis }}
         p.detail-hero__synopsis.detail-hero__synopsis--muted(v-else) No synopsis available.
         .detail-hero__actions
+          button.btn.btn--ghost(
+            @click="refreshBook"
+            :disabled="refreshLoading"
+            title="Refresh book data from source"
+          ) {{ refreshLoading ? 'Refreshing...' : '↻ Refresh' }}
           button.btn.btn--primary(
             v-if="!favorited"
             @click="addFavorite"
@@ -64,6 +69,7 @@ function resolveImage(imageUrl: string, domain?: string): string {
   if (imageUrl.startsWith('http')) return imageUrl
   return `https://${domain}${imageUrl}`
 }
+void resolveImage
 
 const book = ref<Book | null>(null)
 const loading = ref(false)
@@ -71,16 +77,19 @@ const error = ref('')
 const favorited = ref<Favorite | null>(null)
 const favLoading = ref(false)
 const favError = ref('')
+const refreshLoading = ref(false)
 
 const chapters = computed(() =>
   [...(book.value?.chapters ?? [])].sort((a, b) => parseFloat(b.number ?? '0') - parseFloat(a.number ?? '0'))
 )
+void chapters
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString(undefined, {
     year: 'numeric', month: 'short', day: 'numeric'
   })
 }
+void formatDate
 
 async function loadBook() {
   loading.value = true
@@ -93,6 +102,19 @@ async function loadBook() {
     loading.value = false
   }
 }
+
+async function refreshBook() {
+  refreshLoading.value = true
+  error.value = ''
+  try {
+    book.value = await booksApi.get(Number(route.params.id), true)
+  } catch (e: unknown) {
+    error.value = e instanceof Error ? e.message : 'Failed to refresh book'
+  } finally {
+    refreshLoading.value = false
+  }
+}
+void refreshBook
 
 async function loadFavorites() {
   try {
@@ -116,6 +138,7 @@ async function addFavorite() {
     favLoading.value = false
   }
 }
+void addFavorite
 
 async function removeFavorite() {
   if (!favorited.value) return
@@ -129,6 +152,7 @@ async function removeFavorite() {
     favLoading.value = false
   }
 }
+void removeFavorite
 
 onMounted(() => {
   loadBook()
@@ -220,6 +244,7 @@ onMounted(() => {
     display: flex;
     gap: 0.75rem;
     margin-top: 0.5rem;
+    flex-wrap: wrap;
   }
 }
 

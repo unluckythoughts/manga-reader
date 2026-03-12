@@ -9,5 +9,10 @@ export const booksApi = {
     if (bookType) params.set('book_type', bookType)
     return apiClient.get<PaginatedResponse<Book>>(`/reader/books?${params}`)
   },
-  get: (id: number) => apiClient.get<Book>(`/reader/books/${id}`)
+  get: (id: number, force = false) => {
+    const params = new URLSearchParams()
+    if (force) params.set('force', 'true')
+    const query = params.toString()
+    return apiClient.get<Book>(`/reader/books/${id}${query ? `?${query}` : ''}`)
+  }
 }
