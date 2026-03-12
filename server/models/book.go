@@ -19,8 +19,8 @@ type Book struct {
 	Title    string   `gorm:"not null" json:"title"`
 	Type     BookType `gorm:"type:text;not null;check:type IN ('manga', 'novel')" json:"type"`
 	ImageURL string   `gorm:"column:image_url" json:"image_url,omitempty"`
-	Synopsis string   `json:"synopsis,omitempty"`
-	Slug     string   `json:"slug,omitempty"`
+	Synopsis string   `gorm:"column:synopsis" json:"synopsis,omitempty"`
+	Slug     string   `gorm:"column:slug" json:"slug,omitempty"`
 	OtherID  string   `gorm:"column:other_id" json:"other_id,omitempty"`
 	SourceID uint     `gorm:"column:source_id" json:"source_id,omitempty"`
 

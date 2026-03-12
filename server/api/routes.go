@@ -17,7 +17,7 @@ import (
 type api struct {
 	EnableAuth bool `env:"SERVICE_AUTH_ENABLE" envDefault:"false"`
 	s          *service.ReaderService
-	a          *auth.Auth
+	a          *auth.Service
 }
 
 // registerRoutes registers all API routes
@@ -47,14 +47,18 @@ func (a *api) registerRoutes(router web.Router) {
 		router.UseFor("/api/v1/reader/", a.a.GetAuthMiddleware())
 	} else {
 		// If auth is disabled, create a dummy user and set it in the context for all requests
-		err := a.a.CreateUser(&auth.User{
-			Name:     "dummy",
-			Email:    "dummy@example.com",
-			Password: "Dummy@example123", // In a real application, use a secure password and hash it
-			Role:     models.AdminRole,   // Assign admin role for testing purposes
-		})
+		_, err := a.a.GetUserByEmail("dummy@example.com")
 		if err != nil {
-			panic(fmt.Sprintf("failed to create dummy user with err: %+v", err))
+			// panic(fmt.Sprintf("failed to get dummy user with err: %+v", err))
+			err = a.a.CreateUser(&auth.User{
+				Name:     "dummy",
+				Email:    "dummy@example.com",
+				Password: "Dummy@example123", // In a real application, use a secure password and hash it
+				Role:     models.AdminRole,   // Assign admin role for testing purposes
+			})
+			if err != nil {
+				panic(fmt.Sprintf("failed to create dummy user with err: %+v", err))
+			}
 		}
 	}
 
@@ -91,11 +95,11 @@ func (a *api) registerRoutes(router web.Router) {
 }
 
 func Register(router web.Router, gormDB *gorm.DB, l *zap.Logger, w *worker.Worker) {
-	s := service.New(db.New(gormDB), w)
+	s := service.New(db.New(gormDB), w, l)
 	api := &api{s: s}
 
 	// Initialize auth service (needed even when auth is disabled for dummy user)
-	a := auth.NewAuthService(auth.Options{
+	a := auth.New(auth.Options{
 		DB:                gormDB,
 		Logger:            l.Named("auth"),
 		TokenValidInHours: 24,

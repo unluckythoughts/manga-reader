@@ -53,5 +53,16 @@ func (api *api) GetChapter(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.GetChapterByID(uint(id))
+	chapter, err := api.s.GetChapterByID(uint(id))
+	if err != nil {
+		return nil, err
+	}
+
+	if len(chapter.Content.Values()) == 0 {
+		if err := api.s.UpdateChapter(chapter); err != nil {
+			return nil, err
+		}
+	}
+
+	return chapter, nil
 }

@@ -80,6 +80,7 @@ type IConnector interface {
 	GetBooks() ([]Book, error)
 	GetBooksAsync() (<-chan Book, error)
 	GetBookCount() (int, []Book, error)
-	GetBookChapters(bookURL, chapterNum string) ([]Chapter, error)
+	GetBookSynopsis(bookURL string) (string, error)
+	GetBookChapters(bookURL string) ([]Chapter, error)
 	GetChapterContent(chapterURL string) (List, error)
 }

@@ -38,12 +38,12 @@ func GetAllConnectors() map[string]models.IConnector {
 	return cMap
 }
 
-func GetConnector(domain string) (models.IConnector, error) {
+func GetConnector(name string) (models.IConnector, error) {
 	lock.RLock()
 	defer lock.RUnlock()
-	conn, ok := connectorMap[domain]
+	conn, ok := connectorMap[name]
 	if !ok {
-		return nil, fmt.Errorf("could not find config for %s", domain)
+		return nil, fmt.Errorf("could not find config for %s", name)
 	}
 
 	return conn, nil

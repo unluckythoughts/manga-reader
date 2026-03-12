@@ -68,7 +68,13 @@ func (d *DB) GetBookByIDWithRelations(id uint, preload ...string) (*models.Book,
 	query := d.db
 
 	for _, p := range preload {
-		query = query.Preload(p)
+		if p == "Chapters" {
+			query = query.Preload("Chapters", func(db *gorm.DB) *gorm.DB {
+				return db.Order("CAST(number AS REAL) DESC")
+			})
+		} else {
+			query = query.Preload(p)
+		}
 	}
 
 	if err := query.First(&book, id).Error; err != nil {
@@ -155,6 +161,9 @@ func (d *DB) ListBooks(offset, limit int, bookType string, sourceID uint) ([]mod
 	if sourceID > 0 {
 		query = query.Where("source_id = ?", sourceID)
 	}
+
+	// preload source
+	query = query.Preload("Source")
 
 	if err := query.Find(&books).Error; err != nil {
 		return nil, 0, err

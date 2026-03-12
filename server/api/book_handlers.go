@@ -30,13 +30,16 @@ func (api *api) ListBooks(r web.Request) (any, error) {
 		return models.BooksPaginatedResponse{}, err
 	}
 
+	pagination := models.Pagination{
+		Page:  page,
+		Limit: limit,
+		Total: total,
+	}
+	pagination.CalculateTotalPages()
+
 	return models.BooksPaginatedResponse{
-		Items: books,
-		Pagination: models.Pagination{
-			Page:  page,
-			Limit: limit,
-			Total: total,
-		},
+		Items:      books,
+		Pagination: pagination,
 	}, nil
 }
 
@@ -47,5 +50,21 @@ func (api *api) GetBook(r web.Request) (any, error) {
 		return nil, err
 	}
 
-	return api.s.GetBookByID(uint(id))
+	book, err := api.s.GetBookByID(uint(id))
+	if err != nil {
+		return nil, err
+	}
+
+	if len(book.Chapters) > 0 || book.Synopsis != "" {
+		return book, nil
+	}
+
+	// If the book has no chapters and an empty synopsis,
+	// fetch the details from the source and update
+	err = api.s.UpdateBook(book)
+	if err != nil {
+		return nil, err
+	}
+
+	return book, nil
 }

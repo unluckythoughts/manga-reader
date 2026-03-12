@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/unluckythoughts/book-reader/server/connector"
 	"github.com/unluckythoughts/book-reader/server/models"
 )
 
@@ -24,6 +25,30 @@ func (s *ReaderService) GetChapters(page, limit int, bookID uint) ([]models.Chap
 // GetChapterByID retrieves a chapter by its ID
 func (s *ReaderService) GetChapterByID(id uint) (*models.Chapter, error) {
 	return s.db.GetChapterByIDWithRelations(id, "Book")
+}
+
+// UpdateChapter updates an existing chapter
+func (s *ReaderService) UpdateChapter(chapter *models.Chapter) error {
+	sourceID := chapter.Book.SourceID
+	src, err := s.db.GetSourceByID(sourceID)
+	if err != nil {
+		return err
+	}
+
+	conn, err := connector.GetConnector(src.Name)
+	if err != nil {
+		return err
+	}
+
+	// Use the connector to fetch the chapter details
+	content, err := conn.GetChapterContent(chapter.URL)
+	if err != nil {
+		return err
+	}
+	chapter.Content = content
+
+	// save chapter to database after fetching details
+	return s.db.UpdateChapter(chapter)
 }
 
 // CreateChapter creates a new chapter

@@ -131,11 +131,29 @@ func (c *BasicConnector) GetBooksAsync() (<-chan models.Book, error) {
 	return booksChan, nil
 }
 
-func (c *BasicConnector) GetBookChapters(bookURL, chapterNum string) ([]models.Chapter, error) {
+func (c *BasicConnector) GetBookSynopsis(bookURL string) (string, error) {
+	url := c.getCompleteURL(bookURL)
+	html, err := c.s.ScrapeHTML(url)
+	if err != nil {
+		return "", err
+	}
+
+	texts, err := scraper.GetText(html, c.conn.Selectors.Book.Synopsis)
+	if err != nil {
+		return "", err
+	}
+
+	synopsis := strings.Join(texts, "\n")
+
+	return synopsis, nil
+}
+
+func (c *BasicConnector) GetBookChapters(bookURL string) ([]models.Chapter, error) {
 	url := c.getCompleteURL(bookURL)
 	config := scraper.PaginationConfig{
 		NextPageSelector: c.conn.Selectors.Book.NextPage,
 	}
+
 	chapterItemsChan, err := c.s.ScrapePaginated(url, c.conn.Selectors.Book.ChapterListItem, config)
 	if err != nil {
 		return nil, err
@@ -147,19 +165,7 @@ func (c *BasicConnector) GetBookChapters(bookURL, chapterNum string) ([]models.C
 		if err != nil {
 			return nil, err
 		}
-
-		if chapterNum != "" {
-			result, err := utils.CompareNumbers(chapter.Number, chapterNum)
-			if err != nil {
-				return nil, err
-			}
-
-			if result > 0 {
-				chapters = append(chapters, chapter)
-			}
-		} else {
-			chapters = append(chapters, chapter)
-		}
+		chapters = append(chapters, chapter)
 	}
 
 	return chapters, nil

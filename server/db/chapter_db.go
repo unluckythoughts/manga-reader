@@ -183,7 +183,7 @@ func (d *DB) ListChapters(offset, limit int, bookID uint) ([]models.Chapter, err
 		query = query.Where("book_id = ?", bookID)
 	}
 
-	if err := query.Order("number ASC").Find(&chapters).Error; err != nil {
+	if err := query.Order("CAST(number AS DECIMAL) DESC").Find(&chapters).Error; err != nil {
 		return nil, err
 	}
 	return chapters, nil
