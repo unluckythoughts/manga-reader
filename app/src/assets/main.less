@@ -1,0 +1,220 @@
+// Global reset & base styles
+// Variables are injected by vite via additionalData
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: @font-base;
+  background-color: @bg-primary;
+  color: @text-primary;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: @accent;
+  text-decoration: none;
+  transition: color @transition-fast;
+
+  &:hover {
+    color: @accent-hover;
+    text-decoration: underline;
+  }
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  font-family: @font-base;
+}
+
+// ── Utility: page container ──────────────────────────────────────
+.page {
+  padding: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+// ── Utility: form elements ───────────────────────────────────────
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  label {
+    font-size: @fs-sm;
+    font-weight: 500;
+    color: @text-secondary;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 0.65rem 0.9rem;
+    background-color: @bg-input;
+    border: 1px solid @border-color;
+    border-radius: @radius-md;
+    color: @text-primary;
+    font-size: @fs-base;
+    outline: none;
+    transition: border-color @transition-fast;
+    width: 100%;
+
+    &:focus {
+      border-color: @accent;
+    }
+
+    &::placeholder {
+      color: @text-muted;
+    }
+  }
+}
+
+// ── Utility: buttons ─────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.4rem;
+  border: none;
+  border-radius: @radius-md;
+  font-size: @fs-base;
+  font-weight: 600;
+  transition: background-color @transition-fast, opacity @transition-fast;
+
+  &--primary {
+    background-color: @accent;
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      background-color: @accent-hover;
+    }
+  }
+
+  &--ghost {
+    background-color: transparent;
+    color: @text-secondary;
+    border: 1px solid @border-color;
+
+    &:hover:not(:disabled) {
+      background-color: @bg-card;
+      color: @text-primary;
+    }
+  }
+
+  &--danger {
+    background-color: transparent;
+    color: @accent;
+    border: 1px solid @accent;
+
+    &:hover:not(:disabled) {
+      background-color: @accent-muted;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ── Utility: error / empty states ────────────────────────────────
+.error-msg {
+  color: @accent;
+  font-size: @fs-sm;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.empty-state {
+  text-align: center;
+  color: @text-muted;
+  padding: 4rem 0;
+  font-size: @fs-lg;
+}
+
+// ── Utility: loading spinner ─────────────────────────────────────
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid @border-color;
+  border-top-color: @accent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 4rem auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Utility: badge ────────────────────────────────────────────────
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: @fs-xs;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  &--manga  { background-color: rgba(233, 69, 96, 0.2);  color: @accent; }
+  &--novel  { background-color: rgba(76, 175, 80, 0.2);  color: @success; }
+}
+
+// ── Pagination ────────────────────────────────────────────────────
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid @border-color;
+    border-radius: @radius-md;
+    font-size: @fs-sm;
+    font-weight: 600;
+    background-color: transparent;
+    color: @text-secondary;
+    cursor: pointer;
+    transition: background-color @transition-fast, color @transition-fast;
+
+    &:hover:not(:disabled) {
+      background-color: @bg-card;
+      color: @text-primary;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &--active {
+      background-color: @accent;
+      color: #fff;
+      border-color: @accent;
+    }
+  }
+}
