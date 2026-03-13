@@ -9,9 +9,13 @@ const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
 
-// Bootstrap auth before mounting so every component has a valid token from the start
-const authStore = useAuthStore()
-await (authStore.token ? authStore.fetchUser() : authStore.login('dummy@example.com', 'Dummy@example123'))
+async function bootstrap() {
+	// Bootstrap auth before mounting so every component has a valid token from the start.
+	const authStore = useAuthStore()
+	await (authStore.token ? authStore.fetchUser() : authStore.login('dummy@example.com', 'Dummy@example123'))
 
-app.use(router)
-app.mount('#app')
+	app.use(router)
+	app.mount('#app')
+}
+
+void bootstrap()

@@ -11,7 +11,7 @@ DOCKER_IMAGE=book-reader
 DOCKER_TAG=latest
 ENV_FILE=deploy/.env
 
-# 	if (Test-Path "$(UI_DIR)") { Set-Location "$(UI_DIR)"; npm i }
+# if (Test-Path "$(UI_DIR)") { Set-Location "$(UI_DIR)"; npm i }
 init:
 	go clean -modcache
 	go mod tidy
@@ -23,6 +23,12 @@ build:
 # Build locally for debugging
 build-local:
 	go build -gcflags="all=-N -l" -o book-reader.exe .
+
+# Build frontend into public and compile Windows executable
+build-exe:
+	if not exist public mkdir public
+	pushd app && npm install && npx vite build --outDir ../public && popd
+	go build -v -o book-reader.exe .
 
 # Run locally with debug output
 debug: build-local db-migrate

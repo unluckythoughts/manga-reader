@@ -8,7 +8,7 @@ import FavoritesView from '../views/FavoritesView.vue'
 import SourcesView from '../views/SourcesView.vue'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/app/'),
   routes: [
     { path: '/', redirect: '/books' },
     { path: '/login', component: LoginView },

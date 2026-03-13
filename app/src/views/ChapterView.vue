@@ -13,8 +13,8 @@
           v-if="chapter.book_id && chapter.book?.title"
           :to="`/books/${chapter.book_id}`"
         ) {{ chapter.book.title }}
-        span.chapter-nav__crumb-sep /
-        span {{ chapter.title || ' Chapter '+ chapter.number }}
+        span.chapter-nav__crumb-sep /&nbsp;
+        span {{ chapter.number + '. ' + chapter.title }}
       .chapter-nav__spacer
 
     .chapter-body
