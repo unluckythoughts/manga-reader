@@ -1,19 +1,38 @@
-# Build stage
-FROM golang:1.24-bookworm AS builder
+# Frontend stage
+FROM node:18-alpine AS frontend
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY app/package.json app/package-lock.json ./
+
+# Install dependencies with cache mount
+RUN --mount=type=cache,target=/root/.npm \
+		npm install
+
+# Copy frontend source code
+COPY app/ ./
+
+# Build the frontend
+RUN npm run build
+
+# Backend stage
+FROM golang:1.24-alpine AS backend
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     git \
     gcc \
-    sqlite3 \
-    libsqlite3-dev \
-    && rm -rf /var/lib/apt/lists/*
+    musl-dev \
+    sqlite \
+    sqlite-dev
 
 # Set working directory
 WORKDIR /app
 
 # Copy book-reader go mod files
-COPY book-reader/go.mod book-reader/go.sum ./
+COPY go.mod go.sum ./
 
 # Download dependencies with cache mount
 RUN --mount=type=cache,target=/go/pkg/mod \
@@ -21,48 +40,33 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
 # Copy book-reader source code
-COPY book-reader/ ./
+COPY . .
+
+# COPY static files from frontend stage
+COPY --from=frontend /app/dist ./public
 
 # Build the application with cache mount
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    CGO_ENABLED=1 GOOS=linux go build -o book-reader .
+    CGO_ENABLED=1 GOOS=linux go build -tags musl -o book-reader .
 
 # Runtime stage
-FROM debian:bookworm-slim
+FROM alpine:latest AS runtime
 
-# Install runtime dependencies including libraries needed for Chromium
-RUN apt-get update && apt-get install -y \
+# Install runtime dependencies
+RUN apk add --no-cache \
     ca-certificates \
     wget \
-    libglib2.0-0 \
-    libnss3 \
-    libnspr4 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libdrm2 \
-    libdbus-1-3 \
-    libxkbcommon0 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxrandr2 \
-    libgbm1 \
-    libpango-1.0-0 \
-    libcairo2 \
-    libasound2 \
-    libatspi2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+    sqlite-libs
 
 # Set working directory
 WORKDIR /app
 
-# Copy the binary from builder
-COPY --from=builder /app/book-reader .
+# Copy the binary from backend
+COPY --from=backend /app/book-reader .
 
 # Copy static files if they exist
-# COPY --from=builder /app/public ./public
+# COPY --from=frontend /app/dist ./public
 
 # Create directory for SQLite database
 RUN mkdir -p /app/data

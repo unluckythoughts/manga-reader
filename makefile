@@ -1,9 +1,24 @@
 .ONESHELL:
-SHELL = powershell.exe
-.SHELLFLAGS = -NoProfile -Command
+MAKEFLAGS += --no-print-directory
+
+ifeq ($(OS),Windows_NT)
+	SHELL = powershell.exe
+	.SHELLFLAGS = -NoProfile -Command
+	BINARY = book-reader.exe
+	RM = Remove-Item -ErrorAction SilentlyContinue
+	RUN_ARGS = $$env:LOG_LEVEL="debug"; $$env:AUTH_JWT_KEY="debug-secret-key-change-in-production"; 
+else
+	SHELL = /bin/bash
+	.SHELLFLAGS = -e -c
+	BINARY = book-reader
+	RM = rm -f
+	RUN_ARGS = LOG_LEVEL=debug AUTH_JWT_KEY=debug-secret-key-change-in-production 
+endif
+
+DOCKER_COMPOSE_FILE = deploy/docker-compose.yml
+DOCKER_COMPOSE = docker compose
 MIGRATIONS_FOLDER=$(PWD)/migrations
 DB_FILE=$(PWD)/data/book_reader.db
-MAKEFLAGS += --no-print-directory
 UI_DIR = book-reader-ui
 
 # Docker variables
@@ -11,7 +26,6 @@ DOCKER_IMAGE=book-reader
 DOCKER_TAG=latest
 ENV_FILE=deploy/.env
 
-# if (Test-Path "$(UI_DIR)") { Set-Location "$(UI_DIR)"; npm i }
 init:
 	go clean -modcache
 	go mod tidy
@@ -22,29 +36,35 @@ build:
 
 # Build locally for debugging
 build-local:
-	go build -gcflags="all=-N -l" -o book-reader.exe .
+	go build -gcflags="all=-N -l" -o $(BINARY) .
 
-# Build frontend into public and compile Windows executable
+# Build frontend into public and compile executable
 build-exe:
-	if not exist public mkdir public
-	pushd app && npm install && npx vite build --outDir ../public && popd
-	go build -v -o book-reader.exe .
+ifeq ($(OS),Windows_NT)
+	if (-not (Test-Path public)) { New-Item -ItemType Directory -Path public | Out-Null }
+	pushd app; npm install; npx vite build --outDir ../public; popd
+else
+	mkdir -p public
+	(cd app && npm install && npx vite build --outDir ../public)
+endif
+	go build -v -o $(BINARY) .
 
 # Run locally with debug output
 debug: build-local db-migrate
-	$$env:LOG_LEVEL="debug"; $$env:AUTH_JWT_KEY="debug-secret-key-change-in-production"; ./book-reader.exe
+	$(RUN_ARGS) ./$(BINARY)
+
 
 start: db-migrate
-	docker-compose -f deploy/docker-compose.yml up -d
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up --build -d
 
 stop:
-	docker-compose -f deploy/docker-compose.yml down -v
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down -v
 
 run: start
 
 # Docker stop and remove
 docker-down:
-	docker-compose -f deploy/docker-compose.yml down -v
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down -v
 
 # Run tests
 test:
@@ -80,6 +100,4 @@ db-migrate: flyway-run
 
 # Clean build artifacts
 clean:
-	Remove-Item -ErrorAction SilentlyContinue book-reader.exe
-	Remove-Item -ErrorAction SilentlyContinue coverage.out
-	Remove-Item -ErrorAction SilentlyContinue coverage.html
+	$(RM) $(BINARY), coverage.out, coverage.html
