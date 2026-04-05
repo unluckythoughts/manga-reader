@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 	"github.com/unluckythoughts/book-reader/client"
+	"github.com/unluckythoughts/go-microservice/v2/tools/db"
 	"github.com/unluckythoughts/go-microservice/v2/tools/logger"
-	"github.com/unluckythoughts/go-microservice/v2/tools/psql"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -28,7 +28,7 @@ func getLogger() *zap.Logger {
 }
 
 func getDB(l *zap.Logger) *gorm.DB {
-	return psql.New(psql.Options{
+	return db.New(db.Options{
 		Logger:   l,
 		Host:     "localhost",
 		Port:     5432,

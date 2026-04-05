@@ -27,8 +27,6 @@ func (s *ServiceWorker) registerTasks(opts *JOB_OPTIONS) {
 	s.w.RunInBackground("check_sources", s.checkDBSources)
 	// Initial delay before first run of updateSources
 	time.Sleep(2 * time.Second)
-	// Run updateSources once at startup
-	s.w.RunInBackground("update_sources", s.updateSources)
 }
 
 func New(w *worker.Worker, db *db.DB) *ServiceWorker {

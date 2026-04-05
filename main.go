@@ -37,7 +37,6 @@ func main() {
 	opts := microservice.Options{
 		Name:           "book-reader",
 		EnableDB:       true,
-		DBType:         microservice.DBTypeSqlite,
 		ProxyTransport: proxyTransport,
 	}
 	s := microservice.New(opts)
