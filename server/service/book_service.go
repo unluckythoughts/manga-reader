@@ -12,6 +12,13 @@ func (s *ReaderService) GetBooks(page, limit int, search, bookType string, sourc
 	return s.db.ListBooks(offset, limit, bookType, search, sourceID)
 }
 
+// GetReaderBooks retrieves a paginated list of books with optional filters
+func (s *ReaderService) GetReaderBooks(page, limit int, search, bookType string, sourceID, userID uint) ([]models.Book, int64, error) {
+	offset := (page - 1) * limit
+
+	return s.db.ListReaderBooks(offset, limit, bookType, search, sourceID, userID)
+}
+
 // GetBookByID retrieves a book by its ID
 func (s *ReaderService) GetBookByID(id uint) (*models.Book, error) {
 	return s.db.GetBookByIDWithRelations(id, "Source", "Chapters")

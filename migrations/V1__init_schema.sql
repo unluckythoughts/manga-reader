@@ -45,23 +45,13 @@ CREATE TABLE IF NOT EXISTS sources (
 
 CREATE TABLE IF NOT EXISTS favorites (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id     INTEGER,
-  book_id     INTEGER,
+  user_id     INTEGER UNIQUE NOT NULL,
+  data        JSONB,
   progress    TEXT,
-  categories  TEXT,
   created_at  DATETIME NOT NULL,
   updated_at  DATETIME NOT NULL,
   deleted_at  DATETIME,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (book_id) REFERENCES books(id)
-);
-
-CREATE TABLE IF NOT EXISTS categories (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  name        TEXT,
-  created_at  DATETIME NOT NULL,
-  updated_at  DATETIME NOT NULL,
-  deleted_at  DATETIME
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS users (

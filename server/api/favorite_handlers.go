@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/unluckythoughts/book-reader/server/models"
 	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
@@ -10,39 +9,17 @@ import (
 )
 
 func (api *api) ListFavorites(r web.Request) (any, error) {
-	pageSize := r.GetURLParam("limit")
-	pageNumber := r.GetURLParam("page")
-
 	user, err := auth.GetAuthenticatedUser(r)
 	if err != nil {
 		return nil, web.NewError(http.StatusUnauthorized, err)
 	}
 
-	limit, err := strconv.Atoi(pageSize)
-	if err != nil || limit <= 0 {
-		limit = 20 // default limit
-	}
-	page, err := strconv.Atoi(pageNumber)
-	if err != nil || page <= 0 {
-		page = 1 // default page
-	}
-
-	favorites, total, err := api.s.GetFavorites(page, limit, user.ID)
+	fav, err := api.s.GetFavoriteByUserID(user.ID)
 	if err != nil {
-		return models.FavoritesPaginatedResponse{}, err
+		return nil, err
 	}
 
-	pagination := models.Pagination{
-		Page:  page,
-		Limit: limit,
-		Total: total,
-	}
-	pagination.CalculateTotalPages()
-
-	return models.FavoritesPaginatedResponse{
-		Items:      favorites,
-		Pagination: pagination,
-	}, nil
+	return fav, nil
 }
 
 func (api *api) GetFavorite(r web.Request) (any, error) {
@@ -51,13 +28,7 @@ func (api *api) GetFavorite(r web.Request) (any, error) {
 		return nil, web.NewError(http.StatusUnauthorized, err)
 	}
 
-	idText := r.GetRouteParam("id")
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		return nil, err
-	}
-
-	return api.s.GetFavoriteByID(uint(id), user.ID)
+	return api.s.GetFavoriteByUserID(user.ID)
 }
 
 func (api *api) CreateFavorite(r web.Request) (any, error) {
@@ -66,14 +37,12 @@ func (api *api) CreateFavorite(r web.Request) (any, error) {
 		return nil, web.NewError(http.StatusUnauthorized, err)
 	}
 
-	body := models.CreateFavoriteRequest{}
+	body := models.AddFavoriteRequest{}
 	if err := r.GetValidatedBody(&body); err != nil {
 		return nil, err
 	}
 
-	body.UserID = user.ID
-
-	return api.s.CreateFavorite(&body)
+	return api.s.CreateFavorite(&body, user.ID)
 }
 
 func (api *api) UpdateFavorite(r web.Request) (any, error) {
@@ -82,18 +51,12 @@ func (api *api) UpdateFavorite(r web.Request) (any, error) {
 		return nil, web.NewError(http.StatusUnauthorized, err)
 	}
 
-	idText := r.GetRouteParam("id")
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		return nil, err
-	}
-
-	body := models.UpdateFavoriteRequest{}
+	body := models.AddFavoriteRequest{}
 	if err := r.GetValidatedBody(&body); err != nil {
 		return nil, err
 	}
 
-	return api.s.UpdateFavorite(uint(id), user.ID, &body)
+	return api.s.UpdateFavorite(user.ID, &body)
 }
 
 func (api *api) UpdateFavoriteProgress(r web.Request) (any, error) {
@@ -102,26 +65,20 @@ func (api *api) UpdateFavoriteProgress(r web.Request) (any, error) {
 		return nil, web.NewError(http.StatusUnauthorized, err)
 	}
 
-	idText := r.GetRouteParam("id")
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		return nil, err
-	}
-
 	body := models.UpdateFavoriteProgressRequest{}
 	if err := r.GetValidatedBody(&body); err != nil {
 		return nil, err
 	}
 
-	progress := models.NewList([]string{
-		strconv.Itoa(body.Chapter),
-		strconv.Itoa(body.Level),
-	})
-	updatedBody := models.UpdateFavoriteRequest{
-		Progress: progress.String(),
+	var p models.Progress
+	p.ScanValue(body.Chapter, body.Level)
+
+	updates := models.AddFavoriteRequest{
+		BookID:   body.BookID,
+		Progress: string(p),
 	}
 
-	return api.s.UpdateFavorite(uint(id), user.ID, &updatedBody)
+	return api.s.UpdateFavorite(user.ID, &updates)
 }
 
 func (api *api) DeleteFavorite(r web.Request) (any, error) {
@@ -130,11 +87,5 @@ func (api *api) DeleteFavorite(r web.Request) (any, error) {
 		return nil, web.NewError(http.StatusUnauthorized, err)
 	}
 
-	idText := r.GetRouteParam("id")
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, api.s.DeleteFavorite(uint(id), user.ID)
+	return nil, api.s.DeleteFavoriteByUserID(user.ID)
 }

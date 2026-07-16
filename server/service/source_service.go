@@ -19,6 +19,23 @@ func (s *ReaderService) GetSources(page, limit int) ([]models.Source, int64, err
 	return sources, total, nil
 }
 
+// GetReaderSources retrieves a paginated list of sources for the reader
+func (s *ReaderService) GetReaderSources(page, limit int, userID uint) ([]models.Source, int64, error) {
+	offset := (page - 1) * limit
+
+	sources, err := s.db.ListReaderSources(offset, limit, userID)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	total, err := s.db.CountReaderSources(userID)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return sources, total, nil
+}
+
 // GetSourceByID retrieves a source by its ID
 func (s *ReaderService) GetSourceByID(id uint) (*models.Source, error) {
 	return s.db.GetSourceByID(id)

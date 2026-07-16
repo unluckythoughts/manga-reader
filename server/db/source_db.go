@@ -132,6 +132,28 @@ func (d *DB) ListSources(offset, limit int) ([]models.Source, error) {
 	return sources, nil
 }
 
+// ListReaderSources retrieves all sources with pagination
+func (d *DB) ListReaderSources(offset, limit int, userID uint) ([]models.Source, error) {
+	var sources []models.Source
+	query := d.db.Offset(offset)
+
+	if limit > 0 {
+		query = query.Limit(limit)
+	}
+
+	var fav models.Favorite
+	if err := d.db.Model(&fav).Where("user_id = ?", userID).Error; err != nil {
+		return nil, err
+	}
+
+	sourceIDs := fav.Data.Sources
+	if err := query.Where("id IN ?", sourceIDs).Order("name ASC").Find(&sources).Error; err != nil {
+		return nil, err
+	}
+
+	return sources, nil
+}
+
 // ListSourcesWithRelations retrieves all sources with related data
 func (d *DB) ListSourcesWithRelations(offset, limit int, preload ...string) ([]models.Source, error) {
 	var sources []models.Source
@@ -160,10 +182,29 @@ func (d *DB) CountSources() (int64, error) {
 	return count, nil
 }
 
+// CountReaderSources returns the total number of sources for a specific reader
+func (d *DB) CountReaderSources(userID uint) (int64, error) {
+	var fav models.Favorite
+	if err := d.db.Model(&fav).Where("user_id = ?", userID).Error; err != nil {
+		return 0, err
+	}
+	return int64(len(fav.Data.Sources)), nil
+}
+
 // GetAllSources retrieves all sources without pagination
 func (d *DB) GetAllSources() ([]models.Source, error) {
 	var sources []models.Source
 	if err := d.db.Order("name ASC").Find(&sources).Error; err != nil {
+		return nil, err
+	}
+	return sources, nil
+}
+
+
+// GetSourcesByIDs retrieves sources by their IDs
+func (d *DB) GetSourcesByIDs(sourceIDs []uint) ([]models.Source, error) {
+	var sources []models.Source
+	if err := d.db.Where("id IN ?", sourceIDs).Order("name ASC").Find(&sources).Error; err != nil {
 		return nil, err
 	}
 	return sources, nil

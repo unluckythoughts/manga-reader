@@ -40,6 +40,15 @@ func (d *DB) GetBookByID(id uint) (*models.Book, error) {
 	return &book, nil
 }
 
+// GetBooksByIDs retrieves a book by its ID
+func (d *DB) GetBooksByIDs(ids []uint) ([]models.Book, error) {
+	var books []models.Book
+	if err := d.db.Where("id IN ?", ids).Find(&books).Error; err != nil {
+		return nil, err
+	}
+	return books, nil
+}
+
 // CheckBookExists checks if a book exists by source ID and book URL
 func (d *DB) CheckBookExists(sourceID uint, bookURL string) (bool, error) {
 	var count int64
@@ -175,6 +184,67 @@ func (d *DB) ListBooks(offset, limit int, bookType, search string, sourceID uint
 	if sourceID > 0 {
 		countQuery = countQuery.Where("source_id = ?", sourceID)
 	}
+	if search != "" {
+		countQuery = countQuery.Where("title LIKE ?", "%"+search+"%")
+	}
+
+	// Get total count
+	if err := countQuery.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Build query for fetching records
+	query := d.db.Offset(offset)
+	if limit > 0 {
+		query = query.Limit(limit)
+	}
+	if bookType != "" {
+		query = query.Where("type = ?", bookType)
+	}
+	if sourceID > 0 {
+		query = query.Where("source_id = ?", sourceID)
+	}
+
+	// preload source
+	query = query.Preload("Source")
+
+	if search != "" {
+		query = query.Where("title LIKE ?", "%"+search+"%")
+	}
+
+	if err := query.Find(&books).Error; err != nil {
+		return nil, 0, err
+	}
+	return books, total, nil
+}
+
+// ListReaderBooks retrieves all books with optional filters and returns total count for a specific user
+func (d *DB) ListReaderBooks(offset, limit int, bookType, search string, sourceID, userID uint) ([]models.Book, int64, error) {
+	var books []models.Book
+	var total int64
+
+	// Build base query for counting
+	countQuery := d.db.Model(&models.Book{})
+	if bookType != "" {
+		countQuery = countQuery.Where("type = ?", bookType)
+	}
+	if sourceID > 0 {
+		countQuery = countQuery.Where("source_id = ?", sourceID)
+	} else {
+		// If sourceID is not provided, filter books based on user's favorite sources
+		var favoriteSources []uint
+		err := d.db.Model(&models.Favorite{}).Where("user_id = ?", userID).Pluck("data->'sources'", &favoriteSources).Error
+		if err != nil {
+			return nil, 0, err
+		}
+		if len(favoriteSources) > 0 {
+			countQuery = countQuery.Where("source_id IN ?", favoriteSources)
+		} else {
+			// If the user has no favorite sources, return empty result
+			return []models.Book{}, 0, nil
+		}
+	}
+
 	if search != "" {
 		countQuery = countQuery.Where("title LIKE ?", "%"+search+"%")
 	}

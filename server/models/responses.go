@@ -1,6 +1,8 @@
 package models
 
-import "github.com/unluckythoughts/go-microservice/v2/tools/auth"
+import (
+	"github.com/unluckythoughts/go-microservice/v2/tools/auth"
+)
 
 // PaginatedResponse represents a paginated API response
 type PaginatedResponse struct {
@@ -41,14 +43,15 @@ type UsersPaginatedResponse struct {
 	Pagination Pagination  `json:"pagination"`
 }
 
-type CategoriesPaginatedResponse struct {
-	Items      []Category `json:"items"`
-	Pagination Pagination `json:"pagination"`
+type FavoriteBookValue struct {
+	Book     Book     `json:"book"`
+	Progress Progress `json:"progress"`
 }
 
-type FavoritesPaginatedResponse struct {
-	Items      []Favorite `json:"items"`
-	Pagination Pagination `json:"pagination"`
+type FavoriteResponse struct {
+	Sources  []Source                   `json:"sources"`
+	Books    map[uint]FavoriteBookValue `json:"books"`
+	Settings map[string]string          `json:"settings"`
 }
 
 type ChaptersPaginatedResponse struct {

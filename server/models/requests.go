@@ -32,24 +32,18 @@ type CreateChapterRequest struct {
 	OtherID    string `json:"other_id,omitempty"`
 }
 
-// CreateFavoriteRequest represents the request body for creating a favorite
-type CreateFavoriteRequest struct {
-	UserID     uint   `json:"user_id,omitempty"`
-	BookID     uint   `json:"book_id" valid:"required"`
-	Progress   string `json:"progress,omitempty"`
-	Categories string `json:"categories,omitempty"`
-}
-
-// UpdateFavoriteRequest represents the request body for updating a favorite
-type UpdateFavoriteRequest struct {
-	Progress   string `json:"progress,omitempty"`
-	Categories string `json:"categories,omitempty"`
+// AddFavoriteRequest represents the request body for adding data to user favorite
+type AddFavoriteRequest struct {
+	SourceID uint   `json:"source_id" valid:"required"`
+	BookID   uint   `json:"book_id" valid:"required"`
+	Progress string `json:"progress,omitempty"`
 }
 
 // UpdateFavoriteProgressRequest represents the request body for updating a favorite's progress
 type UpdateFavoriteProgressRequest struct {
-	Chapter int `json:"chapter" valid:"required,numeric,min=1"`
-	Level   int `json:"level" valid:"optional,numeric,min=0"`
+	BookID  uint   `json:"book_id" valid:"required"`
+	Chapter string `json:"chapter" valid:"required"`
+	Level   int    `json:"level" valid:"optional,numeric,min=0"`
 }
 
 // CreateCategoryRequest represents the request body for creating a category

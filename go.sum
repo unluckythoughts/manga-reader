@@ -382,8 +382,8 @@ github.com/tonistiigi/units v0.0.0-20180711220420-6950e57a87ea h1:SXhTLE6pb6eld/
 github.com/tonistiigi/units v0.0.0-20180711220420-6950e57a87ea/go.mod h1:WPnis/6cRcDZSUvVmezrxJPkiO87ThFYsoUiMwWNDJk=
 github.com/tonistiigi/vt100 v0.0.0-20240514184818-90bafcd6abab h1:H6aJ0yKQ0gF49Qb2z5hI1UHxSQt4JMyxebFR15KnApw=
 github.com/tonistiigi/vt100 v0.0.0-20240514184818-90bafcd6abab/go.mod h1:ulncasL3N9uLrVann0m+CDlJKWsIAP34MPcOJF6VRvc=
-github.com/unluckythoughts/go-microservice/v2 v2.11.1 h1:FMhdKdJHjslaL3kqpk/Zd01iKB+zsFxSN27EUwGYq6o=
-github.com/unluckythoughts/go-microservice/v2 v2.11.1/go.mod h1:2Gp/kGk2FcEBPvITvAul/pijOYJOgH73uszZZ7bJdNA=
+github.com/unluckythoughts/go-microservice/v2 v2.12.2 h1:r5IuCLLpJgwozfKIrfb8INXtHBZ261piIi27BOQX4lc=
+github.com/unluckythoughts/go-microservice/v2 v2.12.2/go.mod h1:K7BnwR4eW0WXojGJ9nJYpPAm7vtsqcB+qvAUN7M6vJc=
 github.com/unluckythoughts/go-scraper v0.1.29 h1:ZHYezkzZQ+Pnv+EoTLc/OkzChljZ+mkutdtSUh4dNGs=
 github.com/unluckythoughts/go-scraper v0.1.29/go.mod h1:3mKej8JX8kUjEIGHj/7qo+QRs8NQLO4c1CYMZZ3QL3c=
 github.com/wagslane/go-rabbitmq v0.15.0 h1:KibShYLLeDYc3C5fnx+BjiHJLJdL6D5/BysgcRJknRE=

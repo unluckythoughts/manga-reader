@@ -1,8 +1,6 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/unluckythoughts/book-reader/server/db"
 	"github.com/unluckythoughts/book-reader/server/models"
 	"github.com/unluckythoughts/book-reader/server/service"
@@ -22,10 +20,35 @@ type api struct {
 
 // registerRoutes registers all API routes
 func (a *api) registerRoutes(router web.Router) {
+
+	// List sources route is public and does not require authentication
+	// it retrieves a list of sources
+	router.GET("/api/v1/public/sources", a.ListSources)
+
+	// Get source route is public and does not require authentication
+	// it retrieves a source by ID
+	router.GET("/api/v1/public/sources/:id", a.GetSource)
+
+	// List books route is public and does not require authentication in most cases,
+	// it retrieves a paginated list of books
+	// it supports filtering by book type, and source ID
+	router.GET("/api/v1/public/books", a.ListBooks)
+
+	// Get book route is public and does not require authentication
+	// it retrieves a book by ID
+	router.GET("/api/v1/public/books/:id", a.GetBook)
+
+	// List chapters route is public and does not require authentication
+	// it retrieves a paginated list of chapters for a book
+	// it supports filtering by book ID
+	router.GET("/api/v1/public/chapters", a.ListChapters)
+
+	// Get chapter route is public and does not require authentication
+	// it retrieves a chapter by ID
+	router.GET("/api/v1/public/chapters/:id", a.GetChapter)
+
 	if a.EnableAuth {
-		// Auth API
-		router.POST("/api/v1/auth/register", a.a.GetRegisterHandlerForUserRole(models.UserRole))
-		router.POST("/api/v1/auth/logout", a.a.LogoutHandler)
+		auth.RegisterAuthRoutes(router, "/api/v1", a.a, models.UserRole)
 
 		// Check if Google OAuth is configured
 		if a.a.GoogleOauthConfig.ClientID != "" && a.a.GoogleOauthConfig.ClientSecret != "" {
@@ -33,70 +56,30 @@ func (a *api) registerRoutes(router web.Router) {
 			router.POST("/api/v1/oauth/login/google", a.a.GoogleOAuthLogin)
 		}
 
-		// Verification API
-		router.PATCH("/api/v1/auth/verify/:target", a.a.SendTokenHandler)
-		router.GET("/api/v1/auth/verify/:target/:token", a.a.VerifyTokenHandler)
-
-		// User API
-		router.PUT("/api/v1/user", a.a.UpdateUserHandler)
-		router.PATCH("/api/v1/user/change-password", a.a.ChangePasswordHandler)
-		router.GET("/api/v1/user/reset-password", a.a.ResetPasswordHandler)
-		router.PATCH("/api/v1/user/update-password", a.a.UpdatePasswordHandler)
-
 		// Protect Reader API routes
 		router.UseFor("/api/v1/reader/", a.a.GetAuthMiddleware())
-	} else {
-		// If auth is disabled, create a dummy user and set it in the context for all requests
-		_, err := a.a.GetUserByEmail("dummy@example.com")
-		if err != nil {
-			// panic(fmt.Sprintf("failed to get dummy user with err: %+v", err))
-			err = a.a.CreateUser(&auth.User{
-				Name:     "dummy",
-				Email:    "dummy@example.com",
-				Password: "Dummy@example123", // In a real application, use a secure password and hash it
-				Role:     models.AdminRole,   // Assign admin role for testing purposes
-			})
-			if err != nil {
-				panic(fmt.Sprintf("failed to create dummy user with err: %+v", err))
-			}
-		}
+		
+		// List sources route is protected and requires authentication
+		// it retrieves a list of sources for the authenticated user
+		router.GET("/api/v1/reader/sources", a.ListReaderSources)
 
-		// Protect favorites API routes
-		router.UseFor("/api/v1/reader/favorites", a.a.GetAuthMiddleware())
+		// List books route is protected and requires authentication
+		// it retrieves a paginated list of books for the authenticated user
+		// it supports filtering by search, book type, and source ID
+		router.GET("/api/v1/reader/books", a.SearchReaderBooks)
+		
+		// Get Favorite route is protected and requires authentication
+		// it retrieves all favorites for the authenticated user
+		router.GET("/api/v1/reader/favorites", a.GetFavorite)
+
+		// Create, Update, and Delete Favorite routes are protected and require authentication
+		// they allow the authenticated user to create, update, and delete favorite sources and books
+		// they support creating and updating favorites with progress tracking
+		router.POST("/api/v1/reader/favorites", a.CreateFavorite)
+		router.PUT("/api/v1/reader/favorites", a.UpdateFavorite)
+		router.PATCH("/api/v1/reader/favorites", a.UpdateFavoriteProgress)
+		router.DELETE("/api/v1/reader/favorites", a.DeleteFavorite)
 	}
-
-	router.UseFor("/api/v1/user", a.a.GetAuthMiddleware())
-
-	// User API
-	router.POST("/api/v1/auth/login", a.a.LoginHandler)
-	router.GET("/api/v1/user", a.a.GetUserHandler)
-
-	// Books API
-	router.GET("/api/v1/reader/books", a.ListBooks)
-	router.GET("/api/v1/reader/books/:id", a.GetBook)
-
-	// Chapters API
-	router.GET("/api/v1/reader/chapters", a.ListChapters)
-	router.GET("/api/v1/reader/chapters/:id", a.GetChapter)
-
-	// Sources API
-	router.GET("/api/v1/reader/sources", a.ListSources)
-	router.GET("/api/v1/reader/sources/:id", a.GetSource)
-
-	// Categories API
-	router.GET("/api/v1/reader/categories", a.ListCategories)
-	router.GET("/api/v1/reader/categories/:id", a.GetCategory)
-	router.POST("/api/v1/reader/categories", a.CreateCategory)
-	router.PUT("/api/v1/reader/categories/:id", a.UpdateCategory)
-	router.DELETE("/api/v1/reader/categories/:id", a.DeleteCategory)
-
-	// Favorites API
-	router.GET("/api/v1/reader/favorites", a.ListFavorites)
-	router.GET("/api/v1/reader/favorites/:id", a.GetFavorite)
-	router.POST("/api/v1/reader/favorites", a.CreateFavorite)
-	router.PUT("/api/v1/reader/favorites/:id", a.UpdateFavorite)
-	router.PATCH("/api/v1/reader/favorites/:id", a.UpdateFavoriteProgress)
-	router.DELETE("/api/v1/reader/favorites/:id", a.DeleteFavorite)
 }
 
 func Register(router web.Router, gormDB *gorm.DB, l *zap.Logger, w *worker.Worker) {
