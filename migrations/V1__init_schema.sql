@@ -65,19 +65,21 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 CREATE TABLE IF NOT EXISTS users (
-  id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-  name                TEXT NOT NULL,
-  email               TEXT,
-  email_verified      BOOLEAN NOT NULL DEFAULT FALSE,
-  mobile              TEXT,
-  mobile_verified     BOOLEAN NOT NULL DEFAULT FALSE,
-  password            TEXT NOT NULL,
-  role                INTEGER NOT NULL DEFAULT 1,
-  google_id           TEXT,
-  google_avatar       TEXT,
-  created_at          DATETIME NOT NULL,
-  updated_at          DATETIME NOT NULL,
-  deleted_at          DATETIME
+  id                  		INTEGER PRIMARY KEY AUTOINCREMENT,
+  name                		TEXT NOT NULL,
+  email               		TEXT,
+  email_verified      		BOOLEAN NOT NULL DEFAULT FALSE,
+  mobile              		TEXT,
+  mobile_verified     		BOOLEAN NOT NULL DEFAULT FALSE,
+  password            		TEXT NOT NULL,
+  role                		INTEGER NOT NULL DEFAULT 1,
+  google_id           		TEXT,
+  google_avatar       		TEXT,
+	google_refresh_token 		TEXT,
+	google_token_expires_at DATETIME,
+  created_at          		DATETIME NOT NULL,
+  updated_at          		DATETIME NOT NULL,
+  deleted_at          		DATETIME
 );
 CREATE INDEX IF NOT EXISTS idx_users_deleted_at ON users(deleted_at);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);

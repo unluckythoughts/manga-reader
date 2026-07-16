@@ -1,22 +1,3 @@
-# Frontend stage
-FROM node:18-alpine AS frontend
-
-# Set working directory
-WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY app/package.json app/package-lock.json ./
-
-# Install dependencies with cache mount
-RUN --mount=type=cache,target=/root/.npm \
-		npm install
-
-# Copy frontend source code
-COPY app/ ./
-
-# Build the frontend
-RUN npm run build
-
 # Backend stage
 FROM golang:1.26-alpine AS backend
 
@@ -42,9 +23,6 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 # Copy book-reader source code
 COPY . .
 
-# COPY static files from frontend stage
-COPY --from=frontend /app/dist ./public
-
 # Build the application with cache mount
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
@@ -64,10 +42,6 @@ WORKDIR /app
 
 # Copy the binary from backend
 COPY --from=backend /app/book-reader .
-
-# Copy static files if they exist
-# COPY --from=frontend /app/dist ./public
-
 # Create directory for SQLite database
 RUN mkdir -p /app/data
 
